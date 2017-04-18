@@ -1,0 +1,22 @@
+.mb-field-desc{
+  font-style: italic;
+}
+
+.mb-field-row{
+  margin-bottom:20px;
+}
+
+.mb-option-row{
+  margin-bottom:5px;
+}
+
+.mb-admin-label{
+  display: block;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.mb-admin-label.inline{
+  display: inline-block;
+  width: 200px;
+}
