@@ -1,8 +1,8 @@
 <?php
 
-
 class CargonizerAdmin{
   public $Options;
+
 
   function __construct(){
     add_action( 'admin_menu', array($this, 'createSubmenu' ) );
@@ -11,7 +11,7 @@ class CargonizerAdmin{
 
 
   function createSubmenu() {
-    $page = add_submenu_page('woocommerce', __( 'Cargonizer', MB_LANG ), __( 'Cargonizer', MB_LANG ), apply_filters( 'woocommerce_csv_product_role', 'manage_woocommerce' ), WCC_Admin, array( $this, 'adminPage') );
+    $page = add_submenu_page('woocommerce', __( 'Cargonizer', 'wc-cargonizer' ), __( 'Cargonizer', 'wc-cargonizer' ), apply_filters( 'woocommerce_csv_product_role', 'manage_woocommerce' ), WCC_Admin, array( $this, 'adminPage') );
   }
 
 
@@ -24,9 +24,11 @@ class CargonizerAdmin{
     <div class="wrap woocommerce">
       <div class="icon32" id="icon-woocommerce-importer"><br></div>
       <h2 class="nav-tab-wrapper woo-nav-tab-wrapper">
-      <a href="<?php echo admin_url('admin.php?page='.WCC_Admin.'&tab=apiPage') ?>" class="nav-tab <?php echo ($tab == 'import') ? 'nav-tab-active' : ''; ?>"><?php _e('API', MB_LANG); ?></a>
-      <a href="<?php echo admin_url('admin.php?page='.WCC_Admin.'&tab=generalPage') ?>" class="nav-tab <?php echo ($tab == 'import') ? 'nav-tab-active' : ''; ?>"><?php _e('General', MB_LANG); ?></a>
-      <a href="<?php echo admin_url('admin.php?page='.WCC_Admin.'&tab=parcelPage'); ?>" class="nav-tab <?php echo ($tab == 'licence') ? 'nav-tab-active' : ''; ?>"><?php _e('Parcel', MB_LANG); ?></a>
+      <a href="<?php echo admin_url('admin.php?page='.WCC_Admin.'&tab=apiPage') ?>" class="nav-tab <?php echo ($tab == 'apiPage') ? 'nav-tab-active' : ''; ?>"><?php _e('API', 'wc-cargonizer'); ?></a>
+      <a href="<?php echo admin_url('admin.php?page='.WCC_Admin.'&tab=generalPage') ?>" class="nav-tab <?php echo ($tab == 'generalPage') ? 'nav-tab-active' : ''; ?>"><?php _e('General', 'wc-cargonizer'); ?></a>
+      <a href="<?php echo admin_url('admin.php?page='.WCC_Admin.'&tab=parcelPage'); ?>" class="nav-tab <?php echo ($tab == 'parcelPage') ? 'nav-tab-active' : ''; ?>"><?php _e('Parcel', 'wc-cargonizer'); ?></a>
+      <a href="<?php echo admin_url('admin.php?page='.WCC_Admin.'&tab=notificationPage'); ?>" class="nav-tab <?php echo ($tab == 'notificationPage') ? 'nav-tab-active' : ''; ?>"><?php _e('Notification', 'wc-cargonizer'); ?></a>
+      <a href="<?php echo admin_url('admin.php?page='.WCC_Admin.'&tab=addressPage'); ?>" class="nav-tab <?php echo ($tab == 'addressPage') ? 'nav-tab-active' : ''; ?>"><?php _e('Address', 'wc-cargonizer'); ?></a>
       </h2>
       <?php self::$tab(); ?>
     </div>
@@ -35,22 +37,18 @@ class CargonizerAdmin{
 
 
 	public static function apiPage(){
-    ?>
-    <?php if ( isset($_POST['update']) ): ?>
-      <div id="message" class="updated woocommerce-message wc-connect">
-        <div class="squeezer">
-          <?php CargonizerOptions::updateApiSettings(); ?>
-          <h4><strong><?php _e( 'API settings updated', MB_LANG ); ?></strong></h4>
-        </div>
-      </div>
-    <?php endif; ?>
 
+    if ( isset($_POST['update']) ){
+      CargonizerOptions::updateApiSettings();
+      $this->showUpdateMessage ( __( 'API settings updated', 'wc-cargonizer' ) );
+    }
+    ?>
     <div class="tool-box">
       <form action="" method="POST">
-        <h3 class="title"><?php _e('API setttings', MB_LANG); ?></h3>
+        <h3 class="title"><?php _e('API setttings', 'wc-cargonizer'); ?></h3>
         <input type="hidden" name="update" value="1">
         <?php CargonizerOptions::getApiSettings(); ?>
-        <p><input type="submit" class="button" value="<?php _e('update', MB_LANG ); ?>"></p>
+        <p><input type="submit" class="button" value="<?php _e('update', 'wc-cargonizer' ); ?>"></p>
       </form>
     </div>
     <?php
@@ -58,22 +56,20 @@ class CargonizerAdmin{
 
 
   function generalPage(){?>
-    <?php if ( isset($_POST['update']) ): ?>
-    <div id="message" class="updated woocommerce-message wc-connect">
-      <div class="squeezer">
-        <?php CargonizerOptions::updateGeneralSettings(); ?>
-        <?php $this->Options->init(); ?>
-        <h4><?php _e( '<strong>API settings updated</strong> ', MB_LANG ); ?></h4>
-      </div>
-    </div>
-    <?php endif; ?>
+    <?php
+      if ( isset($_POST['update']) ){
+        CargonizerOptions::updateGeneralSettings();
+        $this->Options->init();
+        $this->showUpdateMessage ( __( 'API settings updated', 'wc-cargonizer' ) );
+      }
+    ?>
 
     <div class="tool-box">
       <form action="" method="POST">
-        <h3 class="title"><?php _e('General setttings', MB_LANG); ?></h3>
+        <h3 class="title"><?php _e('General setttings', 'wc-cargonizer'); ?></h3>
         <input type="hidden" name="update" value="1">
         <?php $this->Options->getGeneralSettings(); ?>
-        <p><input type="submit" class="button" value="<?php _e('update', MB_LANG ); ?>"></p>
+        <p><input type="submit" class="button" value="<?php _e('update', 'wc-cargonizer' ); ?>"></p>
       </form>
     </div>
     <?php
@@ -81,23 +77,80 @@ class CargonizerAdmin{
 
 
   function parcelPage(){?>
-    <?php if ( isset($_POST['update']) ): ?>
-    <div id="message" class="updated woocommerce-message wc-connect">
-      <div class="squeezer">
-        <?php CargonizerOptions::updateOptions('Parcel'); ?>
-        <?php $this->Options->init(); ?>
-        <h4><strong><?php _e( 'API settings updated', MB_LANG ); ?></strong></h4>
-      </div>
-    </div>
-    <?php endif; ?>
+    <?php
+      if ( isset($_POST['update']) ){
+        CargonizerOptions::updateOptions('Parcel');
+        $this->Options->init();
+        $this->showUpdateMessage ( __( 'Parcel settings updated', 'wc-cargonizer' ) );
+      }
+    ?>
 
     <div class="tool-box">
       <form action="" method="POST">
-        <h3 class="title"><?php _e('Default package size', MB_LANG); ?></h3>
+        <h3 class="title"><?php _e('Default package size', 'wc-cargonizer'); ?></h3>
         <input type="hidden" name="update" value="1">
         <?php $this->Options->getParcelOptions(); ?>
-        <p><input type="submit" class="button" value="<?php _e('update', MB_LANG ); ?>"></p>
+        <p><input type="submit" class="button" value="<?php _e('update', 'wc-cargonizer' ); ?>"></p>
       </form>
+    </div>
+    <?php
+  }
+
+
+  function addressPage(){ ?>
+    <?php
+      if ( isset($_POST['update']) ){
+        CargonizerOptions::updateOptions( 'Address' );
+        $this->Options->init();
+        $this->showUpdateMessage ( __( 'API settings updated', 'wc-cargonizer' ) );
+      }
+    ?>
+
+    <div class="tool-box">
+      <form action="" method="POST">
+        <h3 class="title"><?php _e('Return address', 'wc-cargonizer'); ?></h3>
+        <input type="hidden" name="update" value="1" />
+        <?php $this->Options->getAddressOptions(); ?>
+        <p><input type="submit" class="button" value="<?php _e('update', 'wc-cargonizer' ); ?>"></p>
+      </form>
+    </div>
+    <?php
+  }
+
+
+  function notificationPage(){ ?>
+    <?php
+      if ( isset($_POST['update']) ){
+        CargonizerOptions::updateOptions( 'Notification' );
+        $this->Options->init();
+        $this->showUpdateMessage ( __( 'Notification settings updated', 'wc-cargonizer' ) );
+      }
+    ?>
+
+    <div class="tool-box">
+      <form action="" method="POST">
+        <h3 class="title"><?php _e('Notifications', 'wc-cargonizer'); ?></h3>
+
+        <div class="wcc-instruction">
+          <h4><?php _e('Placeholders', 'wc-cargonizer'); ?></h4>
+          <?php echo implode('<br/>', Parcel::getPlaceholders() ) ?>
+
+        </div>
+
+        <input type="hidden" name="update" value="1" />
+        <?php $this->Options->getNotificationOptions(); ?>
+        <p><input type="submit" class="button" value="<?php _e('update', 'wc-cargonizer' ); ?>"></p>
+      </form>
+    </div>
+    <?php
+  }
+
+
+  function showUpdateMessage( $text ){ ?>
+     <div id="message" class="updated woocommerce-message wc-connect">
+      <div class="squeezer">
+        <h4><strong><?php echo $text; ?></strong></h4>
+      </div>
     </div>
     <?php
   }
@@ -108,17 +161,17 @@ class CargonizerAdmin{
       <div id="message" class="updated woocommerce-message wc-connect">
         <div class="squeezer">
           <?php CargonizerOptions::updateLicenceSettings(); ?>
-          <h4><?php _e( '<strong>Licence key updated</strong> ', MB_LANG ); ?></h4>
+          <h4><?php _e( '<strong>Licence key updated</strong> ', 'wc-cargonizer' ); ?></h4>
         </div>
       </div>
     <?php endif; ?>
 
     <div class="tool-box">
       <form action="" method="POST">
-        <h3 class="title"><?php _e('Licence key', MB_LANG); ?></h3>
+        <h3 class="title"><?php _e('Licence key', 'wc-cargonizer'); ?></h3>
         <input type="hidden" name="update" value="1">
         <?php CargonizerOptions::licenceSettings(); ?>
-        <p><input type="submit" class="button" value="<?php _e('update', MB_LANG ); ?>"></p>
+        <p><input type="submit" class="button" value="<?php _e('update', 'wc-cargonizer' ); ?>"></p>
       </form>
     </div>
     <?php
@@ -143,6 +196,8 @@ class CargonizerAdmin{
         echo '<link rel="stylesheet" href="'.$path .'css/'.$s.'" type="text/css" />' . "\n";
       }
 
+      wp_register_script( 'po-admin', $path. '/js/wcc-admin.js', false, '1.0.0' );
+      wp_enqueue_script( 'po-admin' );
       // include scripts
       //    foreach ($scripts as $s) {
       //  echo '<script src="'.$path.'js/'.$s.'" ></script>' . "\n";

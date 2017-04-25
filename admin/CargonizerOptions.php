@@ -245,9 +245,7 @@ class CargonizerOptions{
 
 
   public static function updateOptions( $type ){
-
     $method = 'load'.$type."Options";
-    _log($_POST);
 
     foreach ( self::$method() as $key => $option){
       if ( isset($_POST[ $option['name'] ]) ){
@@ -407,6 +405,108 @@ class CargonizerOptions{
     <?php
       endif;
     }
+  }
+
+   /* address options */
+
+  public static function loadNotificationOptions(){
+    return array(
+      array(
+        'name' => 'cargonizer-customer-notification-subject',
+        'label' => __('Subject'),
+        'desc' => __('i.e. "Order @order_id@ at @shop_name@ is sent', 'wc-cargonizer' ),
+        'type' => 'text',
+        'value' => get_option('cargonizer-customer-notification-subject'),
+      ),
+      array(
+        'name' => 'cargonizer-customer-notification-message',
+        'label' => __('Message'),
+        'desc' => __('E-Mail notification to customer after export to Cargonizer'),
+        'type' => 'textarea',
+        'value' => get_option('cargonizer-customer-notification-message'),
+      ),
+
+    );
+  }
+
+
+  function getNotificationOptions(){
+    foreach ( self::loadNotificationOptions() as $key => $option){
+      $this->showOption($option);
+    }
+  }
+
+
+
+   /* address options */
+
+  public static function loadAddressOptions(){
+
+    return array(
+      array(
+        'name' => 'cargonizer-return-address-name',
+        'label' => __('Name'),
+        'type' => 'text',
+        'value' => get_option('cargonizer-return-address-name'),
+      ),
+
+      array(
+        'name' => 'cargonizer-return-address-country',
+        'label' => __('Country'),
+        'type' => 'text',
+        'value' => get_option('cargonizer-return-address-country'),
+      ),
+
+      array(
+        'name' => 'cargonizer-return-address-postcode',
+        'label' => __('Postcode'),
+        'type' => 'text',
+        'value' => get_option('cargonizer-return-address-postcode'),
+      ),
+
+
+      array(
+        'name' => 'cargonizer-return-address-city',
+        'label' => __('City'),
+        'type' => 'text',
+        'value' => get_option('cargonizer-return-address-city'),
+      ),
+
+      array(
+        'name' => 'cargonizer-return-address-address1',
+        'label' => __('Address'),
+        'type' => 'text',
+        'value' => get_option('cargonizer-return-address-address1'),
+      ),
+
+    );
+  }
+
+
+  function getAddressOptions(){
+    foreach ( self::loadAddressOptions() as $key => $option){
+      $this->showOption($option);
+    }
+  }
+
+
+  function showOption( $option ){?>
+    <div class="mb-field-row">
+
+      <?php if( $option['type'] == 'text'): ?>
+        <label class="mb-admin-label inline" for="<?php echo $option['name']; ?>"><?php echo $option['label']; ?></label>
+        <?php if (isset($option['desc']) && trim($option['desc']) ): ?>
+          <div><span class="mb-field-desc"><?php echo $option['desc']; ?></span></div>
+        <?php endif ;?>
+        <input type="<?php echo $option['type']; ?>" name="<?php echo $option['name']; ?>" id="<?php echo $option['name']; ?>" value="<?php echo $option['value']; ?>" size="50" >
+      <?php endif; ?>
+
+      <?php if( $option['type'] == 'textarea'): ?>
+      <label class="mb-admin-label" for="<?php echo $option['name']; ?>"><?php echo $option['label']; ?></label>
+        <textarea name="<?php echo $option['name']; ?>" id="<?php echo $option['name']; ?>" class="wcc-textarea"><?php echo $option['value']; ?></textarea>
+      <?php endif; ?>
+    </div>
+    <?php
   }
 
 

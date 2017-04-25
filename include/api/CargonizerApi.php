@@ -48,6 +48,36 @@ class CargonizerApi{
     return $this->rest('transport_agreements.xml' );
   }
 
+  function getPrinters(){
+    // curl -g -XGET -H'X-Cargonizer-Key: b38515a578db604ba77f063801155add075a56e4' -H'X-Cargonizer-Sender: 1142' 'http://sandbox.cargonizer.no/transport_agreements.xml'
+    _log('get printers');
+
+    return $this->rest('printers.xml', $headers=array(), $method='GET', $xml=null, $debug=true );
+  }
+
+
+  function postLabel( $consignment_id, $printer_id ){
+    // curl -g -XPOST -H'X-Cargonizer-Key: 12345' -H'X-Cargonizer-Sender: 678' 'http://cargonizer.no/consignments/label_direct?printer_id=123&consignment_ids[]=1&consignment_ids[]=2&piece_ids[]=3&piece_ids[]=4'
+
+    $args =
+      array(
+        'printer_id' => $printer_id,
+        'consignment_ids[]' => $consignment_id
+      );
+
+    $resource = 'consignments/label_direct?';
+
+    if ( $query_string = $this->buildQueryString($args) ){
+      $resource .= $query_string;
+    }
+
+    _log( $resource );
+
+
+    return $this->rest( 'label_direct' );
+  }
+
+
   function postConsignment($xml){
     // curl -g -XGET -H'X-Cargonizer-Key: b38515a578db604ba77f063801155add075a56e4' -H'X-Cargonizer-Sender: 1142' 'http://sandbox.cargonizer.no/transport_agreements.xml'
     _log('getTransportAgreements');
@@ -57,8 +87,9 @@ class CargonizerApi{
         'Content-Type' =>  'application/xml'
       );
 
-    return $this->rest('consignments.xml', $headers, 'POST', $xml );
+    return $this->rest('consignments.xml', $headers, 'POST', $xml, $debug=true );
   }
+
 
   function getAgreementByName($name){
     // _log('getAgreement');
@@ -73,6 +104,7 @@ class CargonizerApi{
 
     return $agreement;
   }
+
 
   function getAgreementById($id){
     // _log('getAgreement');
@@ -89,7 +121,13 @@ class CargonizerApi{
   }
 
 
-  function rest($resource, $headers=array(), $method='GET', $xml =null){
+  function buildQueryString( $query_args ){
+    return http_build_query($query_args );
+
+  }
+
+
+  function rest( $resource, $headers=array(), $method='GET', $xml=null, $debug=false){
     _log('Cargonizer::rest()');
 
     $default_headers =
@@ -122,15 +160,16 @@ class CargonizerApi{
 
 
     $url = $this->Domain.$resource;
-    //_log($url);
-    _log($args);
     $response = wp_remote_request( $url, $args );
-    _log('response:');
-    // _log($response);
-
     $status = wp_remote_retrieve_response_code($response);
 
-    _log('status: '.$status);
+
+    if ( $debug ){
+      _log($url);
+      _log($args);
+      _log('response:');
+      _log($response);
+    }
 
     if ( $status==200 || $status==201 ){
       return xmlToArray( simplexml_load_string(wp_remote_retrieve_body($response)) );
@@ -141,6 +180,4 @@ class CargonizerApi{
   }
 
 
-}
-
-?>
+} // end of class

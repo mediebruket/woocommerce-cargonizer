@@ -11,9 +11,8 @@
 
 
     function makeXml($args){
-      _log($args);
+      //_log($args);
       $this->getNodes($args);
-      _log($this->Xml);
     }
 
 

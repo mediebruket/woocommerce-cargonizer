@@ -8,10 +8,13 @@ class Cargonizer{
   function __construct(){
     $this->Settings = new CargonizerOptions();
 
+    add_action( 'wp_ajax_wcc_print_order', array( $this, 'printOrder' ) );
     add_action( 'save_post', array($this, 'createConsignment') );
+
     // add_filter('wc_shipment_tracking_get_providers', array($this, 'setCustomProvider') );
     add_filter('acf/load_field/name=transport_agreement', array($this, 'acf_setTransportAgreements'), 20 );
     add_filter('acf/load_field/name=parcel_type', array($this, 'acf_setCarrierProducts'), 10 );
+    add_filter('acf/load_field/name=parcel_package_type', array($this, 'acf_setParcelTypes'), 10 );
     add_filter('acf/load_field/name=create_consignment', array($this, 'acf_checkConsignmentStatus'), 10 );
     add_filter('acf/load_field/name=parcel_height', array($this, 'acf_setDefaultHeight') );
     add_filter('acf/load_field/name=parcel_length', array($this, 'acf_setDefaultLength') );
@@ -87,9 +90,44 @@ class Cargonizer{
           else{
             $choices[$key] = $p['name'];
           }
-
         }
+      }
+    }
 
+    if ( $choices ){
+      $field['choices'] = array_merge($field['choices'], $choices);
+    }
+
+
+    return $field;
+  }
+
+
+  function acf_setParcelTypes($field){
+    // _log($field);
+    $choices = array();
+
+    if ( $post_id = $this->isOrder($object=false) ){
+      $CargonizerSettings = new CargonizerOptions();
+      $ta = $CargonizerSettings->get('SelectedTransportAgreement');
+      $ts = $CargonizerSettings->get('TransportServices');
+
+      if ( is_array($ta) && isset($ta['products']) && is_array($ta['products']) ){
+        // _log($ta_settings);
+        // _log('settings');
+        foreach ($ta['products'] as $key => $p) {
+          if ( isset($p['types']) && is_array($p['types']) ){
+            foreach ($p['types'] as $ti => $type) {
+              $index = $p['identifier']."|".$ti;
+              if ( is_numeric(array_search($index, $ts)) ){
+                $choices[$ti] = $p['name']." (".$type.")";
+              }
+            }
+          }
+          else{
+            $choices[$key] = $p['name'];
+          }
+        }
       }
     }
 
@@ -98,8 +136,6 @@ class Cargonizer{
       $field['choices'] = array_merge($field['choices'], $choices);
     }
 
-    _log('$choices');
-    _log($load_field);
 
     return $field;
   }
@@ -123,25 +159,50 @@ class Cargonizer{
   function createConsignment(){
     if ( $Parcel = $this->isOrder() ){
 
-      if ( $Parcel->isReady() ){
+      if ( $Parcel->isReady($force=true) ){
         $CargonizeXml = new CargonizeXml( $Parcel->prepareExport() );
         $CargonizerApi = new CargonizerApi();
         $result = null;
 
+        // _log($CargonizeXml);
         $result = $CargonizerApi->postConsignment($CargonizeXml->Xml);
-        if ( $result ){
-          update_post_meta( $Parcel->ID, 'is_cargonized', '1' );
-          $consignment = $result['consignments']['consignment'];
-          // _log($consignment);
-          acf_updateField('consignment_created_at', $consignment['created-at']['$'], $Parcel->ID);
-          acf_updateField('consignment_id', $consignment['bundles']['bundle']['consignment-id']['$'], $Parcel->ID);
-          acf_updateField('consignment_tracking_code', $consignment['number'], $Parcel->ID);
-          acf_updateField('consignment_tracking_url', $consignment['tracking-url'], $Parcel->ID);
-          acf_updateField('consignment_pdf', $consignment['consignment-pdf'], $Parcel->ID);
 
-          $Parcel->notiyCustomer();
+        if ( $result ){
+          if ( is_array($result) && isset($result['consignments']['consignment']) ){
+            update_post_meta( $Parcel->ID, 'is_cargonized', '1' );
+            $Parcel->saveConsignment( $consignment = $result['consignments']['consignment']);
+            $Parcel->notiyCustomer();
+            $this->addNote( $Parcel );
+          }
         }
       }
+    }
+  }
+
+
+  function addNote( $Parcel, $tracking_url = null ){
+    _log('Cargonizer::addNote('.$Parcel->ID.')');
+
+    $data = array(
+      'comment_post_ID'       => $Parcel->ID,
+      'comment_author'        => 'WooCommerce Cargonizer',
+      'comment_author_email'  => get_option('admin_email' ),
+      'comment_content'       => sprintf( __('Parcel exported to Cargonizer.<br/>Consignment id: %s', 'wc-cargonizer'), $Parcel->Meta['consignment_id'][0] ),
+      'comment_agent'         => 'WooCommerce Cargonizer',
+      'comment_type'          => 'order_note',
+      'comment_parent'        => 0,
+      'user_id'               => 1,
+      'comment_author_IP'     => 'null',
+      'comment_date'          => current_time('mysql'),
+      'comment_approved'      => 1,
+    );
+
+    if ( wp_insert_comment($data) ){
+      _log('new note added');
+    }
+    else{
+      _log('error: wp_insert_comment');
+      _log($data);
     }
   }
 
@@ -171,7 +232,27 @@ class Cargonizer{
   }
 
 
+  public static function printOrder(){
+    _log('Cargonizer::printOrder');
+    _log($_POST);
 
-}
+    if ( isset($_POST['order_id']) && is_numeric($_POST['order_id']) ){
+      $Parcel = new Parcel( $_POST['order_id'] );
+      if ( isset($Parcel->Meta['consignment_id'][0]) && is_numeric($Parcel->Meta['consignment_id'][0]) ){
+        $Api = new CargonizerApi();
+        $printers = $Api->getPrinters();
+        _log($printers);
+
+        //$Api->postLabel( $Parcel->Meta['consignment_id'][0], '123' );
+      }
+
+    }
+    echo '1';
+    wp_die();
+  }
+
+
+
+} // end of class
 
 $Cargonizer = new Cargonizer();
