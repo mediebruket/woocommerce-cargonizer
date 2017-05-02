@@ -2,6 +2,14 @@
 
 if( function_exists('acf_add_local_field_group') ):
 
+$readonly = false;
+if ( isset($_GET['post']) && is_numeric($_GET['post']) ){
+  if ( get_post_meta( $_GET['post'], 'is_cargonized', true ) ){
+    $readonly = true;
+  }
+}
+
+
 acf_add_local_field_group(array (
   'key' => 'group_56cc4de510b34',
   'title' => 'Cargonizer',
@@ -65,11 +73,11 @@ acf_add_local_field_group(array (
       'label' => 'Type',
       'name' => 'parcel_type',
       'type' => 'select',
-      'instructions' => 'Velg produkt/tjeneste',
+      'instructions' => 'Select product',
       'required' => 1,
       'conditional_logic' => 0,
       'wrapper' => array('width' => '','class' => '','id' => '',),
-      'choices' => array(0 => 'velg type',),
+      'choices' => array(0 => 'select product',),
       'default_value' => array(),
       'allow_null' => 0,
       'multiple' => 0,
@@ -77,7 +85,28 @@ acf_add_local_field_group(array (
       'ajax' => 0,
       'placeholder' => '',
       'disabled' => 0,
-      'readonly' => 0,
+      'readonly' => $readonly,
+    ),
+    array (
+      'key' => 'field_59086fd6633fa',
+      'label' => 'Services',
+      'name' => 'parcel_services',
+      'type' => 'checkbox',
+      'instructions' => '',
+      'required' => 0,
+      'conditional_logic' => 0,
+      'wrapper' => array (
+        'width' => '',
+        'class' => '',
+        'id' => '',
+      ),
+      'choices' => array (),
+      'default_value' => array (
+      ),
+      'layout' => 'horizontal',
+      'toggle' => 0,
+      'disabled' => 0,
+      'readonly' => $readonly,
     ),
     array (
       'key' => 'field_56cead8e7fd30',
@@ -135,8 +164,8 @@ acf_add_local_field_group(array (
           'min' => 1,
           'max' => '',
           'step' => '',
-          'readonly' => 0,
           'disabled' => 0,
+          'readonly' => $readonly,
         ),
         array (
           'key' => 'field_56cec446a4499',
@@ -147,7 +176,7 @@ acf_add_local_field_group(array (
           'required' => 0,
           'conditional_logic' => 0,
           'wrapper' => array('width' => '','class' => '','id' => '',),
-          'choices' => array(0 => 'velg type',),
+          'choices' => array(0 => 'select parcel type',),
           'default_value' => array(),
           'allow_null' => 0,
           'multiple' => 0,
@@ -155,7 +184,7 @@ acf_add_local_field_group(array (
           'ajax' => 0,
           'placeholder' => '',
           'disabled' => 0,
-          'readonly' => 0,
+          'readonly' => $readonly,
         ),
         array (
           'key' => 'field_56cc578216e1d',
@@ -175,8 +204,8 @@ acf_add_local_field_group(array (
           'prepend' => '',
           'append' => '',
           'maxlength' => '',
-          'readonly' => 0,
           'disabled' => 0,
+          'readonly' => $readonly,
         ),
         array (
           'key' => 'field_56cc4de94d2c6',
@@ -196,8 +225,8 @@ acf_add_local_field_group(array (
           'prepend' => '',
           'append' => '',
           'maxlength' => '',
-          'readonly' => 0,
           'disabled' => 0,
+          'readonly' => $readonly,
         ),
         array (
           'key' => 'field_56cc4e196d60a',
@@ -207,18 +236,14 @@ acf_add_local_field_group(array (
           'instructions' => '',
           'required' => 0,
           'conditional_logic' => 0,
-          'wrapper' => array (
-            'width' => '',
-            'class' => '',
-            'id' => '',
-          ),
+          'wrapper' => array('width' => '','class' => '','id' => '',),
           'default_value' => '',
           'placeholder' => '',
           'prepend' => '',
           'append' => '',
           'maxlength' => '',
-          'readonly' => 0,
           'disabled' => 0,
+          'readonly' => $readonly,
         ),
         array(
           'key' => 'field_56cc4dfc6d608',
@@ -236,6 +261,7 @@ acf_add_local_field_group(array (
           'maxlength' => '',
           'readonly' => 0,
           'disabled' => 0,
+          'readonly' => $readonly,
         ),
         array(
           'key' => 'field_56cc4e0a6d609',
@@ -251,8 +277,8 @@ acf_add_local_field_group(array (
           'prepend' => '',
           'append' => '',
           'maxlength' => '',
-          'readonly' => 0,
           'disabled' => 0,
+          'readonly' => $readonly,
         ),
       ),
     ),

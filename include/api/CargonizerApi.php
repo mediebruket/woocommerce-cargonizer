@@ -43,9 +43,9 @@ class CargonizerApi{
 
   function getTransportAgreements(){
     // curl -g -XGET -H'X-Cargonizer-Key: b38515a578db604ba77f063801155add075a56e4' -H'X-Cargonizer-Sender: 1142' 'http://sandbox.cargonizer.no/transport_agreements.xml'
-    _log('getTransportAgreements');
-
-    return $this->rest('transport_agreements.xml' );
+    //_log('CargonizerApi::getTransportAgreements');
+    $result = $this->rest('transport_agreements.xml', $headers=array(), $method='GET', $xml=null, $debug=false );
+    return $result;
   }
 
   function getPrinters(){

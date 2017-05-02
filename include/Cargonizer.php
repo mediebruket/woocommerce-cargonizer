@@ -17,6 +17,7 @@ class Cargonizer{
     add_filter('acf/load_field/name=parcel_type', array($this, 'acf_setCarrierProducts'), 10 );
     add_filter('acf/load_field/name=parcel_package_type', array($this, 'acf_setParcelTypes'), 10 );
     add_filter('acf/load_field/name=create_consignment', array($this, 'acf_checkConsignmentStatus'), 10 );
+    add_filter('acf/load_field/name=parcel_services', array($this, 'acf_setProductServices') );
     add_filter('acf/load_field/name=parcel_height', array($this, 'acf_setDefaultHeight') );
     add_filter('acf/load_field/name=parcel_length', array($this, 'acf_setDefaultLength') );
     add_filter('acf/load_field/name=parcel_width', array($this, 'acf_setDefaultWidth') );
@@ -135,6 +136,39 @@ class Cargonizer{
 
     if ( $choices ){
       $field['choices'] = array_merge($field['choices'], $choices);
+    }
+
+
+    return $field;
+  }
+
+
+  function acf_setProductServices($field){
+    // _log('acf_setProductServices');
+    // _log($field);
+    $choices = array();
+
+    if ( $post_id = $this->isOrder($object=false) ){
+      $CargonizerSettings = new CargonizerOptions();
+      $ta = $CargonizerSettings->get('SelectedTransportAgreement');
+      $ts = $CargonizerSettings->get('TransportServices');
+
+      if ( is_array($ta) && isset($ta['products']) && is_array($ta['products']) ){
+
+        // _log('settings');
+        foreach ( $ta['products'] as $key => $p) {
+          if ( $key == 0 ){
+            foreach ($p['services'] as $key => $s) {
+              $choices[$s['identifier']] = $s['name'];
+            }
+          }
+        }
+      }
+    }
+
+    if ( !empty($choices) ){
+      $field['choices'] = $choices;
+      $field['default_value'] = 'bring_e_varsle_for_utlevering';
     }
 
 

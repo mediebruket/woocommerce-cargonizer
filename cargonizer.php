@@ -2,7 +2,7 @@
 /*
 Plugin Name: Woocomerce Cargonizer
 Description:
-Author: Mediebruket AS
+<Author: Mediebruket AS
 Author URI: http://mediebruket.no
 */
 

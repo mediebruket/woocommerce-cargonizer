@@ -55,6 +55,11 @@ class Parcel{
   }
 
 
+  function isCargonized(){
+    return  gi($this->Meta, 'is_cargonized');
+
+  }
+
   function isReady( $force = false ){
     _log('Parcel::isReady');
     $is_ready = false;
@@ -155,7 +160,13 @@ class Parcel{
     // _log('prepareExport');
     // _log($this->Items);
     // http://www.logistra.no/api-documentation/12-utviklerinformasjon/16-api-consignments.html
-    $export['consignments']['consignment']['_attr'] = array( 'transport_agreement' => $this->TransportAgreementId, 'estimate' => "true" );
+    $export['consignments']['consignment']['_attr'] =
+      array(
+        'transport_agreement' => $this->TransportAgreementId,
+        'estimate' => "true",
+        'print' => ( get_option('cargonizer-print-on-export' ) == 'on' ) ? true : false
+        );
+
     $export['consignments']['consignment']['values'] = array(
       0 => array(
         'value' => array(
@@ -198,6 +209,8 @@ class Parcel{
 
     // set consignee
     $export['consignments']['consignment']['consignee'] =  $export['consignments']['consignment']['parts']['consignee'];
+
+
     // ---------------- items ----------------
     //
     // <item type="PK" amount="1" weight="22" volume="122" description="Something else"/>
@@ -220,7 +233,29 @@ class Parcel{
     }
 
 
-    // $export['consignments']['services'] = array(); // packages
+    if ( $parcel_services = gi( $this->Meta, 'parcel_services') ){
+      _log('$services');
+      _log($parcel_services);
+      $services = maybe_unserialize($parcel_services);
+      _log($services);
+      if ( is_array($services) && !empty($services) ){
+        foreach ($services as $key => $identifier) {
+          _log($identifier);
+
+            // <service id="bring_e_varsle_for_utlevering"></service>
+
+          $array = array('service' => null );
+          $array['service']['_attr'] = array(
+            'id' => $identifier
+            );
+          $export['consignments']['services'][] = $array; // packages
+
+        }
+      }
+
+    }
+
+
     // $export['consignments']['references']['consignor'] = null;
     // $export['consignments']['references']['consignee'] = null;
 

@@ -13,6 +13,7 @@ class CargonizerOptions{
     $this->setTransportServices();
     $this->getTransportAgreements();
     $this->setDefaultPrinter();
+    $this->setPrintOnExport();
   }
 
   function init(){
@@ -38,6 +39,10 @@ class CargonizerOptions{
 
   function setDefaultPrinter(){
     $this->DefaultPrinter = get_option('cargonizer-default-printer');
+  }
+
+  function setPrintOnExport(){
+    $this->PrintOnExport = get_option('cargonizer-print-on-export');
   }
 
 
@@ -70,6 +75,8 @@ class CargonizerOptions{
         }
       }
     }
+
+    //_log($this->SelectedTransportAgreement);
   }
 
 
@@ -105,15 +112,40 @@ class CargonizerOptions{
                   if ( $abbreviation = gi($type, '@abbreviation' ) ){
                     $types[ $type['@abbreviation'] ] = $type['@name_no'];
                   }
+                }
+              }
+
+              $services = array();
+              if ( isset($product['services']) && is_array($product['services']['service']) ){
+
+                foreach ( $product['services']['service'] as $key => $service ) {
+
+                  if ( isset($service['name']) && isset($service['identifier']) ){
+                    // _log( $service['name']. " ". $service['identifier']);
+                    $services[] =
+                      array(
+                        'name' => $service['name'],
+                        'identifier' => $service['identifier']
+                      );
+                  }
+                  // else{
+                  //   _log('empty service');
+                  //   _log($service);
+                  // }
 
                 }
               }
+              else{
+                _log('no services: '.$product['name']);
+              }
+
 
               if ( !empty($types) ){
                 $products[] = array(
                   'name'        => $product['name'],
                   'identifier'  => $product['identifier'],
                   'types'       => $types,
+                  'services'       => $services,
                   );
               }
             }
@@ -132,7 +164,7 @@ class CargonizerOptions{
       $this->saveTransportAgreements();
     }
 
-    // _log($this->TransportAgreements);
+    _log($this->TransportAgreements);
   }
 
 
@@ -294,23 +326,6 @@ class CargonizerOptions{
 
   /* general options */
 
-  // public static function updateGeneralSettings(){
-  //   // global $api_settings;
-  //   // _log('updateGeneralSettings');
-  //   // _log($_POST);
-  //   if ( isset($_POST['cargonizer-delivery-company-id']) ){
-  //     update_option( 'cargonizer-delivery-company-id', $_POST['cargonizer-delivery-company-id'] );
-  //   }
-
-  //   $services = null;
-  //   if ( isset($_POST['cargonizer-delivery-services']) ){
-  //     $services = $_POST['cargonizer-delivery-services'];
-  //   }
-
-  //   update_option( 'cargonizer-delivery-services', $services );
-  // }
-
-
   function loadGeneralOptions(){
     // _log($this->TransportServices);
     // $this->TransportAgreements;
@@ -327,6 +342,15 @@ class CargonizerOptions{
           'value'   => $this->DefaultPrinter,
           'options' => self::getPrinterList(),
         ),
+
+        array(
+          'name'    => 'cargonizer-print-on-export',
+          'label'   => __('Print on export'),
+          //'desc' => __('Api settings required to load delivery companies'),
+          'type'    => 'checkbox',
+          'value'   => $this->PrintOnExport,
+          'option'   => 'on',
+        ),
         array(
           'name'    => 'cargonizer-delivery-company-id',
           'label'   => __('Delivery company'),
@@ -338,7 +362,7 @@ class CargonizerOptions{
 
         array(
           'name'    => 'cargonizer-delivery-services',
-          'label'   => __('Services'),
+          'label'   => __('Product'),
           'desc'    => __('Select delivery company and update'),
           'type'    => 'multiple_checkbox',
           'value'   => $this->TransportServices,
@@ -353,47 +377,13 @@ class CargonizerOptions{
 
 
   function getGeneralSettings(){
-
-    foreach ( $this->loadGeneralOptions() as $key => $option){
-    ?>
-      <?php if ( $option['type'] == 'select' ): ?>
-        <div class="mb-field-row">
-          <?php $this->showOption( $option ); ?>
-        </div>
-      <?php endif; ?>
-
-      <?php if ( $option['type'] == 'multiple_checkbox' ): ?>
-        <div>
-          <label class="mb-admin-label" for="<?php echo $option['name']; ?>"><?php echo $option['label']; ?></label>
-
-          <div><span class="mb-field-desc"><?php echo $option['desc']; ?></span></div>
-          <?php
-          // _log( $option['options'] );
-          foreach ( $option['options'] as $key => $service_option) {
-            if ( isset($service_option['types']) && is_array($service_option['types']) && !empty($service_option['types']) ){
-              foreach ($service_option['types'] as $type_key => $type) {
-
-                $id = uniqid();
-                $checked  = null;
-                $type_value = $service_option['identifier']."|".$type_key;
-
-                if ( is_numeric(array_search($type_value, $option['value'])) ){
-                  $checked = ' checked="checked" ';
-                }
-
-                printf('<div class="mb-option-row"><input type="checkbox" id="%s" name="%s[]" value="%s" %s /><label for="%s">%s</label></div>', $id, $option['name'], $type_value, $checked, $id, $service_option['name']." (".$type.")" );
-              }
-            }
-          }
-          ?>
-        </div>
-      <?php endif;
-    }
+    foreach ( $this->loadGeneralOptions() as $key => $option): ?>
+      <div class="mb-field-row"><?php $this->showOption( $option ); ?></div>
+    <?php endforeach;
   }
 
 
   /* parcel options */
-
   public static function loadParcelOptions(){
     return array(
       array(
@@ -525,6 +515,48 @@ class CargonizerOptions{
           <div><span class="mb-field-desc"><?php echo $option['desc']; ?></span></div>
         <?php endif ;?>
         <input type="<?php echo $option['type']; ?>" name="<?php echo $option['name']; ?>" id="<?php echo $option['name']; ?>" value="<?php echo $option['value']; ?>" size="50" >
+      <?php endif; ?>
+
+       <?php if( $option['type'] == 'checkbox'): ?>
+        <label class="mb-admin-label inline" for="<?php echo $option['name']; ?>"><?php echo $option['label']; ?></label>
+        <?php if (isset($option['desc']) && trim($option['desc']) ): ?>
+          <div><span class="mb-field-desc"><?php echo $option['desc']; ?></span></div>
+        <?php endif ;?>
+        <input type="<?php echo $option['type']; ?>" name="<?php echo $option['name']; ?>" id="<?php echo $option['name']; ?>" value="<?php echo $option['option']; ?>" <?php  checked( $option['option'], $option['value'] ); ?> >
+      <?php endif; ?>
+
+
+      <?php if( $option['type'] == 'multiple_checkbox'): ?>
+        <div class>
+          <label class="mb-admin-label" for="<?php echo $option['name']; ?>"><?php echo $option['label']; ?></label>
+
+          <?php if ( isset($option['desc'])): ?>
+            <div><span class="mb-field-desc"><?php echo $option['desc']; ?></span></div>
+          <?php endif; ?>
+
+          <?php
+          // _log( $option['options'] );
+          foreach ( $option['options'] as $key => $o) {
+            if ( isset($o['types']) && is_array($o['types']) && !empty($o['types']) ){
+              foreach ($o['types'] as $type_key => $type) {
+
+                $id = uniqid();
+                $checked  = null;
+                $type_value = $o['identifier']."|".$type_key;
+
+                if ( is_numeric(array_search($type_value, $option['value'])) ){
+                  $checked = ' checked="checked" ';
+                }
+
+                printf(
+                  '<div class="mb-option-row"><input type="checkbox" id="%s" name="%s[]" value="%s" %s /><label for="%s">%s</label></div>',
+                  $id, $option['name'], $type_value, $checked, $id, $o['name']." (".$type.")"
+                  );
+              }
+            }
+          }
+          ?>
+        </div>
       <?php endif; ?>
 
       <?php if( $option['type'] == 'textarea'): ?>
