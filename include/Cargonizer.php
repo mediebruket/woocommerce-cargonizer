@@ -13,6 +13,7 @@ class Cargonizer{
 
     // add_filter('wc_shipment_tracking_get_providers', array($this, 'setCustomProvider') );
     add_filter('acf/load_field/name=transport_agreement', array($this, 'acf_setTransportAgreements'), 20 );
+    add_filter('acf/load_field/name=parcel_printer', array($this, 'acf_setParcelPrinter'), 20 );
     add_filter('acf/load_field/name=parcel_type', array($this, 'acf_setCarrierProducts'), 10 );
     add_filter('acf/load_field/name=parcel_package_type', array($this, 'acf_setParcelTypes'), 10 );
     add_filter('acf/load_field/name=create_consignment', array($this, 'acf_checkConsignmentStatus'), 10 );
@@ -156,6 +157,28 @@ class Cargonizer{
   }
 
 
+  function acf_setParcelPrinter($field){
+    //_log('Cargonizer::acf_setParcelPrinter');
+
+    if ( $Parcel = $this->isOrder() ){
+      // _log($this->Settings);
+      if ( $printers = CargonizerOptions::getPrinterList() ){
+        $field['choices'] = array();
+        foreach ($printers as $printer_id => $printer_name) {
+          $field['choices'][$printer_id] = $printer_name;
+        }
+      }
+    }
+
+    if ( $default_printer =  $this->Settings->get('DefaultPrinter' ) ) {
+      $field['default_value'] = $default_printer;
+    }
+
+
+    return $field;
+  }
+
+
   function createConsignment(){
     if ( $Parcel = $this->isOrder() ){
 
@@ -232,18 +255,20 @@ class Cargonizer{
   }
 
 
-  public static function printOrder(){
+  function printOrder(){
     _log('Cargonizer::printOrder');
     _log($_POST);
 
     if ( isset($_POST['order_id']) && is_numeric($_POST['order_id']) ){
       $Parcel = new Parcel( $_POST['order_id'] );
-      if ( isset($Parcel->Meta['consignment_id'][0]) && is_numeric($Parcel->Meta['consignment_id'][0]) ){
-        $Api = new CargonizerApi();
-        $printers = $Api->getPrinters();
-        _log($printers);
 
-        //$Api->postLabel( $Parcel->Meta['consignment_id'][0], '123' );
+      _log($Parcel->ConsignmentId);
+      _log($Parcel->Printer);
+
+      if ( $Parcel->ConsignmentId && $Parcel->Printer ){
+        _log('print..');
+        $Api = new CargonizerApi();
+        $Api->postLabel( $Parcel->ConsignmentId, $Parcel->Printer );
       }
 
     }

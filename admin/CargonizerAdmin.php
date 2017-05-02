@@ -36,10 +36,9 @@ class CargonizerAdmin{
   }
 
 
-	public static function apiPage(){
-
+	function apiPage(){
     if ( isset($_POST['update']) ){
-      CargonizerOptions::updateApiSettings();
+      $this->Options->updateOptions('Api');
       $this->showUpdateMessage ( __( 'API settings updated', 'wc-cargonizer' ) );
     }
     ?>
@@ -47,7 +46,7 @@ class CargonizerAdmin{
       <form action="" method="POST">
         <h3 class="title"><?php _e('API setttings', 'wc-cargonizer'); ?></h3>
         <input type="hidden" name="update" value="1">
-        <?php CargonizerOptions::getApiSettings(); ?>
+        <?php $this->Options->getApiSettings(); ?>
         <p><input type="submit" class="button" value="<?php _e('update', 'wc-cargonizer' ); ?>"></p>
       </form>
     </div>
@@ -58,9 +57,8 @@ class CargonizerAdmin{
   function generalPage(){?>
     <?php
       if ( isset($_POST['update']) ){
-        CargonizerOptions::updateGeneralSettings();
-        $this->Options->init();
-        $this->showUpdateMessage ( __( 'API settings updated', 'wc-cargonizer' ) );
+        $this->Options->updateOptions('General');
+        $this->showUpdateMessage ( __( 'General settings updated', 'wc-cargonizer' ) );
       }
     ?>
 
@@ -79,8 +77,7 @@ class CargonizerAdmin{
   function parcelPage(){?>
     <?php
       if ( isset($_POST['update']) ){
-        CargonizerOptions::updateOptions('Parcel');
-        $this->Options->init();
+        $this->Options->updateOptions('Parcel');
         $this->showUpdateMessage ( __( 'Parcel settings updated', 'wc-cargonizer' ) );
       }
     ?>
@@ -100,8 +97,7 @@ class CargonizerAdmin{
   function addressPage(){ ?>
     <?php
       if ( isset($_POST['update']) ){
-        CargonizerOptions::updateOptions( 'Address' );
-        $this->Options->init();
+        $this->Options->updateOptions( 'Address' );
         $this->showUpdateMessage ( __( 'API settings updated', 'wc-cargonizer' ) );
       }
     ?>
@@ -121,8 +117,7 @@ class CargonizerAdmin{
   function notificationPage(){ ?>
     <?php
       if ( isset($_POST['update']) ){
-        CargonizerOptions::updateOptions( 'Notification' );
-        $this->Options->init();
+        $this->Options->updateOptions( 'Notification' );
         $this->showUpdateMessage ( __( 'Notification settings updated', 'wc-cargonizer' ) );
       }
     ?>
@@ -134,7 +129,6 @@ class CargonizerAdmin{
         <div class="wcc-instruction">
           <h4><?php _e('Placeholders', 'wc-cargonizer'); ?></h4>
           <?php echo implode('<br/>', Parcel::getPlaceholders() ) ?>
-
         </div>
 
         <input type="hidden" name="update" value="1" />

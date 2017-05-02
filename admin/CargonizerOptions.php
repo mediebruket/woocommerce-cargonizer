@@ -5,12 +5,14 @@ class CargonizerOptions{
   protected $SelectedTransportAgreement;
   protected $TransportCompanyId;
   protected $TransportServices;
+  protected $DefaultPrinter;
 
 
   function __construct(){
     $this->setTransportCompanyId();
     $this->setTransportServices();
     $this->getTransportAgreements();
+    $this->setDefaultPrinter();
   }
 
   function init(){
@@ -34,10 +36,14 @@ class CargonizerOptions{
   }
 
 
+  function setDefaultPrinter(){
+    $this->DefaultPrinter = get_option('cargonizer-default-printer');
+  }
+
+
   function setTransportServices(){
     $this->TransportServices = maybe_unserialize( get_option('cargonizer-delivery-services') );
   }
-
 
 
   function getTransportAgreements($force_update=false){
@@ -137,6 +143,7 @@ class CargonizerOptions{
   }
 
 
+
   public static function getCompanyList(){
     $companies = array();
     if ( $ta = get_transient( 'transport_agreements' ) ){
@@ -146,6 +153,38 @@ class CargonizerOptions{
     }
 
     return $companies;
+  }
+
+
+  public static function getPrinterList(){
+    //_log('CargonizerOptions::getPrinterList()');
+    $array = array();
+    $transient = 'wcc_printer_list';
+
+    if ( $ta = get_transient( $transient ) ){
+      foreach ($ta as $printer_id => $printer_name) {
+        $array[ $printer_id ] = $printer_name;
+      }
+    }
+    else{
+      $Api = new CargonizerApi();
+      $printers = $Api->getPrinters();
+
+      $array = array();
+      if ( isset($printers['printers']) && is_array($printers['printers']) && !empty($printers['printers']) ){
+        foreach ($printers['printers'] as $key => $p) {
+          if (  isset($p['id']) ){
+            $array[ $p['id']['$'] ] = $p['name'] ;
+          }
+        }
+      }
+
+      if ( !empty($array) ){
+        set_transient( $transient, $array, 1*60*60 );
+      }
+    }
+
+    return $array;
   }
 
 
@@ -175,7 +214,7 @@ class CargonizerOptions{
 
   /* api options */
 
-  public static function loadApiOptions(){
+  function loadApiOptions(){
     return array(
       array(
         'name' => 'cargonizer-api-key',
@@ -211,8 +250,8 @@ class CargonizerOptions{
   }
 
 
-  public static function getApiSettings(){
-    foreach ( self::loadApiOptions() as $key => $option){
+  function getApiSettings(){
+    foreach ( $this->loadApiOptions() as $key => $option){
     ?>
       <?php if ( $option['type'] == 'text' or $option['type'] == 'checkbox' ): ?>
       <div class="mb-field-row">
@@ -231,89 +270,83 @@ class CargonizerOptions{
   }
 
 
-  public static function updateApiSettings(){
-    foreach ( self::loadApiOptions() as $key => $option){
-      if ( isset($_POST[ $option['name'] ]) ){
-        $option_value = trim( $_POST[ $option['name'] ] );
-        update_option( $option['name'], $option_value );
-      }
-      else{
-        update_option( $option['name'], null );
-      }
-    }
-  }
-
-
-  public static function updateOptions( $type ){
+  function updateOptions( $type ){
     $method = 'load'.$type."Options";
 
-    foreach ( self::$method() as $key => $option){
+    foreach ( $this->$method() as $key => $option){
       if ( isset($_POST[ $option['name'] ]) ){
-        $option_value = trim( $_POST[ $option['name'] ] );
-        update_option( $option['name'], $option_value );
+        $post_value = $_POST[ $option['name'] ];
+
+        if ( is_string($post_value) ){
+          $post_value = trim( $post_value );
+        }
+
+        update_option( $option['name'], $post_value );
       }
       else{
         update_option( $option['name'], null );
       }
     }
+
+    $this->init();
   }
 
 
   /* general options */
 
-  public static function updateGeneralSettings(){
-    // global $api_settings;
-    // _log('updateGeneralSettings');
-    // _log($_POST);
-    if ( isset($_POST['cargonizer-delivery-company-id']) ){
-      update_option( 'cargonizer-delivery-company-id', $_POST['cargonizer-delivery-company-id'] );
-    }
+  // public static function updateGeneralSettings(){
+  //   // global $api_settings;
+  //   // _log('updateGeneralSettings');
+  //   // _log($_POST);
+  //   if ( isset($_POST['cargonizer-delivery-company-id']) ){
+  //     update_option( 'cargonizer-delivery-company-id', $_POST['cargonizer-delivery-company-id'] );
+  //   }
 
-    $services = null;
-    if ( isset($_POST['cargonizer-delivery-services']) ){
-      $services = $_POST['cargonizer-delivery-services'];
-    }
+  //   $services = null;
+  //   if ( isset($_POST['cargonizer-delivery-services']) ){
+  //     $services = $_POST['cargonizer-delivery-services'];
+  //   }
 
-    update_option( 'cargonizer-delivery-services', $services );
-  }
+  //   update_option( 'cargonizer-delivery-services', $services );
+  // }
 
 
   function loadGeneralOptions(){
-
     // _log($this->TransportServices);
     // $this->TransportAgreements;
     // $this->SelectedTransportAgreement;
     // $this->TransportServices;
 
-    $companies = self::getCompanyList();
-
-    $services = array();
-
-    if ( $this->SelectedTransportAgreement ){
-      $services = $this->SelectedTransportAgreement['products'];
-    }
-
     $options =
       array(
         array(
-          'name' => 'cargonizer-delivery-company-id',
-          'label' => __('Delivery company'),
-          'desc' => __('Api settings required to load delivery companies'),
-          'type' => 'select',
-          'value' => $this->TransportCompanyId,
-          'options' => $companies,
+          'name'    => 'cargonizer-default-printer',
+          'label'   => __('Default printer'),
+          //'desc' => __('Api settings required to load delivery companies'),
+          'type'    => 'select',
+          'value'   => $this->DefaultPrinter,
+          'options' => self::getPrinterList(),
         ),
         array(
-          'name' => 'cargonizer-delivery-services',
-          'label' => __('Services'),
-          'desc' => __('Select delivery company and update'),
-          'type' => 'multiple_checkbox',
-          'value' => $this->TransportServices,
-          'options' => $services,
+          'name'    => 'cargonizer-delivery-company-id',
+          'label'   => __('Delivery company'),
+          'desc'    => __('Api settings required to load delivery companies'),
+          'type'    => 'select',
+          'value'   => $this->TransportCompanyId,
+          'options' => self::getCompanyList(),
+        ),
+
+        array(
+          'name'    => 'cargonizer-delivery-services',
+          'label'   => __('Services'),
+          'desc'    => __('Select delivery company and update'),
+          'type'    => 'multiple_checkbox',
+          'value'   => $this->TransportServices,
+          'options' => ( $this->SelectedTransportAgreement ) ? $this->SelectedTransportAgreement['products'] : array(),
         ),
       );
 
-    // _log($options);
+     //_log($options);
 
     return $options;
   }
@@ -321,18 +354,11 @@ class CargonizerOptions{
 
   function getGeneralSettings(){
 
-    foreach ( self::loadGeneralOptions() as $key => $option){
+    foreach ( $this->loadGeneralOptions() as $key => $option){
     ?>
       <?php if ( $option['type'] == 'select' ): ?>
         <div class="mb-field-row">
-          <label class="mb-admin-label" for="<?php echo $option['name']; ?>"><?php echo $option['label']; ?></label>
-          <div ><span class="mb-field-desc"><?php echo $option['desc']; ?></span></div>
-            <select name="<?php echo $option['name'] ?>" id="<?php echo $option['name'] ?>">
-              <?php foreach ($option['options'] as $value => $title) {
-                printf('<option value="%s" %s>%s</option>',  $value, selected( $value, $this->TransportCompanyId, $echo=false ), $title );
-              }
-            ?>
-            </select>
+          <?php $this->showOption( $option ); ?>
         </div>
       <?php endif; ?>
 
@@ -490,7 +516,7 @@ class CargonizerOptions{
   }
 
 
-  function showOption( $option ){?>
+  function showOption( $option, $default_value=null ){?>
     <div class="mb-field-row">
 
       <?php if( $option['type'] == 'text'): ?>
@@ -505,6 +531,20 @@ class CargonizerOptions{
       <label class="mb-admin-label" for="<?php echo $option['name']; ?>"><?php echo $option['label']; ?></label>
         <textarea name="<?php echo $option['name']; ?>" id="<?php echo $option['name']; ?>" class="wcc-textarea"><?php echo $option['value']; ?></textarea>
       <?php endif; ?>
+
+      <?php if( $option['type'] == 'select'): ?>
+        <label class="mb-admin-label" for="<?php echo $option['name']; ?>"><?php echo $option['label']; ?></label>
+        <?php if ( isset($option['desc']) ): ?>
+          <div><span class="mb-field-desc"><?php echo $option['desc']; ?></span></div>
+        <?php endif; ?>
+        <select name="<?php echo $option['name'] ?>" id="<?php echo $option['name'] ?>">
+            <?php foreach ($option['options'] as $value => $title) {
+              printf('<option value="%s" %s>%s</option>',  $value, selected( $value, $option['value'], $echo=false ), $title );
+            }
+          ?>
+        </select>
+      <?php endif; ?>
+
     </div>
     <?php
   }

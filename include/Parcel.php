@@ -1,15 +1,18 @@
 <?php
 
 class Parcel{
+  public $ConsignmentId;
   public $ID;
-  public $TrackingProvider;
   public $Items;
-  public $WC_Order;
+  public $Meta;
+  public $Printer;
+  public $TrackingProvider;
   public $TransportAgreements;
   public $TransportAgreementId;
   public $TransportAgreementProduct;
   public $TransportAgreementProductType;
-  public $Meta;
+  public $WC_Order;
+
 
 
   function __construct($post_id){
@@ -24,6 +27,9 @@ class Parcel{
         }
 
         $this->getPostMeta();
+        $this->setPrinter();
+        $this->setConsignmentId();
+        $this->setConsignmentId();
         $this->getTransportAgreementSettings();
         $this->Items = $this->getItems();
         //$this->TrackingProvider = $this->getTrackingProvider();
@@ -34,6 +40,18 @@ class Parcel{
 
   function getPostMeta(){
     $this->Meta = get_post_custom( $this->ID );
+  }
+
+
+  function setPrinter(){
+    $this->Printer = gi($this->Meta, 'parcel_printer');
+    //_log($this->Printer);
+  }
+
+
+  function setConsignmentId(){
+    $this->ConsignmentId = gi($this->Meta, 'consignment_id');
+    //_log($this->Printer);
   }
 
 

@@ -52,7 +52,7 @@ class CargonizerApi{
     // curl -g -XGET -H'X-Cargonizer-Key: b38515a578db604ba77f063801155add075a56e4' -H'X-Cargonizer-Sender: 1142' 'http://sandbox.cargonizer.no/transport_agreements.xml'
     _log('get printers');
 
-    return $this->rest('printers.xml', $headers=array(), $method='GET', $xml=null, $debug=true );
+    return $this->rest('printers.xml', $headers=array(), $method='GET', $xml=null, $debug=false );
   }
 
 
@@ -71,10 +71,8 @@ class CargonizerApi{
       $resource .= $query_string;
     }
 
-    _log( $resource );
 
-
-    return $this->rest( 'label_direct' );
+    return $this->rest( $resource,  $headers=array(), $method='GET', $xml=null, $debug=true  );
   }
 
 
