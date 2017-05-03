@@ -227,7 +227,7 @@ class Cargonizer{
   function createConsignment(){
     if ( $Parcel = $this->isOrder() ){
 
-      if ( $Parcel->isReady($force=true) ){
+      if ( $Parcel->isReady($force=false) ){
         $CargonizeXml = new CargonizeXml( $Parcel->prepareExport() );
         $CargonizerApi = new CargonizerApi();
         $result = null;

@@ -78,7 +78,7 @@ class Parcel{
   }
 
   function isReady( $force = false ){
-    _log('Parcel::isReady');
+    _log('Parcel::isReady()');
     $is_ready = false;
     // if parcel is not exported / cargonized
     if ( !gi($this->Meta, 'is_cargonized') or $force ){
@@ -102,6 +102,9 @@ class Parcel{
           $is_ready = true;
         }
       }
+    }
+    else{
+      _log('already cargonized');
     }
 
     _log($is_ready);

@@ -6,6 +6,7 @@ jQuery(document).ready(function(){
   initCarrier();
 });
 
+
 function initPrintBtn(){
   if ( jQuery('#acf-field_56cee621c7cd1').length ){
     var consignment_id = jQuery('#acf-field_56cee621c7cd1').val();
@@ -57,14 +58,18 @@ function checkIfCargonized(){
 
 function initCarrier(){
   // _log('initCarrier');
+
+  // changed carrier
   jQuery('#acf-field_56cd64c524656').change(function(){
     var carrier_id = jQuery(this).val();
     updateCarrierProducts( carrier_id );
     updateProductServices();
   });
 
+  // changed product
   jQuery('#acf-field_56cec446a4498').change(function(){
     updateProductServices();
+    updateProductTypes();
   });
 
 
@@ -87,6 +92,8 @@ function initCarrier(){
           jQuery('input[value="'+parcel_carrier_product_services[i]+'"]').attr('checked', true);
         };
       }
+
+      updateProductTypes();
     }
   }
 
@@ -118,6 +125,7 @@ function updateCarrierProducts( carrier_id ){
 
     if ( options.length ){
       jQuery('#acf-field_56cec446a4498').html(options);
+
     }
   }
 }
@@ -131,11 +139,12 @@ function updateProductServices(){
   // _log(product_id);
   var pid_tmp = product_id.split('|');
 
+  // _log(pid_tmp);
   if ( typeof pid_tmp[0] !== 'undefined' ){
     identifier =  pid_tmp[0];
   }
 
-  //_log( 'identifier '+ identifier );
+  // _log( 'identifier '+ identifier );
   TransportProduct = null;
 
   if ( identifier ){
@@ -168,6 +177,19 @@ function updateProductServices(){
 }
 
 
+function updateProductTypes(){
+  // _log('updateProductTypes');
+  // _log(TransportProduct);
+  if ( TransportProduct && typeof TransportProduct.types !== 'undefined' ){
+    var options = makeOption( 'select parcel type', '' );
+    for ( type_index in TransportProduct.types ){
+      // _log( type_index );
+      options += makeOption( TransportProduct.types[type_index], type_index );
+    }
+
+    jQuery('.acf-field.acf-field-56cc575e16e1c select').html(options);
+  }
+}
 
 
 function makeCheckbox( title, value ){
