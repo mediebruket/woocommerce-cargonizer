@@ -4,13 +4,16 @@ class Parcel{
   public $ConsignmentId;
   public $ID;
   public $Items;
+  public $IsCargonized;
   public $Meta;
   public $Printer;
+  public $ParcelType;
   public $TrackingProvider;
   public $TransportAgreements;
   public $TransportAgreementId;
   public $TransportAgreementProduct;
   public $TransportAgreementProductType;
+
   public $WC_Order;
 
 
@@ -26,10 +29,13 @@ class Parcel{
           $this->$attribute = $value;
         }
 
-        $this->getPostMeta();
-        $this->setPrinter();
-        $this->setConsignmentId();
-        $this->setConsignmentId();
+        $this->Meta           = $this->getPostMeta();
+        $this->IsCargonized   = $this->isCargonized();
+        $this->Printer        = $this->getPrinter();
+        $this->ParcelType     = $this->getParcelType();
+        $this->ParcelServices = $this->getParcelServices();
+
+        $this->ConsignmentId = $this->getConsignmentId();
         $this->getTransportAgreementSettings();
         $this->Items = $this->getItems();
         //$this->TrackingProvider = $this->getTrackingProvider();
@@ -39,20 +45,31 @@ class Parcel{
 
 
   function getPostMeta(){
-    $this->Meta = get_post_custom( $this->ID );
+    return get_post_custom( $this->ID );
   }
 
 
-  function setPrinter(){
-    $this->Printer = gi($this->Meta, 'parcel_printer');
+  function getPrinter(){
+    return gi($this->Meta, 'parcel_printer');
     //_log($this->Printer);
   }
 
 
-  function setConsignmentId(){
-    $this->ConsignmentId = gi($this->Meta, 'consignment_id');
+  function getParcelType(){
+    return gi($this->Meta, 'parcel_type');
     //_log($this->Printer);
   }
+
+  function getParcelServices(){
+    return maybe_unserialize( gi($this->Meta, 'parcel_services') );
+    //_log($this->Printer);
+  }
+
+
+  function getConsignmentId(){
+    return gi($this->Meta, 'consignment_id');
+  }
+
 
 
   function isCargonized(){
@@ -219,40 +236,46 @@ class Parcel{
     foreach ($this->Items as $key => $item) {
       $array = array('item' => null );
 
-      $array['item']['_attr'] =
+      $parcel_weight = null;
+      if ( $pw = gi( $item, 'parcel_weight' ) ){
+        $parcel_weight = $pw;
+      }
+
+      $item_attributes =
         array(
-          'type'    => ( $parcel_type = gi( $item, 'parcel_package_type' ) ) ? $parcel_type : $this->TransportAgreementProductType,
-          'amount'  => gi( $item, 'parcel_amount' ),
-          'weight'  => gi( $item, 'parcel_weight' ),
-          'length'  => gi( $item, 'parcel_length' ),
-          'width'   => gi( $item, 'parcel_width' ),
+          'type'        => ( $parcel_type = gi( $item, 'parcel_package_type' ) ) ? $parcel_type : $this->TransportAgreementProductType,
+          // 'type'        => 'package',
+          'amount'      => gi( $item, 'parcel_amount' ),
+          'weight'      => $parcel_weight,
+          'length'      => gi( $item, 'parcel_length' ),
+          'width'       => gi( $item, 'parcel_width' ),
+          'height'      => gi( $item, 'parcel_height' ),
           'description' => gi($item, 'parcel_description' ),
         );
+
+      $item_attributes['volume'] = $item_attributes['length']*$item_attributes['width']*$item_attributes['height'];
+
+      $array['item']['_attr'] = $item_attributes;
+
 
       $export['consignments']['consignment']['items'][]= $array;
     }
 
 
     if ( $parcel_services = gi( $this->Meta, 'parcel_services') ){
-      _log('$services');
-      _log($parcel_services);
       $services = maybe_unserialize($parcel_services);
-      _log($services);
+
       if ( is_array($services) && !empty($services) ){
         foreach ($services as $key => $identifier) {
-          _log($identifier);
-
-            // <service id="bring_e_varsle_for_utlevering"></service>
-
+          // <service id="bring_e_varsle_for_utlevering"></service>
           $array = array('service' => null );
           $array['service']['_attr'] = array(
             'id' => $identifier
             );
-          $export['consignments']['services'][] = $array; // packages
+          $export['consignments']['consignment']['services'][] = $array; // packages
 
         }
       }
-
     }
 
 
@@ -273,11 +296,14 @@ class Parcel{
 
 
   function saveConsignment( $consignment ){
+    _log('saveConsignment');
+    _log($consignment);
     acf_updateField('consignment_created_at', $consignment['created-at']['$'], $this->ID);
     acf_updateField('consignment_id', $consignment['bundles']['bundle'][0]['consignment-id']['$'], $this->ID);
     acf_updateField('consignment_tracking_code', $consignment['number'], $this->ID);
     acf_updateField('consignment_tracking_url', $consignment['tracking-url'], $this->ID);
     acf_updateField('consignment_pdf', $consignment['consignment-pdf'], $this->ID);
+    //acf_updateField('consignment_estimated_costs', '1234', $this->ID);
     $this->getPostMeta();
   }
 

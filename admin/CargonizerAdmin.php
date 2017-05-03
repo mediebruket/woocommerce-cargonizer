@@ -1,11 +1,16 @@
 <?php
 
+add_filter( 'manage_edit-shop_order_columns', array('CargonizerAdmin', 'newCustomOrderColumn' ) );
+add_action( 'manage_shop_order_posts_custom_column', array('CargonizerAdmin', 'setCustomOrderColumnValue' ), 1 );
+
+
 class CargonizerAdmin{
   public $Options;
 
 
   function __construct(){
     add_action( 'admin_menu', array($this, 'createSubmenu' ) );
+    add_action( 'admin_footer', array($this, 'addTransportAgreements' ) );
     add_action( 'admin_enqueue_scripts', array( $this, 'registerScripts' ) );
   }
 
@@ -198,6 +203,74 @@ class CargonizerAdmin{
       // }
     }
   }
+
+
+  function addTransportAgreements(){
+    // _log('addTransportAgreements');
+    $this->Options = new CargonizerOptions();
+    $agreements = array();
+    $ta = $this->Options->get('TransportAgreements');
+    if ( is_array($ta) ){
+      foreach ($ta as $key => $agreement) {
+        $agreements[ $agreement['id'] ] = $agreement;
+      }
+    }
+    // _log();
+    if ( isset($_GET['post']) && is_numeric($_GET['post']) ){
+      $carrier_id = $_GET['post'];
+      $Parcel = new Parcel($_GET['post']);
+      // _log($Parcel);
+      // _log($Parcel->TransportAgreementId);
+      // _log($Parcel->ParcelType);
+      // _log($Parcel->ParcelServices);
+      // _log($Parcel->IsCargonized);
+      printf( '<script>var parcel_carrier_id=%s;</script>', $Parcel->TransportAgreementId );
+      printf( '<script>var parcel_carrier_product="%s"</script>', $Parcel->ParcelType );
+      printf( '<script>var parcel_carrier_product_services=%s</script>', json_encode($Parcel->ParcelServices) );
+      printf( '<script>var parcel_is_cargonized=%s</script>', (( $Parcel->IsCargonized ) ? 'true' : 'false') ) ;
+    }
+
+    printf( '<script>var transport_agreements=%s;</script>', json_encode($agreements) );
+
+  }
+
+
+
+
+  public static function newCustomOrderColumn($columns){
+    $new_columns = (is_array($columns)) ? $columns : array();
+    unset( $new_columns['order_actions'] );
+
+    $new_columns['wcc_consignment_id'] = __('Consignment id');
+    $new_columns['wcc_tracking_url'] = __('Tracking url');
+
+    //stop editing
+
+    $new_columns['order_actions'] = $columns['order_actions'];
+    return $new_columns;
+  }
+
+
+  public static function setCustomOrderColumnValue($column){
+    global $post;
+    $data = get_post_meta( $post->ID );
+    if ( $column == 'wcc_consignment_id' ) {
+      echo (isset($data['consignment_id'][0]) ? $data['consignment_id'][0] : '');
+    }
+
+    if ( $column == 'wcc_tracking_url' ) {
+      $tracking_url = null;
+      if ( isset($data['consignment_tracking_url'][0]) && trim($data['consignment_tracking_url'][0]) ){
+        $tracking_url = sprintf('<a href="%s" target="_blank">%s</a>', $data['consignment_tracking_url'][0], __('Tracking url') );
+      }
+
+      echo $tracking_url;
+
+    }
+  }
+
+
+
 
 
 

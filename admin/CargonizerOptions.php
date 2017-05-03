@@ -81,7 +81,7 @@ class CargonizerOptions{
 
 
   function setTransportAgreements($array){
-    _log('CargonizerSettings::setTransportAgreements()');
+    // _log('CargonizerSettings::setTransportAgreements()');
 
     if ( is_array($array) ){
       foreach ($array as $key => $value) {
@@ -136,7 +136,7 @@ class CargonizerOptions{
                 }
               }
               else{
-                _log('no services: '.$product['name']);
+                //_log('no services: '.$product['name']);
               }
 
 
@@ -164,12 +164,12 @@ class CargonizerOptions{
       $this->saveTransportAgreements();
     }
 
-    _log($this->TransportAgreements);
+    // _log($this->TransportAgreements);
   }
 
 
   function saveTransportAgreements(){
-    _log('CargonizerSettings::saveTransportAgreements');
+    // _log('CargonizerSettings::saveTransportAgreements');
     // _log($this->TransportAgreements);
     set_transient( 'transport_agreements', $this->TransportAgreements, 1*60*60 );
   }
@@ -265,6 +265,7 @@ class CargonizerOptions{
         'label' => __('Sandbox'),
         'type' => 'checkbox',
         'value' => get_option('cargonizer-sandbox-modus'),
+        'option' => 'on'
       ),
       array(
         'name' => 'cargonizer-sandbox-api-key',
@@ -284,20 +285,7 @@ class CargonizerOptions{
 
   function getApiSettings(){
     foreach ( $this->loadApiOptions() as $key => $option){
-    ?>
-      <?php if ( $option['type'] == 'text' or $option['type'] == 'checkbox' ): ?>
-      <div class="mb-field-row">
-        <label class="mb-admin-label inline" for="<?php echo $option['name']; ?>"><?php echo $option['label']; ?></label>
-        <?php if( $option['type'] == 'text'): ?>
-          <input type="<?php echo $option['type']; ?>" name="<?php echo $option['name']; ?>" id="<?php echo $option['name']; ?>" value="<?php echo $option['value']; ?>" size="50" >
-        <?php endif; ?>
-
-        <?php if( $option['type'] == 'checkbox' ): ?>
-          <input type="<?php echo $option['type']; ?>" name="<?php echo $option['name']; ?>" id="<?php echo $option['name']; ?>" value="on" <?php checked( 'on', $option['value'] ); ?> >
-        <?php endif; ?>
-      </div>
-    <?php
-      endif;
+      $this->showOption($option);
     }
   }
 
@@ -353,7 +341,7 @@ class CargonizerOptions{
         ),
         array(
           'name'    => 'cargonizer-delivery-company-id',
-          'label'   => __('Delivery company'),
+          'label'   => __('Default delivery company'),
           'desc'    => __('Api settings required to load delivery companies'),
           'type'    => 'select',
           'value'   => $this->TransportCompanyId,
@@ -362,8 +350,8 @@ class CargonizerOptions{
 
         array(
           'name'    => 'cargonizer-delivery-services',
-          'label'   => __('Product'),
-          'desc'    => __('Select delivery company and update'),
+          'label'   => __('Products'),
+          'desc'    => __('If empty, select delivery company and update'),
           'type'    => 'multiple_checkbox',
           'value'   => $this->TransportServices,
           'options' => ( $this->SelectedTransportAgreement ) ? $this->SelectedTransportAgreement['products'] : array(),
@@ -384,7 +372,7 @@ class CargonizerOptions{
 
 
   /* parcel options */
-  public static function loadParcelOptions(){
+  function loadParcelOptions(){
     return array(
       array(
         'name' => 'cargonizer-parcel-height',
@@ -409,23 +397,14 @@ class CargonizerOptions{
 
 
   function getParcelOptions(){
-    foreach ( self::loadParcelOptions() as $key => $option){
-    ?>
-      <?php if ( $option['type'] == 'text' ): ?>
-      <div class="mb-field-row">
-        <label class="mb-admin-label inline" for="<?php echo $option['name']; ?>"><?php echo $option['label']; ?></label>
-        <?php if( $option['type'] == 'text'): ?>
-          <input type="<?php echo $option['type']; ?>" name="<?php echo $option['name']; ?>" id="<?php echo $option['name']; ?>" value="<?php echo $option['value']; ?>" size="50" >
-        <?php endif; ?>
-      </div>
-    <?php
-      endif;
+    foreach ( $this->loadParcelOptions() as $key => $option){
+      $this->showOption($option);
     }
   }
 
    /* address options */
 
-  public static function loadNotificationOptions(){
+  function loadNotificationOptions(){
     return array(
       array(
         'name' => 'cargonizer-customer-notification-subject',
@@ -447,7 +426,7 @@ class CargonizerOptions{
 
 
   function getNotificationOptions(){
-    foreach ( self::loadNotificationOptions() as $key => $option){
+    foreach ( $this->loadNotificationOptions() as $key => $option){
       $this->showOption($option);
     }
   }
@@ -456,7 +435,7 @@ class CargonizerOptions{
 
    /* address options */
 
-  public static function loadAddressOptions(){
+  function loadAddressOptions(){
 
     return array(
       array(

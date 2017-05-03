@@ -180,11 +180,22 @@ class Cargonizer{
   function acf_setTransportAgreements($field){
     // _log('Cargonizer::acf_setTransportAgreements');
     if ( $Parcel = $this->isOrder() ){
-      // _log($this->Settings);
-      if ( $ta = $this->Settings->get('SelectedTransportAgreement' ) ){
+
+      $agreements = $this->Settings->get('TransportAgreements');
+      if ( is_array($agreements) ){
         $field['choices'] = array();
-        $field['choices'][$ta['id']] = $ta['title'];
+        foreach ($agreements as $key => $a) {
+          $field['choices'][$a['id']] = $a['title'];
+        }
       }
+
+      if( is_numeric($Parcel->TransportAgreementId) && $Parcel->TransportAgreementId ){
+        $field['default_value'] = $Parcel->TransportAgreementId ;
+      }
+      elseif ( $ta = $this->Settings->get('SelectedTransportAgreement' ) ){
+        $field['default_value'] = $ta['id'];
+      }
+
     }
 
     return $field;

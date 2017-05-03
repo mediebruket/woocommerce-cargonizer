@@ -5,7 +5,7 @@ if( function_exists('acf_add_local_field_group') ):
 $readonly = false;
 if ( isset($_GET['post']) && is_numeric($_GET['post']) ){
   if ( get_post_meta( $_GET['post'], 'is_cargonized', true ) ){
-    $readonly = true;
+    // $readonly = true;
   }
 }
 
@@ -77,7 +77,7 @@ acf_add_local_field_group(array (
       'required' => 1,
       'conditional_logic' => 0,
       'wrapper' => array('width' => '','class' => '','id' => '',),
-      'choices' => array(0 => 'select product',),
+      'choices' => array( 0 => 'select type' ),
       'default_value' => array(),
       'allow_null' => 0,
       'multiple' => 0,
@@ -95,14 +95,9 @@ acf_add_local_field_group(array (
       'instructions' => '',
       'required' => 0,
       'conditional_logic' => 0,
-      'wrapper' => array (
-        'width' => '',
-        'class' => '',
-        'id' => '',
-      ),
-      'choices' => array (),
-      'default_value' => array (
-      ),
+      'wrapper' => array('width' => '','class' => '','id' => '',),
+      'choices' => array(),
+      'default_value' => array(),
       'layout' => 'horizontal',
       'toggle' => 0,
       'disabled' => 0,
@@ -234,7 +229,7 @@ acf_add_local_field_group(array (
           'name' => 'parcel_height',
           'type' => 'text',
           'instructions' => '',
-          'required' => 0,
+          'required' => 1,
           'conditional_logic' => 0,
           'wrapper' => array('width' => '','class' => '','id' => '',),
           'default_value' => '',
@@ -251,7 +246,7 @@ acf_add_local_field_group(array (
           'name' => 'parcel_length',
           'type' => 'text',
           'instructions' => '',
-          'required' => 0,
+          'required' => 1,
           'conditional_logic' => 0,
           'wrapper' => array('width' => '','class' => '','id' => '',),
           'default_value' => '',
@@ -269,7 +264,7 @@ acf_add_local_field_group(array (
           'name' => 'parcel_width',
           'type' => 'text',
           'instructions' => '',
-          'required' => 0,
+          'required' => 1,
           'conditional_logic' => 0,
           'wrapper' => array('width' => '','class' => '','id' => '',),
           'default_value' => '',
@@ -340,6 +335,23 @@ acf_add_local_field_group(array (
       'readonly' => 1,
       'disabled' => 0,
     ),
+    // array(
+    //   'key' => 'field_56cee621c7cd12',
+    //   'label' => 'Estimated freight costs',
+    //   'name' => 'consignment_estimated_costs',
+    //   'type' => 'text',
+    //   'instructions' => '',
+    //   'required' => 0,
+    //   'conditional_logic' => 0,
+    //   'wrapper' => array('width' => '','class' => '','id' => '',),
+    //   'default_value' => '',
+    //   'placeholder' => '',
+    //   'prepend' => '',
+    //   'append' => '',
+    //   'maxlength' => '',
+    //   'readonly' => 1,
+    //   'disabled' => 0,
+    // ),
     array(
       'key' => 'field_56cee62ec7cd2',
       'label' => 'Sporingskode',
