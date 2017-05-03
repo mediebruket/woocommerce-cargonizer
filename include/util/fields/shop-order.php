@@ -291,8 +291,8 @@ acf_add_local_field_group(array (
     ),
     array(
       'key' => 'field_56cee5f87deaa',
-      'label' => 'Bekreftelse',
-      'name' => 'bekreftelse',
+      'label' => 'Confirmation',
+      'name' => 'confirmation',
       'type' => 'tab',
       'instructions' => '',
       'required' => 0,
@@ -303,7 +303,7 @@ acf_add_local_field_group(array (
     ),
     array(
       'key' => 'field_56cee60ac7cd0',
-      'label' => 'Dato',
+      'label' => 'Date',
       'name' => 'consignment_created_at',
       'type' => 'text',
       'instructions' => '',
@@ -354,7 +354,7 @@ acf_add_local_field_group(array (
     // ),
     array(
       'key' => 'field_56cee62ec7cd2',
-      'label' => 'Sporingskode',
+      'label' => 'Tracking code',
       'name' => 'consignment_tracking_code',
       'type' => 'text',
       'instructions' => '',
@@ -371,7 +371,7 @@ acf_add_local_field_group(array (
     ),
     array(
       'key' => 'field_56cee6bd6fb1e',
-      'label' => 'Sporings-adresse',
+      'label' => 'Tracking url',
       'name' => 'consignment_tracking_url',
       'type' => 'text',
       'instructions' => '',
