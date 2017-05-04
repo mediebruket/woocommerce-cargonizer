@@ -62,3 +62,14 @@
   margin-bottom: 5px;
   font-size:16px;
 }
+
+#wcc-print-response:empty{
+  display: none !important;
+}
+
+#wcc-print-response{
+  display: inline-block;
+  padding:5px 20px;
+  width: 320px !important;
+  margin-left:10px;
+}

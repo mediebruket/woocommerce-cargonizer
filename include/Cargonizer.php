@@ -304,20 +304,40 @@ class Cargonizer{
     _log('Cargonizer::printOrder');
     _log($_POST);
 
+    $response = '1';
     if ( isset($_POST['order_id']) && is_numeric($_POST['order_id']) ){
       $Parcel = new Parcel( $_POST['order_id'] );
 
-      _log($Parcel->ConsignmentId);
-      _log($Parcel->Printer);
+      _log('ConsignmentId: '.$Parcel->ConsignmentId);
+      _log('Printer: '. $Parcel->Printer);
+
+      if ( !$Parcel->ConsignmentId ){
+        $response = 'Missing consignment id';
+      }
+
+      if ( !$Parcel->Printer ){
+        $response = 'Missing printer_abort(printer_handle)';
+      }
 
       if ( $Parcel->ConsignmentId && $Parcel->Printer ){
-        _log('print..');
         $Api = new CargonizerApi();
-        $Api->postLabel( $Parcel->ConsignmentId, $Parcel->Printer );
+        if ( $Api->postLabel( $Parcel->ConsignmentId, $Parcel->Printer ) == 'Printing' ){
+          $printer = $Parcel->Printer;
+          if ( $ta = get_transient( 'wcc_printer_list' ) ){
+            if ( isset( $ta[$Parcel->Printer] ) ){
+              $printer = $ta[$Parcel->Printer]. " (".$Parcel->Printer.")";
+            }
+          }
+          $response = 'Label was printed on printer '.$printer;
+        }
+        else{
+          $response = 'Could not connect to Cargonizer';
+        }
+
       }
 
     }
-    echo '1';
+    echo $response;
     wp_die();
   }
 

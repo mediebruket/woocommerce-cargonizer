@@ -50,9 +50,9 @@ class CargonizerApi{
 
   function getPrinters(){
     // curl -g -XGET -H'X-Cargonizer-Key: b38515a578db604ba77f063801155add075a56e4' -H'X-Cargonizer-Sender: 1142' 'http://sandbox.cargonizer.no/transport_agreements.xml'
-    _log('get printers');
+    _log('CargonizerApi::getPrinters()');
 
-    return $this->rest('printers.xml', $headers=array(), $method='GET', $xml=null, $debug=false );
+    return $this->rest('printers.xml', $headers=array(), $method='GET', $xml=null, $debug=true );
   }
 
 
@@ -72,7 +72,7 @@ class CargonizerApi{
     }
 
 
-    return $this->rest( $resource,  $headers=array(), $method='GET', $xml=null, $debug=true  );
+    return $this->rest( $resource,  $headers=array(), $method='GET', $xml=null, $debug=false );
   }
 
 
@@ -169,8 +169,14 @@ class CargonizerApi{
       _log($response);
     }
 
-    if ( $status==200 || $status==201 ){
-      return xmlToArray( simplexml_load_string(wp_remote_retrieve_body($response)) );
+    if ( $status==200 or $status==201 or $status == 202 ){
+      if ( $status == 200 or $status == 201 ){
+        return xmlToArray( simplexml_load_string(wp_remote_retrieve_body($response)) );
+      }
+      else{
+        return wp_remote_retrieve_body($response);
+      }
+
     }
     else{
       return null;

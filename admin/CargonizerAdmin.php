@@ -188,7 +188,7 @@ class CargonizerAdmin{
       $path = $plugin_path.'assets/';
 
       // $scripts = array( 'bootstrap-datepicker.js', 'bootstrap-datepicker.no.js', 'datepicker.js', 'forms.js',  'jquery.validate.min.js', 'messages_no.js' );
-      $styles = array( 'admin.css' );
+      $styles = array( 'wcc-admin.css' );
 
       // include stylesheets
       foreach ($styles as $s) {

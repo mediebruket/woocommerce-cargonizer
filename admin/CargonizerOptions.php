@@ -189,18 +189,21 @@ class CargonizerOptions{
 
 
   public static function getPrinterList(){
-    //_log('CargonizerOptions::getPrinterList()');
+    _log('CargonizerOptions::getPrinterList()');
     $array = array();
     $transient = 'wcc_printer_list';
 
     if ( $ta = get_transient( $transient ) ){
+      // _log('has printer transient');
       foreach ($ta as $printer_id => $printer_name) {
         $array[ $printer_id ] = $printer_name;
       }
     }
     else{
+      // _log('get printers from cargonizer');
       $Api = new CargonizerApi();
       $printers = $Api->getPrinters();
+
 
       $array = array();
       if ( isset($printers['printers']) && is_array($printers['printers']) && !empty($printers['printers']) ){
