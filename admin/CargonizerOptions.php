@@ -176,20 +176,23 @@ class CargonizerOptions{
 
 
 
-  public static function getCompanyList(){
+  function getCompanyList(){
     $companies = array();
+    $this->getTransportAgreements();
+
     if ( $ta = get_transient( 'transport_agreements' ) ){
       foreach ($ta as $key => $row) {
         $companies[ $row['id'] ] = $row['title'];
       }
     }
 
+
     return $companies;
   }
 
 
   public static function getPrinterList(){
-    _log('CargonizerOptions::getPrinterList()');
+    //_log('CargonizerOptions::getPrinterList()');
     $array = array();
     $transient = 'wcc_printer_list';
 
@@ -348,7 +351,7 @@ class CargonizerOptions{
           'desc'    => __('Api settings required to load delivery companies'),
           'type'    => 'select',
           'value'   => $this->TransportCompanyId,
-          'options' => self::getCompanyList(),
+          'options' => $this->getCompanyList(),
         ),
 
         array(

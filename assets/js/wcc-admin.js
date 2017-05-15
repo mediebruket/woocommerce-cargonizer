@@ -44,7 +44,7 @@ function printOrder(){
 
 
 function checkIfCargonized(){
-  if ( parcel_is_cargonized == true ){
+  if (typeof parcel_is_cargonized !== 'undefined' &&  parcel_is_cargonized == true ){
     // select
     jQuery('#acf-field_56cd64c524655, #acf-field_56cd64c524656, #acf-field_56cec446a4498').attr('disabled', true);
     // checkbox

@@ -302,7 +302,20 @@ class Parcel{
     _log('saveConsignment');
     _log($consignment);
     acf_updateField('consignment_created_at', $consignment['created-at']['$'], $this->ID);
-    acf_updateField('consignment_id', $consignment['bundles']['bundle'][0]['consignment-id']['$'], $this->ID);
+
+    if ( $consignment['bundles']['bundle'] ){
+      $bundle = $consignment['bundles']['bundle'];
+      if ( isset($bundle[0]) ){
+        $consignment_id = $bundle[0]['consignment-id']['$'];
+      }
+      else {
+       $consignment_id = $bundle['consignment-id']['$'];
+      }
+
+      acf_updateField('consignment_id', $consignment_id, $this->ID);
+    }
+
+
     acf_updateField('consignment_tracking_code', $consignment['number'], $this->ID);
     acf_updateField('consignment_tracking_url', $consignment['tracking-url'], $this->ID);
     acf_updateField('consignment_pdf', $consignment['consignment-pdf'], $this->ID);

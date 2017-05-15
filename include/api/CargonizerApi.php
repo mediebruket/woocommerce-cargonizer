@@ -57,22 +57,28 @@ class CargonizerApi{
 
 
   function postLabel( $consignment_id, $printer_id ){
+    _log('CargonizerApi::postLabel('.$consignment_id.' '.$printer_id.')');
     // curl -g -XPOST -H'X-Cargonizer-Key: 12345' -H'X-Cargonizer-Sender: 678' 'http://cargonizer.no/consignments/label_direct?printer_id=123&consignment_ids[]=1&consignment_ids[]=2&piece_ids[]=3&piece_ids[]=4'
 
-    $args =
-      array(
-        'printer_id' => $printer_id,
-        'consignment_ids[]' => $consignment_id
-      );
+    if ( $consignment_id && $printer_id ){
+      $args =
+        array(
+          'printer_id' => $printer_id,
+          'consignment_ids[]' => $consignment_id
+        );
 
-    $resource = 'consignments/label_direct?';
+      $resource = 'consignments/label_direct?';
 
-    if ( $query_string = $this->buildQueryString($args) ){
-      $resource .= $query_string;
+      if ( $query_string = $this->buildQueryString($args) ){
+        $resource .= $query_string;
+      }
+
+
+      return $this->rest( $resource,  $headers=array(), $method='GET', $xml=null, $debug=true );
     }
-
-
-    return $this->rest( $resource,  $headers=array(), $method='GET', $xml=null, $debug=false );
+    else{
+      return null;
+    }
   }
 
 
