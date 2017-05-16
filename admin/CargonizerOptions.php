@@ -9,17 +9,18 @@ class CargonizerOptions{
 
 
   function __construct(){
-    $this->setTransportCompanyId();
-    $this->setTransportServices();
-    $this->getTransportAgreements();
-    $this->setDefaultPrinter();
-    $this->setPrintOnExport();
+    $this->TransportCompanyId         = $this->getTransportCompanyId();
+    $this->TransportServices          = $this->getTransportServices();
+    $this->DefaultPrinter             = $this->getDefaultPrinter();
+    $this->PrintOnExport              = $this->getPrintOnExport();
+    $this->TransportAgreements        = $this->getTransportAgreements();
+    $this->SelectedTransportAgreement = $this->getSelectedTransportAgreement();
   }
+
 
   function init(){
     $this->__construct();
   }
-
 
 
   function get($Attribute){
@@ -32,56 +33,100 @@ class CargonizerOptions{
   }
 
 
-  function setTransportCompanyId(){
-    $this->TransportCompanyId = get_option('cargonizer-delivery-company-id');
-  }
+  function updateOptions( $type ){
+    $method = 'load'.$type."Options";
 
+    foreach ( $this->$method() as $key => $option){
+      if ( isset($_POST[ $option['name'] ]) ){
+        $post_value = $_POST[ $option['name'] ];
 
-  function setDefaultPrinter(){
-    $this->DefaultPrinter = get_option('cargonizer-default-printer');
-  }
+        if ( is_string($post_value) ){
+          $post_value = trim( $post_value );
+        }
 
-  function setPrintOnExport(){
-    $this->PrintOnExport = get_option('cargonizer-print-on-export');
-  }
-
-
-  function setTransportServices(){
-    $this->TransportServices = maybe_unserialize( get_option('cargonizer-delivery-services') );
-  }
-
-
-  function getTransportAgreements($force_update=false){
-    // _log('CargonizerSettings::getTransportAgreements()');
-    $transport_agreements = get_transient('transport_agreements');
-
-    if ( $transport_agreements && !$force_update ){
-      $this->TransportAgreements = $transport_agreements;
-    }
-    else{
-      _log('update transient');
-      $Api = new CargonizerApi(true);
-      $this->setTransportAgreements( $Api->TransportAgreements['transport-agreements']['transport-agreement'] );
+        update_option( $option['name'], $post_value );
+      }
+      else{
+        update_option( $option['name'], null );
+      }
     }
 
-    // _log($this->TransportCompanyId);
-    // _log($this->TransportAgreements);
+    $this->init();
+  }
+
+
+  function getOptions( $type ){
+    $method = 'load'.$type.'Options';
+    ob_start();
+    foreach ( $this->$method() as $key => $option):
+    ?>
+      <div class="mb-field-row"><?php CargonizerHtmlBuilder::buildOption( $option ); ?></div>
+    <?php
+
+    endforeach;
+    $output = ob_get_contents();
+    ob_end_clean();
+
+    return $output;
+  }
+
+
+  function getTransportCompanyId(){
+    return get_option('cargonizer-delivery-company-id');
+  }
+
+
+  function getDefaultPrinter(){
+    return get_option('cargonizer-default-printer');
+  }
+
+
+  function getPrintOnExport(){
+    return get_option('cargonizer-print-on-export');
+  }
+
+
+  function getTransportServices(){
+    return maybe_unserialize( get_option('cargonizer-delivery-services') );
+  }
+
+
+  function getSelectedTransportAgreement(){
+    $selected_transport_agreement = null;
 
     if ( $this->TransportCompanyId && is_array($this->TransportAgreements) && !empty($this->TransportAgreements) ){
       foreach ($this->TransportAgreements as $key => $ta) {
         if ( $ta['id'] == $this->TransportCompanyId ){
-          $this->SelectedTransportAgreement = $ta;
+          $selected_transport_agreement = $ta;
           break;
         }
       }
     }
 
-    //_log($this->SelectedTransportAgreement);
+    return $selected_transport_agreement;
   }
 
 
-  function setTransportAgreements($array){
-    // _log('CargonizerSettings::setTransportAgreements()');
+  function getTransportAgreements($force_update=false){
+    //_log('CargonizerOptions::getTransportAgreements()');
+    $transport_agreements = get_transient('transport_agreements');
+
+    if ( !$transport_agreements or $force_update ){
+      _log('update transient');
+      $Api = new CargonizerApi(true);
+      if ( $ta = $this->sanitizeTransportAgreements( $Api->TransportAgreements['transport-agreements']['transport-agreement'] ) ){
+         $this->saveTransportAgreements( $ta );
+         $transport_agreements = $ta;
+      }
+    }
+
+    return $transport_agreements;
+  }
+
+
+  function sanitizeTransportAgreements($array){
+    $transport_agreements = null;
+    // _log('CargonizerSettings::sanitizeTransportAgreements()');
 
     if ( is_array($array) ){
       foreach ($array as $key => $value) {
@@ -155,23 +200,22 @@ class CargonizerOptions{
           // add carrier if has products
           if ( $products ){
             $carrier['products'] = $products;
-            $this->TransportAgreements[] = $carrier;
+            $transport_agreements[] = $carrier;
           }
 
         }
       }
-
-      $this->saveTransportAgreements();
     }
 
+    return $transport_agreements;
     // _log($this->TransportAgreements);
   }
 
 
-  function saveTransportAgreements(){
+  function saveTransportAgreements(  $transport_agreements ){
     // _log('CargonizerSettings::saveTransportAgreements');
     // _log($this->TransportAgreements);
-    set_transient( 'transport_agreements', $this->TransportAgreements, 1*60*60 );
+    set_transient( 'transport_agreements', $transport_agreements, 1*60*60 );
   }
 
 
@@ -226,27 +270,16 @@ class CargonizerOptions{
   }
 
 
-  public static function licenceSettings(){
-    global $licence_settings;
-
-    foreach ($licence_settings as $key => $value) {
-    ?>
-    <div>
-    <label class="mb-admin-label" for="<?php echo $key; ?>"><?php echo $value; ?></label>
-    <input type="input" class="licence-key" name="<?php echo $key; ?>" id="<?php echo $key; ?>" value="<?php echo get_option($key); ?>" size="50" >
-    </div>
-
-    <?php
-    }
-  		global $plugin_file;
-  		$Plugin = new MB_Updater($plugin_file);
-  		$valid = $Plugin->checkLicenceKey();
-  		$color = ( $valid  == '1' ) ? '#009933' : '#cc0000';
-  		set_transient( $Plugin->Slug.'_last_check', $valid, 0 );
-  		?>
-
-  		<style type="text/css">.licence-key{border:2px solid <?php echo $color; ?>}</style>
-  		<?php
+  function loadLicenceOptions(){
+    return array(
+       array(
+        'name'  => 'woocomerce-cargonizer_licence_key',
+        'label' => __('Licence key'),
+        'type'  => 'text',
+        'value' => get_option('cargonizer-licence-key'),
+        'css'   => 'licence-key',
+      )
+    );
 	}
 
 
@@ -289,43 +322,7 @@ class CargonizerOptions{
   }
 
 
-  function getApiSettings(){
-    foreach ( $this->loadApiOptions() as $key => $option){
-      $this->showOption($option);
-    }
-  }
-
-
-  function updateOptions( $type ){
-    $method = 'load'.$type."Options";
-
-    foreach ( $this->$method() as $key => $option){
-      if ( isset($_POST[ $option['name'] ]) ){
-        $post_value = $_POST[ $option['name'] ];
-
-        if ( is_string($post_value) ){
-          $post_value = trim( $post_value );
-        }
-
-        update_option( $option['name'], $post_value );
-      }
-      else{
-        update_option( $option['name'], null );
-      }
-    }
-
-    $this->init();
-  }
-
-
-  /* general options */
-
   function loadGeneralOptions(){
-    // _log($this->TransportServices);
-    // $this->TransportAgreements;
-    // $this->SelectedTransportAgreement;
-    // $this->TransportServices;
-
     $options =
       array(
         array(
@@ -370,14 +367,6 @@ class CargonizerOptions{
   }
 
 
-  function getGeneralSettings(){
-    foreach ( $this->loadGeneralOptions() as $key => $option): ?>
-      <div class="mb-field-row"><?php $this->showOption( $option ); ?></div>
-    <?php endforeach;
-  }
-
-
-  /* parcel options */
   function loadParcelOptions(){
     return array(
       array(
@@ -402,14 +391,6 @@ class CargonizerOptions{
   }
 
 
-  function getParcelOptions(){
-    foreach ( $this->loadParcelOptions() as $key => $option){
-      $this->showOption($option);
-    }
-  }
-
-   /* address options */
-
   function loadNotificationOptions(){
     return array(
       array(
@@ -426,20 +407,9 @@ class CargonizerOptions{
         'type' => 'textarea',
         'value' => get_option('cargonizer-customer-notification-message'),
       ),
-
     );
   }
 
-
-  function getNotificationOptions(){
-    foreach ( $this->loadNotificationOptions() as $key => $option){
-      $this->showOption($option);
-    }
-  }
-
-
-
-   /* address options */
 
   function loadAddressOptions(){
 
@@ -481,100 +451,6 @@ class CargonizerOptions{
       ),
 
     );
-  }
-
-
-  function getAddressOptions(){
-    foreach ( self::loadAddressOptions() as $key => $option){
-      $this->showOption($option);
-    }
-  }
-
-
-  function showOption( $option, $default_value=null ){?>
-    <div class="mb-field-row">
-
-      <?php if( $option['type'] == 'text'): ?>
-        <label class="mb-admin-label inline" for="<?php echo $option['name']; ?>"><?php echo $option['label']; ?></label>
-        <?php if (isset($option['desc']) && trim($option['desc']) ): ?>
-          <div><span class="mb-field-desc"><?php echo $option['desc']; ?></span></div>
-        <?php endif ;?>
-        <input type="<?php echo $option['type']; ?>" name="<?php echo $option['name']; ?>" id="<?php echo $option['name']; ?>" value="<?php echo $option['value']; ?>" size="50" >
-      <?php endif; ?>
-
-       <?php if( $option['type'] == 'checkbox'): ?>
-        <label class="mb-admin-label inline" for="<?php echo $option['name']; ?>"><?php echo $option['label']; ?></label>
-        <?php if (isset($option['desc']) && trim($option['desc']) ): ?>
-          <div><span class="mb-field-desc"><?php echo $option['desc']; ?></span></div>
-        <?php endif ;?>
-        <input type="<?php echo $option['type']; ?>" name="<?php echo $option['name']; ?>" id="<?php echo $option['name']; ?>" value="<?php echo $option['option']; ?>" <?php  checked( $option['option'], $option['value'] ); ?> >
-      <?php endif; ?>
-
-
-      <?php if( $option['type'] == 'multiple_checkbox'): ?>
-        <div class>
-          <label class="mb-admin-label" for="<?php echo $option['name']; ?>"><?php echo $option['label']; ?></label>
-
-          <?php if ( isset($option['desc'])): ?>
-            <div><span class="mb-field-desc"><?php echo $option['desc']; ?></span></div>
-          <?php endif; ?>
-
-          <?php
-          // _log( $option['options'] );
-          foreach ( $option['options'] as $key => $o) {
-            if ( isset($o['types']) && is_array($o['types']) && !empty($o['types']) ){
-              foreach ($o['types'] as $type_key => $type) {
-
-                $id = uniqid();
-                $checked  = null;
-                $type_value = $o['identifier']."|".$type_key;
-
-                if ( is_numeric(array_search($type_value, $option['value'])) ){
-                  $checked = ' checked="checked" ';
-                }
-
-                printf(
-                  '<div class="mb-option-row"><input type="checkbox" id="%s" name="%s[]" value="%s" %s /><label for="%s">%s</label></div>',
-                  $id, $option['name'], $type_value, $checked, $id, $o['name']." (".$type.")"
-                  );
-              }
-            }
-          }
-          ?>
-        </div>
-      <?php endif; ?>
-
-      <?php if( $option['type'] == 'textarea'): ?>
-      <label class="mb-admin-label" for="<?php echo $option['name']; ?>"><?php echo $option['label']; ?></label>
-        <textarea name="<?php echo $option['name']; ?>" id="<?php echo $option['name']; ?>" class="wcc-textarea"><?php echo $option['value']; ?></textarea>
-      <?php endif; ?>
-
-      <?php if( $option['type'] == 'select'): ?>
-        <label class="mb-admin-label" for="<?php echo $option['name']; ?>"><?php echo $option['label']; ?></label>
-        <?php if ( isset($option['desc']) ): ?>
-          <div><span class="mb-field-desc"><?php echo $option['desc']; ?></span></div>
-        <?php endif; ?>
-        <select name="<?php echo $option['name'] ?>" id="<?php echo $option['name'] ?>">
-            <?php foreach ($option['options'] as $value => $title) {
-              printf('<option value="%s" %s>%s</option>',  $value, selected( $value, $option['value'], $echo=false ), $title );
-            }
-          ?>
-        </select>
-      <?php endif; ?>
-
-    </div>
-    <?php
-  }
-
-
-  public static function updateLicenceSettings(){
-    global $licence_settings;
-
-    foreach ($licence_settings as $key => $value) {
-      if ( isset($_POST[$key]) ){
-        update_option( $key, trim($_POST[$key])  );
-      }
-    }
   }
 
 

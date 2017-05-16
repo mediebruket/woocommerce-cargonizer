@@ -146,13 +146,6 @@ class Parcel{
   }
 
 
-  function saveTransportAgreements(){
-    // _log('saveTransportAgreements');
-    // _log($this->TransportAgreements);
-    set_transient( 'transport_agreements', $this->TransportAgreements, 1*60*60 );
-  }
-
-
   public static function _getTransportAgreements(){
     return get_transient('transport_agreements');
   }
@@ -383,70 +376,6 @@ class Parcel{
     }
 
   }
-
-
-  // function setTransportAgreements($array){
-  //   _log('setTransportAgreements');
-
-  //   if ( is_array($array) ){
-  //     foreach ($array as $key => $value) {
-  //       // _log($value);
-  //       if ( isset($value['carrier']['identifier']) && isset($value['id']['$']) ){
-  //         // _log($value['carrier']['identifier']);
-
-  //         // set carrier
-  //         $carrier = array(
-  //           'id'          => $value['id']['$'],
-  //           'identifier'  => $value['carrier']['identifier'],
-  //           'name'        => $value['carrier']['name'],
-  //           'desc'        => $value['description'],
-  //           'title'       => $value['carrier']['identifier'].' ('.$value['description'] .')'
-  //         );
-
-
-  //         // set products
-  //         $products = array();
-  //         if ( is_array($value['products']['product']) ){
-  //           foreach ( $value['products']['product']  as $key => $product) {
-  //               // _log($key);
-  //               // _log($product);
-
-  //             $types = array();
-  //             if ( isset($product['item_types']['item_type']) && is_array($product['item_types']['item_type']) ){
-  //               foreach ($product['item_types']['item_type'] as $index => $type){
-  //                 if ( $abbreviation = gi($type, '@abbreviation' ) ){
-  //                   $types[ $type['@abbreviation'] ] = $type['@name_no'];
-  //                 }
-
-  //               }
-  //             }
-
-  //             if ( !empty($types) ){
-  //               $products[] = array(
-  //                 'name'        => $product['name'],
-  //                 'identifier'  => $product['identifier'],
-  //                 'types'       => $types,
-  //                 );
-  //             }
-  //           }
-  //         }
-
-
-  //         // add carrier if has products
-  //         if ( $products ){
-  //           $carrier['products'] = $products;
-  //           $this->TransportAgreements[] = $carrier;
-  //         }
-
-  //       }
-  //     }
-
-  //     $this->saveTransportAgreements();
-  //   }
-
-  //   // _log($this->TransportAgreements);
-  // }
-  //
 
 
 } // end of class

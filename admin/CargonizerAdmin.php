@@ -19,6 +19,17 @@ class CargonizerAdmin{
     $page = add_submenu_page('woocommerce', __( 'Cargonizer', 'wc-cargonizer' ), __( 'Cargonizer', 'wc-cargonizer' ), apply_filters( 'woocommerce_csv_product_role', 'manage_woocommerce' ), WCC_Admin, array( $this, 'adminPage') );
   }
 
+  function getTabs(){
+    return array(
+      'apiPage'           => __('API', 'wc-cargonizer'),
+      'generalPage'       => __('General', 'wc-cargonizer'),
+      'parcelPage'        => __('Parcel', 'wc-cargonizer'),
+      'notificationPage'  => __('Notification', 'wc-cargonizer'),
+      'addressPage'       => __('Address', 'wc-cargonizer'),
+      'licencePage'       => __('Licence', 'wc-cargonizer'),
+      );
+  }
+
 
   function adminPage() {
     global $woocommerce;
@@ -29,11 +40,10 @@ class CargonizerAdmin{
     <div class="wrap woocommerce">
       <div class="icon32" id="icon-woocommerce-importer"><br></div>
       <h2 class="nav-tab-wrapper woo-nav-tab-wrapper">
-      <a href="<?php echo admin_url('admin.php?page='.WCC_Admin.'&tab=apiPage') ?>" class="nav-tab <?php echo ($tab == 'apiPage') ? 'nav-tab-active' : ''; ?>"><?php _e('API', 'wc-cargonizer'); ?></a>
-      <a href="<?php echo admin_url('admin.php?page='.WCC_Admin.'&tab=generalPage') ?>" class="nav-tab <?php echo ($tab == 'generalPage') ? 'nav-tab-active' : ''; ?>"><?php _e('General', 'wc-cargonizer'); ?></a>
-      <a href="<?php echo admin_url('admin.php?page='.WCC_Admin.'&tab=parcelPage'); ?>" class="nav-tab <?php echo ($tab == 'parcelPage') ? 'nav-tab-active' : ''; ?>"><?php _e('Parcel', 'wc-cargonizer'); ?></a>
-      <a href="<?php echo admin_url('admin.php?page='.WCC_Admin.'&tab=notificationPage'); ?>" class="nav-tab <?php echo ($tab == 'notificationPage') ? 'nav-tab-active' : ''; ?>"><?php _e('Notification', 'wc-cargonizer'); ?></a>
-      <a href="<?php echo admin_url('admin.php?page='.WCC_Admin.'&tab=addressPage'); ?>" class="nav-tab <?php echo ($tab == 'addressPage') ? 'nav-tab-active' : ''; ?>"><?php _e('Address', 'wc-cargonizer'); ?></a>
+      <?php foreach ($this->getTabs() as $key => $text) {
+        printf('<a href="%s" class="nav-tab %s">%s</a>', admin_url('admin.php?page='.WCC_Admin.'&tab='.$key) , (($tab == $key) ? 'nav-tab-active' : null), $text );
+      }
+      ?>
       </h2>
       <?php self::$tab(); ?>
     </div>
@@ -46,102 +56,85 @@ class CargonizerAdmin{
       $this->Options->updateOptions('Api');
       $this->showUpdateMessage ( __( 'API settings updated', 'wc-cargonizer' ) );
     }
-    ?>
-    <div class="tool-box">
-      <form action="" method="POST">
-        <h3 class="title"><?php _e('API setttings', 'wc-cargonizer'); ?></h3>
-        <input type="hidden" name="update" value="1">
-        <?php $this->Options->getApiSettings(); ?>
-        <p><input type="submit" class="button" value="<?php _e('update', 'wc-cargonizer' ); ?>"></p>
-      </form>
-    </div>
-    <?php
+
+    $this->showToolBox( __('API setttings', 'wc-cargonizer'),  $this->Options->getOptions('Api') );
   }
 
 
-  function generalPage(){?>
-    <?php
-      if ( isset($_POST['update']) ){
-        $this->Options->updateOptions('General');
-        $this->showUpdateMessage ( __( 'General settings updated', 'wc-cargonizer' ) );
-      }
-    ?>
+  function generalPage(){
+    if ( isset($_POST['update']) ){
+      $this->Options->updateOptions('General');
+      $this->showUpdateMessage ( __( 'General settings updated', 'wc-cargonizer' ) );
+    }
 
-    <div class="tool-box">
-      <form action="" method="POST">
-        <h3 class="title"><?php _e('General setttings', 'wc-cargonizer'); ?></h3>
-        <input type="hidden" name="update" value="1">
-        <?php $this->Options->getGeneralSettings(); ?>
-        <p><input type="submit" class="button" value="<?php _e('update', 'wc-cargonizer' ); ?>"></p>
-      </form>
-    </div>
-    <?php
+    $this->showToolBox( __('General setttings', 'wc-cargonizer'), $this->Options->getOptions('General') );
   }
 
 
-  function parcelPage(){?>
-    <?php
-      if ( isset($_POST['update']) ){
-        $this->Options->updateOptions('Parcel');
-        $this->showUpdateMessage ( __( 'Parcel settings updated', 'wc-cargonizer' ) );
-      }
-    ?>
+  function parcelPage(){
+    if ( isset($_POST['update']) ){
+      $this->Options->updateOptions('Parcel');
+      $this->showUpdateMessage ( __( 'Parcel settings updated', 'wc-cargonizer' ) );
+    }
 
-    <div class="tool-box">
-      <form action="" method="POST">
-        <h3 class="title"><?php _e('Default package size', 'wc-cargonizer'); ?></h3>
-        <input type="hidden" name="update" value="1">
-        <?php $this->Options->getParcelOptions(); ?>
-        <p><input type="submit" class="button" value="<?php _e('update', 'wc-cargonizer' ); ?>"></p>
-      </form>
-    </div>
-    <?php
+    $this->showToolBox( __('Default package size', 'wc-cargonizer'), $this->Options->getOptions('Parcel') );
   }
 
 
-  function addressPage(){ ?>
-    <?php
-      if ( isset($_POST['update']) ){
-        $this->Options->updateOptions( 'Address' );
-        $this->showUpdateMessage ( __( 'API settings updated', 'wc-cargonizer' ) );
-      }
-    ?>
+  function addressPage(){
+    if ( isset($_POST['update']) ){
+      $this->Options->updateOptions( 'Address' );
+      $this->showUpdateMessage ( __( 'API settings updated', 'wc-cargonizer' ) );
+    }
 
-    <div class="tool-box">
-      <form action="" method="POST">
-        <h3 class="title"><?php _e('Return address', 'wc-cargonizer'); ?></h3>
-        <input type="hidden" name="update" value="1" />
-        <?php $this->Options->getAddressOptions(); ?>
-        <p><input type="submit" class="button" value="<?php _e('update', 'wc-cargonizer' ); ?>"></p>
-      </form>
-    </div>
-    <?php
+    $this->showToolBox( __('Address settings', 'wc-cargonizer'), $this->Options->getOptions('Address') );
   }
 
 
-  function notificationPage(){ ?>
-    <?php
+  function notificationPage(){
       if ( isset($_POST['update']) ){
         $this->Options->updateOptions( 'Notification' );
         $this->showUpdateMessage ( __( 'Notification settings updated', 'wc-cargonizer' ) );
       }
+
+      $this->showToolBox( __('Notifications', 'wc-cargonizer'), $this->Options->getOptions('Notification') );
     ?>
 
+    <div class="wcc-instruction">
+      <h4><?php _e('Placeholders', 'wc-cargonizer'); ?></h4>
+      <?php echo implode('<br/>', Parcel::getPlaceholders() ) ?>
+    </div>
+    <?php
+  }
+
+
+  function licencePage(){
+    if ( isset($_POST['update']) ){
+      $this->Options->updateOptions( 'Licence' );
+      $this->showUpdateMessage ( __( 'Licence updated', 'wc-cargonizer' ) );
+    }
+
+    $this->showToolBox( __('Licence settings', 'wc-cargonizer'), $this->Options->getOptions('Licence') );
+
+    global $plugin_file;
+    $Plugin = new CargonizerUpdater($plugin_file);
+    $valid = $Plugin->checkLicenceKey();
+    $color = ( $valid  == '1' ) ? '#009933' : '#cc0000';
+    set_transient( $Plugin->Slug.'_last_check', $valid, 0 );
+    printf('<style type="text/css">.licence-key{border:2px solid %s !important; }</style>', $color );
+  }
+
+
+  function showToolBox( $title, $options=null ){ ?>
     <div class="tool-box">
       <form action="" method="POST">
-        <h3 class="title"><?php _e('Notifications', 'wc-cargonizer'); ?></h3>
-
-        <div class="wcc-instruction">
-          <h4><?php _e('Placeholders', 'wc-cargonizer'); ?></h4>
-          <?php echo implode('<br/>', Parcel::getPlaceholders() ) ?>
-        </div>
-
+        <h3 class="title"><?php echo $title; ?></h3>
         <input type="hidden" name="update" value="1" />
-        <?php $this->Options->getNotificationOptions(); ?>
+        <?php echo $options; ?>
         <p><input type="submit" class="button" value="<?php _e('update', 'wc-cargonizer' ); ?>"></p>
       </form>
     </div>
-    <?php
+  <?php
   }
 
 
@@ -155,31 +148,7 @@ class CargonizerAdmin{
   }
 
 
-  public static function licencePage(){ ?>
-    <?php if ( isset($_POST['update']) ): ?>
-      <div id="message" class="updated woocommerce-message wc-connect">
-        <div class="squeezer">
-          <?php CargonizerOptions::updateLicenceSettings(); ?>
-          <h4><?php _e( '<strong>Licence key updated</strong> ', 'wc-cargonizer' ); ?></h4>
-        </div>
-      </div>
-    <?php endif; ?>
-
-    <div class="tool-box">
-      <form action="" method="POST">
-        <h3 class="title"><?php _e('Licence key', 'wc-cargonizer'); ?></h3>
-        <input type="hidden" name="update" value="1">
-        <?php CargonizerOptions::licenceSettings(); ?>
-        <p><input type="submit" class="button" value="<?php _e('update', 'wc-cargonizer' ); ?>"></p>
-      </form>
-    </div>
-    <?php
-  }
-
-
-
   function registerScripts(){
-
     if ( is_admin() ) {
       $scripts = array();
       $styles = array();
