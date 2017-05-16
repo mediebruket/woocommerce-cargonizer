@@ -66,8 +66,16 @@ class CargonizerAdmin{
       $this->Options->updateOptions('General');
       $this->showUpdateMessage ( __( 'General settings updated', 'wc-cargonizer' ) );
     }
+    else if ( isset($_GET['delete']) && $_GET['delete'] == '1' ){
+      delete_option( 'cargonizer-delivery-company-id' );
+      delete_option( 'cargonizer-delivery-services' );
+      delete_option( 'cargonizer-default-printer' );
+      delete_transient( 'wcc_printer_list' );
+      delete_transient( 'transport_agreements' );
+      $this->Options->init();
+    }
 
-    $this->showToolBox( __('General setttings', 'wc-cargonizer'), $this->Options->getOptions('General') );
+    $this->showToolBox( __('General setttings', 'wc-cargonizer'), $this->Options->getOptions('General'), true );
   }
 
 
@@ -125,13 +133,19 @@ class CargonizerAdmin{
   }
 
 
-  function showToolBox( $title, $options=null ){ ?>
+  function showToolBox( $title, $options=null, $reset = false ){ ?>
     <div class="tool-box">
       <form action="" method="POST">
         <h3 class="title"><?php echo $title; ?></h3>
         <input type="hidden" name="update" value="1" />
         <?php echo $options; ?>
-        <p><input type="submit" class="button" value="<?php _e('update', 'wc-cargonizer' ); ?>"></p>
+        <p>
+          <input type="submit" class="wcc-button save" value="<?php _e('update', 'wc-cargonizer' ); ?>">
+          <?php if  ( $reset ): ?>
+
+            <a class="wcc-button  delete" href="<?php echo $_SERVER['REQUEST_URI']."&delete=1"; ?>"><?php _e('reset', 'wc-cargonizer' );  ?></a>
+          <?php endif; ?>
+        </p>
       </form>
     </div>
   <?php
@@ -237,8 +251,6 @@ class CargonizerAdmin{
 
     }
   }
-
-
 
 
 
