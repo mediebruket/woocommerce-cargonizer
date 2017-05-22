@@ -114,9 +114,10 @@ class Parcel{
 
 
   function getTransportAgreementSettings(){
-    //_log('Parcel::getTransportAgreementSettings');
+    // _log('Parcel::getTransportAgreementSettings');
     $this->TransportAgreementId = null;
     if ( $ta = gi($this->Meta, 'transport_agreement') ){
+
       $transport_agreement = explode('|', $ta);
       // _log('$ta');
       // _log($ta);
@@ -170,6 +171,7 @@ class Parcel{
   function prepareExport(){
     _log('Parcel::prepareExport');
 
+    //_log($this->Meta);
     // _log('prepareExport');
     // _log($this->Items);
     // http://www.logistra.no/api-documentation/12-utviklerinformasjon/16-api-consignments.html
@@ -208,6 +210,33 @@ class Parcel{
     $export['consignments']['consignment']['parts']['consignee']['city']      = gi( $this->Meta, '_shipping_city' );
     $export['consignments']['consignment']['parts']['consignee']['address1']  = gi( $this->Meta, '_shipping_address_1' );
     $export['consignments']['consignment']['parts']['consignee']['address2']  = gi( $this->Meta, '_shipping_address_2' );
+
+
+    if ( ! trim($export['consignments']['consignment']['parts']['consignee']['name']) ){
+      $export['consignments']['consignment']['parts']['consignee']['name'] = gi( $this->Meta, '_billing_first_name' )." ".gi( $this->Meta,'_billing_last_name' ); // customer address
+    }
+
+    if ( !$export['consignments']['consignment']['parts']['consignee']['country'] ) {
+      $export['consignments']['consignment']['parts']['consignee']['country'] = ( gi( $this->Meta, '_billing_country' ) ) ? gi( $this->Meta, '_billing_country' ) : 'NO';
+    }
+
+    if ( !$export['consignments']['consignment']['parts']['consignee']['postcode'] ){
+      $export['consignments']['consignment']['parts']['consignee']['postcode'] = gi( $this->Meta, '_billing_postcode' );
+    }
+
+    if ( !$export['consignments']['consignment']['parts']['consignee']['city'] ){
+      $export['consignments']['consignment']['parts']['consignee']['city']  = gi( $this->Meta, '_billing_city' );
+    }
+
+    if ( !$export['consignments']['consignment']['parts']['consignee']['address1'] ){
+      $export['consignments']['consignment']['parts']['consignee']['address1']= gi( $this->Meta, '_billing_address_1' );
+    }
+
+    if ( !$export['consignments']['consignment']['parts']['consignee']['address2'] ){
+      $export['consignments']['consignment']['parts']['consignee']['address2'] = gi( $this->Meta, '_billing_address_2' );
+    }
+
+
     $export['consignments']['consignment']['parts']['consignee']['email']     = gi( $address, 'email' );
     $export['consignments']['consignment']['parts']['consignee']['mobile']    = gi( $address, 'phone' );
 

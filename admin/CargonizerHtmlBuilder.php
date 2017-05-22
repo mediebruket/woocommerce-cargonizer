@@ -17,7 +17,7 @@ class CargonizerHtmlBuilder{
   }
 
   public static function buildDesc( $text, $css = 'mb-field-desc' ){
-    printf( '<div><span class="%s"></span>%s</div>', $text, $css );
+    printf( '<div><span class="%s"></span>%s</div>', $css, $text );
   }
 
 

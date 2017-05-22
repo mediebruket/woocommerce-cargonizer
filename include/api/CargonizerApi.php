@@ -4,12 +4,6 @@
 curl -g -XGET -d@consignment.xml -H'Content-Type: application/xml' -H'X-Cargonizer-Key: b38515a578db604ba77f063801155add075a56e4' -H'X-Cargonizer-Sender: 1142' 'http://sandbox.cargonizer.no/consignments.xml'
 */
 
-define('API_KEY', 'e6333abfd77d721910eec5230993f83595c66cdc');
-define('API_SENDER', '2577');
-
-define('SANDBOX_KEY', 'b38515a578db604ba77f063801155add075a56e4');
-define('SANDBOX_SENDER', '1142');
-
 
 class CargonizerApi{
   protected $Key;
@@ -52,7 +46,7 @@ class CargonizerApi{
     // curl -g -XGET -H'X-Cargonizer-Key: b38515a578db604ba77f063801155add075a56e4' -H'X-Cargonizer-Sender: 1142' 'http://sandbox.cargonizer.no/transport_agreements.xml'
     _log('CargonizerApi::getPrinters()');
 
-    return $this->rest('printers.xml', $headers=array(), $method='GET', $xml=null, $debug=true );
+    return $this->rest('printers.xml', $headers=array(), $method='GET', $xml=null, $debug=false );
   }
 
 

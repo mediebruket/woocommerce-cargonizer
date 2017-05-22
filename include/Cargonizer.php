@@ -244,6 +244,9 @@ class Cargonizer{
           }
         }
       }
+      // else{
+      //   _log('not ready');
+      // }
     }
   }
 
@@ -255,7 +258,7 @@ class Cargonizer{
       'comment_post_ID'       => $Parcel->ID,
       'comment_author'        => 'WooCommerce Cargonizer',
       'comment_author_email'  => get_option('admin_email' ),
-      'comment_content'       => sprintf( __('Parcel exported to Cargonizer.<br/>Consignment id: %s', 'wc-cargonizer'), $Parcel->Meta['consignment_id'][0] ),
+      'comment_content'       => sprintf( __('Parcel exported to Cargonizer.<br/>Consignment id: %s', 'wc-cargonizer'), get_post_meta( $Parcel->ID, 'consignment_id', true ) ),
       'comment_agent'         => 'WooCommerce Cargonizer',
       'comment_type'          => 'order_note',
       'comment_parent'        => 0,

@@ -207,7 +207,7 @@ class CargonizerAdmin{
       // _log($Parcel->ParcelType);
       // _log($Parcel->ParcelServices);
       // _log($Parcel->IsCargonized);
-      printf( '<script>var parcel_carrier_id=%s;</script>', $Parcel->TransportAgreementId );
+      printf( '<script>var parcel_carrier_id=%s;</script>', json_encode($Parcel->TransportAgreementId) );
       printf( '<script>var parcel_carrier_product="%s"</script>', $Parcel->ParcelType );
       printf( '<script>var parcel_carrier_product_services=%s</script>', json_encode($Parcel->ParcelServices) );
       printf( '<script>var parcel_is_cargonized=%s</script>', (( $Parcel->IsCargonized ) ? 'true' : 'false') ) ;

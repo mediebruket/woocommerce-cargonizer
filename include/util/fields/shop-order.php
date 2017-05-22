@@ -279,10 +279,10 @@ acf_add_local_field_group(array (
     ),
     array(
       'key' => 'field_56cd6cad3cbf3',
-      'label' => 'Opprett oppdrag',
+      'label' => 'Create consignment',
       'name' => 'create_consignment',
       'type' => 'true_false',
-      'instructions' => 'Kryss av denne sjekkboksen når du har valgt leverandør og lagt inn pakke(r)',
+      'instructions' => 'To create a consignment on cargonizer.no: Enable this checkox if carrier is selected and the parcel(s) added.',
       'required' => 0,
       'conditional_logic' => null,
       'wrapper' => array('width' => '','class' => '','id' => '',),

@@ -91,7 +91,7 @@ function initCarrier(){
 
 
       updateProductServices();
-      if ( parcel_carrier_product_services.length ){
+      if ( typeof parcel_carrier_product_services !== 'undefined' &&  parcel_carrier_product_services != null && parcel_carrier_product_services.length ){
         for (var i = 0; i < parcel_carrier_product_services.length; i++) {
           // _log( parcel_carrier_product_services[i] );
           jQuery('input[value="'+parcel_carrier_product_services[i]+'"]').attr('checked', true);
