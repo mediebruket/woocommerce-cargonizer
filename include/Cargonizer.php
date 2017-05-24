@@ -10,6 +10,7 @@ class Cargonizer{
 
     add_action( 'wp_ajax_wcc_print_order', array( $this, 'printOrder' ) );
     add_action( 'save_post', array($this, 'createConsignment') );
+    add_action( 'init',  array($this, 'resetConsignment') , 10, 2 );
 
     // add_filter('wc_shipment_tracking_get_providers', array($this, 'setCustomProvider') );
     add_filter('acf/load_field/name=transport_agreement', array($this, 'acf_setTransportAgreements'), 20 );
@@ -251,14 +252,14 @@ class Cargonizer{
   }
 
 
-  function addNote( $Parcel, $tracking_url = null ){
+  function addNote( $Parcel, $type = 'exported' ){
     _log('Cargonizer::addNote('.$Parcel->ID.')');
 
     $data = array(
       'comment_post_ID'       => $Parcel->ID,
       'comment_author'        => 'WooCommerce Cargonizer',
       'comment_author_email'  => get_option('admin_email' ),
-      'comment_content'       => sprintf( __('Parcel exported to Cargonizer.<br/>Consignment id: %s', 'wc-cargonizer'), get_post_meta( $Parcel->ID, 'consignment_id', true ) ),
+      'comment_content'       => sprintf( __('Cargonizer: Parcel %s', 'wc-cargonizer'), $type ),
       'comment_agent'         => 'WooCommerce Cargonizer',
       'comment_type'          => 'order_note',
       'comment_parent'        => 0,
@@ -267,6 +268,11 @@ class Cargonizer{
       'comment_date'          => current_time('mysql'),
       'comment_approved'      => 1,
     );
+
+    if ( $type == 'exported' ){
+      $data['comment_content'] = '<br/>'.sprintf( __('Consignment id: %s', 'wc-cargonizer'), get_post_meta( $Parcel->ID, 'consignment_id', true ) );
+    }
+
 
     if ( wp_insert_comment($data) ){
       _log('new note added');
@@ -342,6 +348,26 @@ class Cargonizer{
     }
     echo $response;
     wp_die();
+  }
+
+
+  function resetConsignment(){
+    if ( _is($_GET, 'wcc_action') == 'reset_consignment' ){
+
+      $order_id = _is($_GET, 'post');
+      if ( is_numeric($order_id) ){
+
+        //delete_post_meta( $order_id, $meta_key, $meta_value );
+        $Parcel = new Parcel($order_id);
+        $Parcel->reset();
+        $this->addNote( $Parcel, 'reset' );
+
+        if ( $location = get_edit_post_link($order_id) ){
+          wp_redirect( str_replace('&amp;', '&', $location) );
+          die();
+        }
+      }
+    }
   }
 
 

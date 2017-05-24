@@ -2,6 +2,7 @@
 
 add_filter( 'manage_edit-shop_order_columns', array('CargonizerAdmin', 'newCustomOrderColumn' ) );
 add_action( 'manage_shop_order_posts_custom_column', array('CargonizerAdmin', 'setCustomOrderColumnValue' ), 1 );
+add_action( 'woocommerce_admin_order_data_after_order_details', array('CargonizerAdmin', 'showResetLink' ), 1 );
 
 
 class CargonizerAdmin{
@@ -18,6 +19,7 @@ class CargonizerAdmin{
   function createSubmenu() {
     $page = add_submenu_page('woocommerce', __( 'Cargonizer', 'wc-cargonizer' ), __( 'Cargonizer', 'wc-cargonizer' ), apply_filters( 'woocommerce_csv_product_role', 'manage_woocommerce' ), WCC_Admin, array( $this, 'adminPage') );
   }
+
 
   function getTabs(){
     return array(
@@ -250,6 +252,25 @@ class CargonizerAdmin{
       echo $tracking_url;
 
     }
+  }
+
+
+  public static function showResetLink( $Order ){
+
+    if ( get_post_meta( $Order->id, 'is_cargonized', true ) ){
+      if ( $edit_link = get_edit_post_link($Order->id) ){
+        $delete_link = $edit_link.'&wcc_action=reset_consignment';
+        $delete_text = __('Logistra Cargonizer: reset consignment', 'wc-cargonizer' );
+
+        if ( $delete_link && $delete_text ){
+          $desc = __('Does not delete the consignment on cargonizer.no', 'wc-cargonizer');
+          printf('<p class="form-field form-field-wide wcc-delete-invoice"><span class="wcc-delete-icon">x</span> <a href="%s">%s</a><span class="wcc-delete-desc">%s</span></p>', $delete_link, $delete_text, $desc );
+        }
+      }
+    }
+
+
+    return $Order;
   }
 
 

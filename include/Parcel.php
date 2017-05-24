@@ -13,9 +13,7 @@ class Parcel{
   public $TransportAgreementId;
   public $TransportAgreementProduct;
   public $TransportAgreementProductType;
-
   public $WC_Order;
-
 
 
   function __construct($post_id){
@@ -74,8 +72,35 @@ class Parcel{
 
   function isCargonized(){
     return  gi($this->Meta, 'is_cargonized');
-
   }
+
+
+  function reset(){
+    _log('Parcell::reset('.$this->ID.')');
+    $rf =
+      array(
+          'is_cargonized',
+          'parcel_printer',
+          'transport_agreement',
+          'parcel_type',
+          'parcel_services',
+          'message_consignee',
+          'items',
+          'create_consignment',
+          'confirmation',
+          'consignment_created_at',
+          'consignment_id',
+          'consignment_tracking_code',
+          'consignment_tracking_url',
+          'consignment_pdf',
+        );
+
+    foreach ($rf as $index => $field) {
+      _log('reset: '.$field);
+      acf_updateField($field, null, $this->ID );
+    }
+  }
+
 
   function isReady( $force = false ){
     _log('Parcel::isReady()');

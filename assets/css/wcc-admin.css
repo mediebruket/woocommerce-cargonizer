@@ -116,3 +116,34 @@
   border-color: #b92c28;
   margin-left:200px;
 }
+
+
+.wcc-delete-icon{
+  border:1px solid #cc0000;
+  background: #cc0000;
+  color: white !important;
+  display: inline-block;
+  height:14px;
+  width: 14px;
+  font-size: 12px;
+  line-height: 14px;
+  text-align: center;
+  vertical-align: middle;
+  -webkit-border-radius: 7px;
+          border-radius: 7px;
+}
+
+.wcc-delete-invoice a{
+  color: #cc0000;
+  text-decoration: none;
+}
+
+.wcc-delete-invoice a:hover{
+  text-decoration: underline;
+  color: #cc0000;
+}
+
+.wcc-delete-desc{
+  display: block;
+  font-style: italic;
+}
