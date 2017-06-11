@@ -17,7 +17,23 @@ class CargonizerAdmin{
 
 
   function createSubmenu() {
-    $page = add_submenu_page('woocommerce', __( 'Cargonizer', 'wc-cargonizer' ), __( 'Cargonizer', 'wc-cargonizer' ), apply_filters( 'woocommerce_csv_product_role', 'manage_woocommerce' ), WCC_Admin, array( $this, 'adminPage') );
+    $page = add_submenu_page(
+        'woocommerce', 
+        __( 'Cargonizer', 'wc-cargonizer' ), 
+        __( 'Cargonizer', 'wc-cargonizer' ), 
+        'read', 
+        WCC_Admin, 
+        array( $this, 'adminPage') 
+      );
+      
+    
+    $page = add_submenu_page(
+        'woocommerce', 
+        __( 'Consignments', 'wc-cargonizer' ), 
+        __( 'Consignments', 'wc-cargonizer' ), 
+        'read', 
+        'edit.php?post_type=consignment'
+    );
   }
 
 
@@ -180,12 +196,9 @@ class CargonizerAdmin{
         echo '<link rel="stylesheet" href="'.$path .'css/'.$s.'" type="text/css" />' . "\n";
       }
 
-      wp_register_script( 'po-admin', $path. '/js/wcc-admin.js', false, '1.0.0' );
-      wp_enqueue_script( 'po-admin' );
-      // include scripts
-      //    foreach ($scripts as $s) {
-      //  echo '<script src="'.$path.'js/'.$s.'" ></script>' . "\n";
-      // }
+      wp_register_script( 'wcc-admin', $path. '/js/wcc-admin.js', false, '1.0.0' );
+      wp_enqueue_script( 'wcc-admin' );
+       
     }
   }
 

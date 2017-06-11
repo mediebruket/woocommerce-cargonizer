@@ -12,3 +12,4 @@ include('Parcel.php');
 include('CargonizeXml.php');
 include('Cargonizer.php');
 include('CargonizerUpdater.php');
+include('Consignment.php');

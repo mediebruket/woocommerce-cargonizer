@@ -9,7 +9,7 @@ class Cargonizer{
     $this->Settings = new CargonizerOptions();
 
     add_action( 'wp_ajax_wcc_print_order', array( $this, 'printOrder' ) );
-    add_action( 'save_post', array($this, 'createConsignment') );
+    add_action( 'save_post', array($this, 'createConsignment'), 10, 1 );
     add_action( 'init',  array($this, 'resetConsignment') , 10, 2 );
 
     // add_filter('wc_shipment_tracking_get_providers', array($this, 'setCustomProvider') );
@@ -225,25 +225,47 @@ class Cargonizer{
   }
 
 
-  function createConsignment(){
-    if ( $Parcel = $this->isOrder() ){
+  function createConsignment( $post_id ){
+    if ( !isset($_REQUEST['post_ID']) or $_REQUEST['post_ID'] != $post_id ){
+      return false;
+    }
+    else{
+      _log('create');
+    }
 
+    if ( $Parcel = $this->isOrder(true ) ){
+      _log('2');
+      //_log($Parcel);
       if ( $Parcel->isReady($force=false) ){
-        $CargonizeXml = new CargonizeXml( $Parcel->prepareExport() );
-        $CargonizerApi = new CargonizerApi();
-        $result = null;
+        _log('3');
 
-        // _log($CargonizeXml);
-        $result = $CargonizerApi->postConsignment($CargonizeXml->Xml);
+        // send to queue 
+        if ( $Parcel->hasFutureShippingDate() ){
+          _log('has future date');
+          // TODO check if is not cargonized
+          Consignment::createOrUpdate( $Parcel->Id, $recurring=false );
 
-        if ( $result ){
-          if ( is_array($result) && isset($result['consignments']['consignment']) ){
-            update_post_meta( $Parcel->ID, 'is_cargonized', '1' );
-            $Parcel->saveConsignment( $consignment = $result['consignments']['consignment']);
-            $Parcel->notiyCustomer();
-            $this->addNote( $Parcel );
-          }
         }
+        // create consignment now
+        else{
+          _log('create consignment now');
+          $CargonizeXml = new CargonizeXml( $Parcel->prepareExport() );
+          $CargonizerApi = new CargonizerApi();
+          $result = null;
+
+          // _log($CargonizeXml);
+          //$result = $CargonizerApi->postConsignment($CargonizeXml->Xml);
+
+          if ( $result ){
+            if ( is_array($result) && isset($result['consignments']['consignment']) ){
+              update_post_meta( $Parcel->ID, 'is_cargonized', '1' );
+              $Parcel->saveConsignment( $consignment = $result['consignments']['consignment']);
+              $Parcel->notiyCustomer();
+              $this->addNote( $Parcel );
+            }
+          }  
+        }
+        
       }
       // else{
       //   _log('not ready');
@@ -284,8 +306,9 @@ class Cargonizer{
   }
 
 
-  function isOrder($object=true){
+  function isOrder($object=true ){
     global $post;
+      
     if ( isset($post->post_type) && $post->post_type == 'shop_order' ){
       if ( $object ){
         return new Parcel($post->ID);
@@ -311,7 +334,6 @@ class Cargonizer{
 
   function printOrder(){
     _log('Cargonizer::printOrder');
-    _log($_POST);
 
     $response = '1';
     if ( isset($_POST['order_id']) && is_numeric($_POST['order_id']) ){

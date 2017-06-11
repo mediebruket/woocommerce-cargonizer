@@ -140,45 +140,49 @@ function updateProductServices(){
   // _log('updateProductServices');
   // _log (TransportAgreement );
   var product_id = jQuery('#acf-field_56cec446a4498').val();
-  var identifier = null;
-  // _log(product_id);
-  var pid_tmp = product_id.split('|');
 
-  // _log(pid_tmp);
-  if ( typeof pid_tmp[0] !== 'undefined' ){
-    identifier =  pid_tmp[0];
+  if ( typeof product_id !== 'undefined' && product_id != 0 ){
+    var identifier = null;
+    // _log(product_id);
+    var pid_tmp = product_id.split('|');
+
+    // _log(pid_tmp);
+    if ( typeof pid_tmp[0] !== 'undefined' ){
+      identifier =  pid_tmp[0];
+    }
+
+    // _log( 'identifier '+ identifier );
+    TransportProduct = null;
+
+    if ( identifier ){
+      for (var i = 0; i < TransportAgreement.products.length; i++) {
+        var product = TransportAgreement.products[i];
+
+        //_log(product.identifier);
+        if ( product.identifier == identifier ){
+          TransportProduct = product;
+        }
+      };
+    }
+
+
+    // _log('TransportProduct');
+    // _log(TransportProduct);
+    var product_services = '';
+    if ( typeof TransportProduct.services !== 'undefined' ){
+      // _log( 'Services: '+TransportProduct.services.length);
+      for (var i = 0; i < TransportProduct.services.length ; i++) {
+        // _log ( TransportProduct.services[i] );
+        var Service =  TransportProduct.services[i];
+        // _log('Service');
+        // _log(Service);
+        product_services += makeCheckbox( Service.name,  Service.identifier );
+      };
+    }
+
+    jQuery('.acf-field.acf-field-59086fd6633fa .acf-checkbox-list').html( product_services );  
   }
-
-  // _log( 'identifier '+ identifier );
-  TransportProduct = null;
-
-  if ( identifier ){
-    for (var i = 0; i < TransportAgreement.products.length; i++) {
-      var product = TransportAgreement.products[i];
-
-      //_log(product.identifier);
-      if ( product.identifier == identifier ){
-        TransportProduct = product;
-      }
-    };
-  }
-
-
-  // _log('TransportProduct');
-  // _log(TransportProduct);
-  var product_services = '';
-  if ( typeof TransportProduct.services !== 'undefined' ){
-    // _log( 'Services: '+TransportProduct.services.length);
-    for (var i = 0; i < TransportProduct.services.length ; i++) {
-      // _log ( TransportProduct.services[i] );
-      var Service =  TransportProduct.services[i];
-      // _log('Service');
-      // _log(Service);
-      product_services += makeCheckbox( Service.name,  Service.identifier );
-    };
-  }
-
-  jQuery('.acf-field.acf-field-59086fd6633fa .acf-checkbox-list').html( product_services );
+  
 }
 
 

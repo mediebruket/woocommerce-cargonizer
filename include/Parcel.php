@@ -3,11 +3,13 @@
 class Parcel{
   public $ConsignmentId;
   public $ID;
+  public $Id;
   public $Items;
   public $IsCargonized;
   public $Meta;
   public $Printer;
   public $ParcelType;
+  public $ShippingDate;
   public $TrackingProvider;
   public $TransportAgreements;
   public $TransportAgreementId;
@@ -20,6 +22,7 @@ class Parcel{
     if ( is_numeric($post_id) ){
       // set woocommerce order object
       $this->WC_Order = new WC_Order($post_id);
+      $this->ID = $this->Id = $post_id;
 
       if ( $post = get_post($post_id) ){
         // set wordpress attributes
@@ -28,6 +31,7 @@ class Parcel{
         }
 
         $this->Meta           = $this->getPostMeta();
+        $this->ShippingDate   = $this->getShippingDate();
         $this->IsCargonized   = $this->isCargonized();
         $this->Printer        = $this->getPrinter();
         $this->ParcelType     = $this->getParcelType();
@@ -50,6 +54,22 @@ class Parcel{
   function getPrinter(){
     return gi($this->Meta, 'parcel_printer');
     //_log($this->Printer);
+  }
+
+
+  function getShippingDate(){
+    return gi($this->Meta, 'parcel_shipping_date');
+    //_log($this->Printer);
+  }
+
+
+  function hasFutureShippingDate(){
+    if ( $this->ShippingDate > date('Ymd') ){
+      return true;
+    }
+    else{
+      return false;
+    }
   }
 
 
