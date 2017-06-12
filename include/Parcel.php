@@ -37,10 +37,17 @@ class Parcel{
         $this->ParcelType     = $this->getParcelType();
         $this->ParcelServices = $this->getParcelServices();
 
+        // recurring
+        $this->IsRecurring                  = $this->getIsRecurring();
+        $this->RecurringCarrierId           = $this->getRecurringCarrierId();
+        $this->RecurringConsignmentType     = $this->getRecurringConsignmentType();
+        $this->RecurringConsignmentServices = $this->getRecurringConsignmentServices();
+        $this->RecurringInterval            = $this->getRecurringInterval();
+
         $this->ConsignmentId = $this->getConsignmentId();
         $this->getTransportAgreementSettings();
         $this->Items = $this->getItems();
-        //$this->TrackingProvider = $this->getTrackingProvider();
+
       }
     }
   }
@@ -59,6 +66,33 @@ class Parcel{
 
   function getShippingDate(){
     return gi($this->Meta, 'parcel_shipping_date');
+    //_log($this->Printer);
+  }
+
+
+  function getIsRecurring(){
+    return gi($this->Meta, 'parcel-is-recurring');
+    //_log($this->Printer);
+  }
+
+
+  function getRecurringInterval(){
+    return gi($this->Meta, 'parcel-recurring-consignment-interval' );
+  }
+
+
+  function getRecurringCarrierId(){
+    return gi($this->Meta, 'parcel_recurring_carrier_id');
+    //_log($this->Printer);
+  }
+
+  function getRecurringConsignmentType(){
+    return gi($this->Meta, 'parcel-recurring-consignment-type');
+    //_log($this->Printer);
+  }
+
+  function getRecurringConsignmentServices(){
+    return maybe_unserialize( gi($this->Meta, 'parcel-recurring-consignment-services') );
     //_log($this->Printer);
   }
 
@@ -188,7 +222,7 @@ class Parcel{
 
 
   function getItems(){
-    return acf_getField('items', $this->ID);
+    return acf_getField('consignment_items', $this->ID);
   }
 
 

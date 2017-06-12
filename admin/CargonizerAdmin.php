@@ -3,6 +3,9 @@
 add_filter( 'manage_edit-shop_order_columns', array('CargonizerAdmin', 'newCustomOrderColumn' ) );
 add_action( 'manage_shop_order_posts_custom_column', array('CargonizerAdmin', 'setCustomOrderColumnValue' ), 1 );
 add_action( 'woocommerce_admin_order_data_after_order_details', array('CargonizerAdmin', 'showResetLink' ), 1 );
+add_filter( 'manage_edit-consignment_columns' , array('CargonizerAdmin', 'registerEditColumns') );
+//add_action( 'manage_car_posts_custom_column' , array('CargonizerAdmin', 'fillCustomColumns') , 10, 2 );
+
 
 
 class CargonizerAdmin{
@@ -18,20 +21,20 @@ class CargonizerAdmin{
 
   function createSubmenu() {
     $page = add_submenu_page(
-        'woocommerce', 
-        __( 'Cargonizer', 'wc-cargonizer' ), 
-        __( 'Cargonizer', 'wc-cargonizer' ), 
-        'read', 
-        WCC_Admin, 
-        array( $this, 'adminPage') 
+        'woocommerce',
+        __( 'Cargonizer', 'wc-cargonizer' ),
+        __( 'Cargonizer', 'wc-cargonizer' ),
+        'read',
+        WCC_Admin,
+        array( $this, 'adminPage')
       );
-      
-    
+
+
     $page = add_submenu_page(
-        'woocommerce', 
-        __( 'Consignments', 'wc-cargonizer' ), 
-        __( 'Consignments', 'wc-cargonizer' ), 
-        'read', 
+        'woocommerce',
+        __( 'Consignments', 'wc-cargonizer' ),
+        __( 'Consignments', 'wc-cargonizer' ),
+        'read',
         'edit.php?post_type=consignment'
     );
   }
@@ -198,7 +201,7 @@ class CargonizerAdmin{
 
       wp_register_script( 'wcc-admin', $path. '/js/wcc-admin.js', false, '1.0.0' );
       wp_enqueue_script( 'wcc-admin' );
-       
+
     }
   }
 
@@ -222,6 +225,7 @@ class CargonizerAdmin{
       // _log($Parcel->ParcelType);
       // _log($Parcel->ParcelServices);
       // _log($Parcel->IsCargonized);
+      printf( '<script>var Parcel=%s;</script>', json_encode($Parcel) );
       printf( '<script>var parcel_carrier_id=%s;</script>', json_encode($Parcel->TransportAgreementId) );
       printf( '<script>var parcel_carrier_product="%s"</script>', $Parcel->ParcelType );
       printf( '<script>var parcel_carrier_product_services=%s</script>', json_encode($Parcel->ParcelServices) );
@@ -285,6 +289,46 @@ class CargonizerAdmin{
 
     return $Order;
   }
+
+
+   public static function registerEditColumns($columns) {
+
+    // , mottaker,
+    // intervall ( f. eks. hver 15. ),
+    // neste avsendingsdato ( f. eks. 15.06 ),
+    // sporingskode,
+    // consignment id +
+    //  en hurtigknapp som oppretter et oppdrag hos Cargonizer og printer ut etiketten.
+
+    unset($columns['tags']);
+    unset($columns['date']);
+    return array_merge( $columns, CargonizerConfig::getConfig('consignment') );
+  }
+
+
+  public static function getCustomColumns(){
+    return array('car-producer', 'car-model', 'product_code', 'car-type', 'car-fuel', 'car-year-model');
+  }
+
+
+  public static function fillCustomColumns( $column, $post_id ) {
+    if ( self::isCustomConsignmentColumn($column) ){
+      echo self::getField($column, $post_id );
+    }
+  }
+
+
+  public static function isCustomConsignmentColumn($column){
+    $custom_columns = self::getCustomColumns();
+
+    if ( is_numeric(array_search($column, $custom_columns))  ){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+
 
 
 

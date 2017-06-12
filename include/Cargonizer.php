@@ -13,15 +13,26 @@ class Cargonizer{
     add_action( 'init',  array($this, 'resetConsignment') , 10, 2 );
 
     // add_filter('wc_shipment_tracking_get_providers', array($this, 'setCustomProvider') );
+    add_filter('acf/load_field/name=parcel_recurring_carrier_id', array($this, 'acf_setTransportAgreements'), 20 );
+    add_filter('acf/load_field/name=consignment_carrier_id', array($this, 'acf_setTransportAgreements'), 20 );
     add_filter('acf/load_field/name=transport_agreement', array($this, 'acf_setTransportAgreements'), 20 );
+
     add_filter('acf/load_field/name=parcel_printer', array($this, 'acf_setParcelPrinter'), 20 );
     add_filter('acf/load_field/name=parcel_type', array($this, 'acf_setCarrierProducts'), 10 );
     add_filter('acf/load_field/name=parcel_package_type', array($this, 'acf_setParcelTypes'), 10 );
     add_filter('acf/load_field/name=create_consignment', array($this, 'acf_checkConsignmentStatus'), 10 );
+
     add_filter('acf/load_field/name=parcel_services', array($this, 'acf_setProductServices') );
+
     add_filter('acf/load_field/name=parcel_height', array($this, 'acf_setDefaultHeight') );
+    add_filter('acf/load_field/name=parcel_recurring_consignment_height', array($this, 'acf_setDefaultHeight') );
+
     add_filter('acf/load_field/name=parcel_length', array($this, 'acf_setDefaultLength') );
+    add_filter('acf/load_field/name=parcel_recurring_length', array($this, 'acf_setDefaultLength') );
+
     add_filter('acf/load_field/name=parcel_width', array($this, 'acf_setDefaultWidth') );
+    add_filter('acf/load_field/name=parcel_recurring_width', array($this, 'acf_setDefaultWidth') );
+
     add_filter( 'wp_mail_content_type', array($this, 'setMailContentType') );
   }
 
@@ -229,21 +240,20 @@ class Cargonizer{
     if ( !isset($_REQUEST['post_ID']) or $_REQUEST['post_ID'] != $post_id ){
       return false;
     }
-    else{
-      _log('create');
-    }
+
 
     if ( $Parcel = $this->isOrder(true ) ){
-      _log('2');
+
+
       //_log($Parcel);
       if ( $Parcel->isReady($force=false) ){
-        _log('3');
 
-        // send to queue 
+
+        // send to queue
         if ( $Parcel->hasFutureShippingDate() ){
           _log('has future date');
           // TODO check if is not cargonized
-          Consignment::createOrUpdate( $Parcel->Id, $recurring=false );
+          Consignment::createOrUpdate( $Parcel, $recurring=false );
 
         }
         // create consignment now
@@ -259,13 +269,18 @@ class Cargonizer{
           if ( $result ){
             if ( is_array($result) && isset($result['consignments']['consignment']) ){
               update_post_meta( $Parcel->ID, 'is_cargonized', '1' );
-              $Parcel->saveConsignment( $consignment = $result['consignments']['consignment']);
+              $Parcel->saveConsignment( $consignment = $result['consignments']['consignment'] );
               $Parcel->notiyCustomer();
               $this->addNote( $Parcel );
             }
-          }  
+          }
         }
-        
+
+        if ( $Parcel->IsRecurring ){
+          _log('create recurring');
+          Consignment::createOrUpdate( $Parcel, $recurring=true );
+        }
+
       }
       // else{
       //   _log('not ready');
@@ -308,7 +323,7 @@ class Cargonizer{
 
   function isOrder($object=true ){
     global $post;
-      
+
     if ( isset($post->post_type) && $post->post_type == 'shop_order' ){
       if ( $object ){
         return new Parcel($post->ID);

@@ -3,18 +3,20 @@ add_action( 'init', array('Consignment', '_registerPostType') );
 
 class Consignment{
 
-  public static function createOrUpdate( $order_id, $recurring=false ){
-    _log('Consignment::createOrUpdate('.$order_id.')');
-    
-    $args = array( 
-      'post_author' => get_current_user_id(),     
-      'post_title' =>  sprintf( 'Related to order #%s ', $order_id, (($recurring) ? '| recurring ' : null) ),      
+  public static function createOrUpdate( $Parcel, $recurring=false ){
+    _log('Consignment::createOrUpdate('.$Parcel->ID.')');
+    _log( $Parcel->WC_Order->get_address() );
+    //_log($Parcel);
+
+    $args = array(
+      'post_author' => get_current_user_id(),
+      'post_title' =>  sprintf( 'Related to order #%s %s', $Parcel->ID, ( ($recurring) ? '| recurring ' : null) ),
       'post_status' => 'publish',
       'post_type' => 'consignment',
       'post_parent' => 0,
     );
 
-    if ( $cid = self::getConsignmentIdByOrderId( $order_id ) ){
+    if ( $cid = self::getConsignmentIdByOrderId( $Parcel->ID ) ){
       _log('update existing consignment: '.$cid);
       $args['ID'] = $cid;
     }
@@ -24,17 +26,49 @@ class Consignment{
 
     if ( $post_id = wp_insert_post( $args ) ){
       _log('consignment: '.$post_id);
-      update_post_meta( $post_id, 'consignment_order_id', $order_id );
+
+      $meta_key = 'consignment_order_id';
+      update_post_meta( $post_id, 'recurring_consignment_order_id', $Parcel->ID );
+      update_post_meta( $post_id, 'recurring_consignment_interval', $Parcel->RecurringInterval );
+
+      // save
+      // carrier id
+      // product / type
+      // services
+      // message
+      // packages
+
+      // copy meta values
+      $address = $Parcel->WC_Order->get_address();
+      update_post_meta( $post_id, '_shipping_first_name', gi( $Parcel->Meta, '_shipping_first_name' ) );
+      update_post_meta( $post_id, '_shipping_last_name',  gi( $Parcel->Meta, '_shipping_last_name' ) );
+      update_post_meta( $post_id, '_shipping_country',    gi( $Parcel->Meta, '_shipping_country' ) );
+      update_post_meta( $post_id, '_shipping_postcode',   gi( $Parcel->Meta, '_shipping_postcode' ) );
+      update_post_meta( $post_id, '_shipping_city',       gi( $Parcel->Meta, '_shipping_city' ) );
+      update_post_meta( $post_id, '_shipping_address_1',  gi( $Parcel->Meta, '_shipping_address_1' ) );
+      update_post_meta( $post_id, '_shipping_address_2',  gi( $Parcel->Meta, '_shipping_address_2' ) );
+
+      update_post_meta( $post_id, '_billing_first_name',  gi( $Parcel->Meta, '_billing_first_name' ) );
+      update_post_meta( $post_id, '_billing_last_name',   gi( $Parcel->Meta, '_billing_last_name' ) );
+      update_post_meta( $post_id, '_billing_country',     gi( $Parcel->Meta, '_billing_country' ) );
+      update_post_meta( $post_id, '_billing_postcode',    gi( $Parcel->Meta, '_billing_postcode' ) );
+      update_post_meta( $post_id, '_billing_city',        gi( $Parcel->Meta, '_billing_city' ) );
+      update_post_meta( $post_id, '_billing_address_1',   gi( $Parcel->Meta, '_billing_address_1' ) );
+      update_post_meta( $post_id, '_billing_address_2',   gi( $Parcel->Meta, '_billing_address_2' ) );
+
+      update_post_meta( $post_id, 'email', gi( $address, 'email' ) );
+      update_post_meta( $post_id, 'phone', gi( $address, 'phone' ) );
+
 
       if ( !isset($args['ID']) ){
-        self::addNote($order_id, $post_id);  
+        self::addNote($Parcel->ID, $post_id);
       }
-      
+
       /*
-        Products: name, sku, count 
+        Products: name, sku, count
         Shipping address:
         logistra settings
-        intervall ? 
+        intervall ?
         shipping date / neste shipping
         is recurring
       */
@@ -59,7 +93,7 @@ class Consignment{
       'comment_approved'      => 1,
     );
 
-    
+
     if ( wp_insert_comment($data) ){
       _log('new note added');
     }
@@ -70,13 +104,16 @@ class Consignment{
   }
 
 
-  public static function getConsignmentIdByOrderId( $order_id ){
+  public static function getConsignmentIdByOrderId( $order_id, $recurring=false ){
     global $wpdb;
-    $sql = sprintf("SELECT post_id FROM %s WHERE meta_key = 'consignment_order_id' and meta_value= '%s';", $wpdb->postmeta, $order_id );
+    $meta_key = 'consignment_order_id';
+    if ( $recurring ){
+      $meta_key = 'recurring_consignment_order_id';
+    }
+    $sql = sprintf("SELECT post_id FROM %s WHERE meta_key = '%s' and meta_value= '%s';", $wpdb->postmeta, $meta_key, $order_id );
     return $wpdb->get_var($sql);
-
   }
-    
+
   public static function _registerPostType(){
 
     $single = __('consignment' );
