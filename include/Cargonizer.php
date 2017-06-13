@@ -12,10 +12,11 @@ class Cargonizer{
     add_action( 'save_post', array($this, 'createConsignment'), 10, 1 );
     add_action( 'init',  array($this, 'resetConsignment') , 10, 2 );
 
-    // add_filter('wc_shipment_tracking_get_providers', array($this, 'setCustomProvider') );
+    // add_filter('wc_shipment_tracking_get_providers', array($this, 'setCustomProvider') ); ???
+
     add_filter('acf/load_field/name=parcel_recurring_carrier_id', array($this, 'acf_setTransportAgreements'), 20 );
-    add_filter('acf/load_field/name=consignment_carrier_id', array($this, 'acf_setTransportAgreements'), 20 );
-    add_filter('acf/load_field/name=transport_agreement', array($this, 'acf_setTransportAgreements'), 20 );
+    add_filter('acf/load_field/name=consignment_carrier_id', array($this, 'acf_setTransportAgreements'), 30 );
+    add_filter('acf/load_field/name=transport_agreement', array($this, 'acf_setTransportAgreements'), 40 );
 
     add_filter('acf/load_field/name=parcel_printer', array($this, 'acf_setParcelPrinter'), 20 );
     add_filter('acf/load_field/name=parcel_type', array($this, 'acf_setCarrierProducts'), 10 );
@@ -143,11 +144,10 @@ class Cargonizer{
           }
         }
       }
-    }
 
-
-    if ( $choices ){
-      $field['choices'] = array_merge($field['choices'], $choices);
+      if ( $choices ){
+        $field['choices'] = array_merge($field['choices'], $choices);
+      }
     }
 
 
@@ -191,14 +191,11 @@ class Cargonizer{
 
   function acf_setTransportAgreements($field){
     // _log('Cargonizer::acf_setTransportAgreements');
+    // _log($field);
     if ( $Parcel = $this->isOrder() ){
 
-      $agreements = $this->Settings->get('TransportAgreements');
-      if ( is_array($agreements) ){
-        $field['choices'] = array();
-        foreach ($agreements as $key => $a) {
-          $field['choices'][$a['id']] = $a['title'];
-        }
+      if (  $choices = $this->getTransportAgreementChoices() ){
+        $field['choices'] = $choices;
       }
 
       if( is_numeric($Parcel->TransportAgreementId) && $Parcel->TransportAgreementId ){
@@ -207,10 +204,28 @@ class Cargonizer{
       elseif ( $ta = $this->Settings->get('SelectedTransportAgreement' ) ){
         $field['default_value'] = $ta['id'];
       }
-
+    }
+    else if ( $Consignment = $this->isConsignment() ){
+      if (  $choices = $this->getTransportAgreementChoices() ){
+        $field['choices'] = $choices;
+      }
     }
 
     return $field;
+  }
+
+
+  function getTransportAgreementChoices(){
+
+    $choices = array();
+    $agreements = $this->Settings->get('TransportAgreements');
+    if ( is_array($agreements) ){
+      foreach ($agreements as $key => $a) {
+        $choices[$a['id']] = $a['title'];
+      }
+    }
+
+    return $choices;
   }
 
 
@@ -327,6 +342,24 @@ class Cargonizer{
     if ( isset($post->post_type) && $post->post_type == 'shop_order' ){
       if ( $object ){
         return new Parcel($post->ID);
+      }
+      else{
+        return $post->ID;
+      }
+
+    }
+    else{
+      return null;
+    }
+  }
+
+
+  function isConsignment($object=true ){
+    global $post;
+
+    if ( isset($post->post_type) && $post->post_type == 'consignment' ){
+      if ( $object ){
+        return new Consignment($post->ID);
       }
       else{
         return $post->ID;

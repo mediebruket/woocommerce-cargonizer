@@ -42,7 +42,9 @@ class Parcel{
         $this->RecurringCarrierId           = $this->getRecurringCarrierId();
         $this->RecurringConsignmentType     = $this->getRecurringConsignmentType();
         $this->RecurringConsignmentServices = $this->getRecurringConsignmentServices();
+        $this->RecurringConsignmentItems    = $this->getRecurringConsignmentItems();
         $this->RecurringInterval            = $this->getRecurringInterval();
+        $this->RecurringConsignmentMessage  = $this->getRecurringConsignmentMessage();
 
         $this->ConsignmentId = $this->getConsignmentId();
         $this->getTransportAgreementSettings();
@@ -86,14 +88,36 @@ class Parcel{
     //_log($this->Printer);
   }
 
+
   function getRecurringConsignmentType(){
     return gi($this->Meta, 'parcel-recurring-consignment-type');
     //_log($this->Printer);
   }
 
+
+  function getRecurringConsignmentMessage(){
+    return gi($this->Meta, 'parcel-consignment-message');
+    //_log($this->Printer);
+  }
+
+
   function getRecurringConsignmentServices(){
     return maybe_unserialize( gi($this->Meta, 'parcel-recurring-consignment-services') );
     //_log($this->Printer);
+  }
+
+
+  function getRecurringConsignmentItems(){
+    $items = acf_getField('parcel-recurring-consignment-items', $this->ID);
+    if ( is_array($items) ){
+      foreach ($items as $key => $item) {
+        if ( isset($item['parcel_recurring_consignment_type']) ){
+          $items[$key]['parcel_package_type'] = $item['parcel_recurring_consignment_type'];
+        }
+      }
+    }
+
+    return $items;
   }
 
 

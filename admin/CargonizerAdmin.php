@@ -4,7 +4,7 @@ add_filter( 'manage_edit-shop_order_columns', array('CargonizerAdmin', 'newCusto
 add_action( 'manage_shop_order_posts_custom_column', array('CargonizerAdmin', 'setCustomOrderColumnValue' ), 1 );
 add_action( 'woocommerce_admin_order_data_after_order_details', array('CargonizerAdmin', 'showResetLink' ), 1 );
 add_filter( 'manage_edit-consignment_columns' , array('CargonizerAdmin', 'registerEditColumns') );
-//add_action( 'manage_car_posts_custom_column' , array('CargonizerAdmin', 'fillCustomColumns') , 10, 2 );
+add_action( 'manage_consignment_posts_custom_column' , array('CargonizerAdmin', 'fillCustomColumns') , 10, 2 );
 
 
 
@@ -198,8 +198,15 @@ class CargonizerAdmin{
       foreach ($styles as $s) {
         echo '<link rel="stylesheet" href="'.$path .'css/'.$s.'" type="text/css" />' . "\n";
       }
+      echo '<link rel="stylesheet" href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" integrity="sha384-dNpIIXE8U05kAbPhy3G1cz+yZmTzA6CY8Vg/u2L9xRnHjJiAK76m2BIEaSEV+/aU" crossorigin="anonymous">';
 
       wp_register_script( 'wcc-admin', $path. '/js/wcc-admin.js', false, '1.0.0' );
+      wp_register_script( 'wcc-admin-consignment', $path. '/js/wcc-admin-consignment.js', false, '1.0.0' );
+      wp_register_script( 'wcc-admin-action', $path. '/js/wcc-admin-action.js', false, '1.0.0' );
+      wp_register_script( 'wcc-admin-html', $path. '/js/wcc-admin-html.js', false, '1.0.0' );
+      wp_enqueue_script( 'wcc-admin-html' );
+      wp_enqueue_script( 'wcc-admin-action' );
+      wp_enqueue_script( 'wcc-admin-consignment' );
       wp_enqueue_script( 'wcc-admin' );
 
     }
@@ -207,7 +214,7 @@ class CargonizerAdmin{
 
 
   function addTransportAgreements(){
-    // _log('addTransportAgreements');
+    _log('addTransportAgreements');
     $this->Options = new CargonizerOptions();
     $agreements = array();
     $ta = $this->Options->get('TransportAgreements');
@@ -218,18 +225,29 @@ class CargonizerAdmin{
     }
     // _log();
     if ( isset($_GET['post']) && is_numeric($_GET['post']) ){
+
       $carrier_id = $_GET['post'];
-      $Parcel = new Parcel($_GET['post']);
-      // _log($Parcel);
-      // _log($Parcel->TransportAgreementId);
-      // _log($Parcel->ParcelType);
-      // _log($Parcel->ParcelServices);
-      // _log($Parcel->IsCargonized);
-      printf( '<script>var Parcel=%s;</script>', json_encode($Parcel) );
-      printf( '<script>var parcel_carrier_id=%s;</script>', json_encode($Parcel->TransportAgreementId) );
-      printf( '<script>var parcel_carrier_product="%s"</script>', $Parcel->ParcelType );
-      printf( '<script>var parcel_carrier_product_services=%s</script>', json_encode($Parcel->ParcelServices) );
-      printf( '<script>var parcel_is_cargonized=%s</script>', (( $Parcel->IsCargonized ) ? 'true' : 'false') ) ;
+      $post = get_post($carrier_id);
+
+      _log($post->post_type);
+      if ( $post->post_type == 'shop_order' ){
+        $Parcel = new Parcel($_GET['post']);
+        // _log($Parcel);
+        // _log($Parcel->TransportAgreementId);
+        // _log($Parcel->ParcelType);
+        // _log($Parcel->ParcelServices);
+        // _log($Parcel->IsCargonized);
+        printf( '<script>var Parcel=%s;</script>', json_encode($Parcel) );
+        printf( '<script>var parcel_carrier_id=%s;</script>', json_encode($Parcel->TransportAgreementId) );
+        printf( '<script>var parcel_carrier_product="%s"</script>', $Parcel->ParcelType );
+        printf( '<script>var parcel_carrier_product_services=%s</script>', json_encode($Parcel->ParcelServices) );
+        printf( '<script>var parcel_is_cargonized=%s</script>', (( $Parcel->IsCargonized ) ? 'true' : 'false') ) ;
+      }
+      else if ( $post->post_type = 'consignment' ){
+        $Consignment = new Consignment($_GET['post']);
+        printf( '<script>var Consignment=%s;</script>', json_encode($Consignment) );
+      }
+
     }
 
     printf( '<script>var transport_agreements=%s;</script>', json_encode($agreements) );
@@ -306,22 +324,62 @@ class CargonizerAdmin{
   }
 
 
-  public static function getCustomColumns(){
-    return array('car-producer', 'car-model', 'product_code', 'car-type', 'car-fuel', 'car-year-model');
-  }
 
 
   public static function fillCustomColumns( $column, $post_id ) {
     if ( self::isCustomConsignmentColumn($column) ){
-      echo self::getField($column, $post_id );
+      $Consignment = new Consignment ( $post_id );
+      $post_meta = get_post_custom( $post_id );
+      // echo self::getField($column, $post_id );
+      if ( $column == 'consignment-receiver'){
+        echo gi($post_meta, '_shipping_first_name').' '.gi($post_meta, '_shipping_last_name');
+      }
+      else if ( $column == 'consignment-interval' ){
+        if ( $interval = gi($post_meta, 'recurring_consignment_interval') ){
+          printf("every %sth", $interval) ;
+        }
+        else{
+          echo 'n/a';
+        }
+      }
+      else if ( $column == 'consignment-next-shipping-date' ){
+        if ( $interval = gi($post_meta, 'recurring_consignment_interval') ){
+          $month = date('m');
+          $year = date('Y');
+          if ( date('d') > $interval ){
+            if ( $month != 12 ){
+              $month += 1;
+            }
+            else{
+              $month = 1;
+              $year += 1;
+            }
+          }
+
+          printf('%s.%s.%s', $interval, $month, $year);
+        }
+      }
+      else if ( $column == 'consignment-actions'){
+        printf('<a href="#" class="consignment-action"><i class="fa fa-paper-plane" aria-hidden="true"></i></a> ');
+        printf('<a href="#" class="consignment-action"><i class="fa fa-print" aria-hidden="true"></i></a>');
+
+        if ( $Consignment->OrderId && is_numeric($Consignment->OrderId) ){
+          printf('<a href="%s" class="consignment-action" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i></a>', get_edit_post_link( $Consignment->OrderId) );
+        }
+
+      }
+      else{
+        echo $column;
+      }
+
     }
   }
 
 
   public static function isCustomConsignmentColumn($column){
-    $custom_columns = self::getCustomColumns();
+    $custom_columns = CargonizerConfig::getConfig('consignment');
 
-    if ( is_numeric(array_search($column, $custom_columns))  ){
+    if ( isset($custom_columns[$column]) ){
       return true;
     }
     else{

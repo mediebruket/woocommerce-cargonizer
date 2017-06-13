@@ -545,7 +545,7 @@ acf_add_local_field_group(
     array(
       'key' => 'field_593e2ee07bdd4',
       'label' => 'Package',
-      'name' => 'parcel-consignment-package',
+      'name' => 'parcel-recurring-consignment-items',
       'type' => 'repeater',
       'instructions' => '',
       'required' => 0,
@@ -559,7 +559,7 @@ acf_add_local_field_group(
         array(
           'key' => 'field_593e2fab50a5d',
           'label' => 'Type',
-          'name' => 'parcel-consignment-type',
+          'name' => 'parcel_recurring_consignment_type',
           'type' => 'select',
           'instructions' => '',
           'required' => 0,
@@ -578,7 +578,7 @@ acf_add_local_field_group(
         array(
           'key' => 'field_593e2fc050a5e',
           'label' => 'Description',
-          'name' => 'parcel-consignment-description',
+          'name' => 'parcel_recurring_consignment_description',
           'type' => 'text',
           'instructions' => '',
           'required' => 0,

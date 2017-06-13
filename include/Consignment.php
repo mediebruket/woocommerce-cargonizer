@@ -2,6 +2,66 @@
 add_action( 'init', array('Consignment', '_registerPostType') );
 
 class Consignment{
+  public $ID;
+  public $Id;
+  public $CarrierId;
+  public $CarrierProduct;
+  public $CarrierProductId;
+  public $CarrierProductType;
+  public $CarrierProductService;
+  public $IsRecurring;
+  public $IsCargonized;
+  public $OrderId;
+  public $Meta;
+
+  function __construct( $post_id ){
+    $this->Id               = $this->ID = $post_id;
+    $this->Meta             = $this->getPostMeta();
+    $this->OrderId          = $this->getOrderId();
+    $this->CarrierId        = $this->getCarrierId();
+    $this->CarrierProduct   = $this->getCarrierProduct();
+    $this->CarrierProductServices   = $this->getCarrierProductServices();
+    $this->IsRecurring      = $this->isRecurring();
+
+    if ( $this->CarrierProduct ){
+      $tmp = explode('|', $this->CarrierProduct );
+      $this->CarrierProductId    = ( isset($tmp[0]) ) ? $tmp[0] : null;
+      $this->CarrierProductType  =  ( isset($tmp[1]) ) ? $tmp[1] : null;
+    }
+
+    // _log($this);
+  }
+
+
+  function getPostMeta(){
+    return get_post_custom( $this->ID );
+  }
+
+
+  function getOrderId(){
+    return gi($this->Meta, 'recurring_consignment_order_id');
+  }
+
+  function isRecurring(){
+    return gi($this->Meta, 'consignment_is_recurring');
+  }
+
+
+  function getCarrierId(){
+    return gi($this->Meta, 'consignment_carrier_id');
+  }
+
+
+  function getCarrierProduct(){
+    return gi($this->Meta, 'consignment_product');
+  }
+
+
+  function getCarrierProductServices(){
+    return acf_getField('consignment_services', $this->Id );
+  }
+
+
 
   public static function createOrUpdate( $Parcel, $recurring=false ){
     _log('Consignment::createOrUpdate('.$Parcel->ID.')');
@@ -32,11 +92,19 @@ class Consignment{
       update_post_meta( $post_id, 'recurring_consignment_interval', $Parcel->RecurringInterval );
 
       // save
-      // carrier id
-      // product / type
-      // services
-      // message
-      // packages
+      update_post_meta( $post_id, 'consignment_carrier_id', $Parcel->RecurringCarrierId );
+      update_post_meta( $post_id, 'consignment_product', $Parcel->RecurringConsignmentType );
+      update_post_meta( $post_id, 'consignment_services', $Parcel->RecurringConsignmentServices );
+      update_post_meta( $post_id, 'consignment_message', $Parcel->RecurringConsignmentMessage );
+      update_post_meta( $post_id, 'consignment_is_recurring', $Parcel->IsRecurring );
+
+      // _log('Parcel');
+      // _log($Parcel);
+      acf_updateField('consignment_items', $Parcel->RecurringConsignmentItems, $post_id);
+
+      // TODO
+      // is recurring
+      // Products: name, sku, count
 
       // copy meta values
       $address = $Parcel->WC_Order->get_address();
@@ -64,14 +132,6 @@ class Consignment{
         self::addNote($Parcel->ID, $post_id);
       }
 
-      /*
-        Products: name, sku, count
-        Shipping address:
-        logistra settings
-        intervall ?
-        shipping date / neste shipping
-        is recurring
-      */
     }
   }
 

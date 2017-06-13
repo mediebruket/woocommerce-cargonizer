@@ -152,3 +152,41 @@
 body.post-type-consignment #edit-slug-box{
   display: none;
 }
+
+.consignment-action{
+  border:1px solid #ccc;
+  width: 25px;
+  padding: 5px 0px;
+  font-size: 16px;
+  line-height: 16px;
+  display: inline-block;
+  color: #333;
+  text-align: center;
+  margin-right:10px;
+  background: #f7f7f7;
+  -webkit-border-radius: 3px;
+          border-radius: 3px;
+}
+
+.consignment-action:hover{
+  border-color: #333;
+  color: #333;
+}
+
+#consignment-interval,
+#consignment-next-shipping-date,
+#consignment-actions
+{
+  width:12%;
+}
+
+
+#acf-field_593e32538dbca-1{
+  opacity: 0;
+}
+
+div[data-name='parcel-consignment-copy'] .acf-input label:before{
+  content: "\f021";
+  font: normal normal normal 14px/1 FontAwesome;
+
+}
