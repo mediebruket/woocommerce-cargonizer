@@ -1,5 +1,6 @@
 <?php
-add_action( 'init', array('Consignment', '_registerPostType') );
+add_action( 'init', array('Consignment', '_registerPostType'), 10 );
+add_action( 'init', array('Consignment', '_updateNextShippingDate'), 20 );
 
 class Consignment{
   public $ID;
@@ -11,6 +12,7 @@ class Consignment{
   public $CarrierProductService;
   public $IsRecurring;
   public $IsCargonized;
+  public $Items;
   public $OrderId;
   public $Meta;
 
@@ -21,6 +23,7 @@ class Consignment{
     $this->CarrierId        = $this->getCarrierId();
     $this->CarrierProduct   = $this->getCarrierProduct();
     $this->CarrierProductServices   = $this->getCarrierProductServices();
+    $this->Items            = $this->getItems();
     $this->IsRecurring      = $this->isRecurring();
 
     if ( $this->CarrierProduct ){
@@ -28,7 +31,6 @@ class Consignment{
       $this->CarrierProductId    = ( isset($tmp[0]) ) ? $tmp[0] : null;
       $this->CarrierProductType  =  ( isset($tmp[1]) ) ? $tmp[1] : null;
     }
-
     // _log($this);
   }
 
@@ -44,6 +46,11 @@ class Consignment{
 
   function isRecurring(){
     return gi($this->Meta, 'consignment_is_recurring');
+  }
+
+
+  function getItems(){
+    return acf_getField('consignment_items', $this->ID);
   }
 
 
@@ -65,18 +72,17 @@ class Consignment{
 
   public static function createOrUpdate( $Parcel, $recurring=false ){
     _log('Consignment::createOrUpdate('.$Parcel->ID.')');
-    _log( $Parcel->WC_Order->get_address() );
-    //_log($Parcel);
 
+    //_log($Parcel);
     $args = array(
       'post_author' => get_current_user_id(),
-      'post_title' =>  sprintf( 'Related to order #%s %s', $Parcel->ID, ( ($recurring) ? '| recurring ' : null) ),
+      'post_title' =>  sprintf( 'Order #%s %s', $Parcel->ID, ( ($recurring) ? '| recurring ' : null) ),
       'post_status' => 'publish',
       'post_type' => 'consignment',
       'post_parent' => 0,
     );
 
-    if ( $cid = self::getConsignmentIdByOrderId( $Parcel->ID ) ){
+    if ( $cid = self::getConsignmentIdByOrderId( $Parcel->ID, $recurring ) ){
       _log('update existing consignment: '.$cid);
       $args['ID'] = $cid;
     }
@@ -87,24 +93,34 @@ class Consignment{
     if ( $post_id = wp_insert_post( $args ) ){
       _log('consignment: '.$post_id);
 
-      $meta_key = 'consignment_order_id';
-      update_post_meta( $post_id, 'recurring_consignment_order_id', $Parcel->ID );
-      update_post_meta( $post_id, 'recurring_consignment_interval', $Parcel->RecurringInterval );
+      $meta_order_key = 'consignment_order_id';
+      if ( $recurring ){
+        $meta_order_key = 'recurring_consignment_order_id';
+      }
+      update_post_meta( $post_id, $meta_order_key, $Parcel->ID );
+      update_post_meta( $post_id, 'consignment_is_recurring', $recurring );
 
-      // save
-      update_post_meta( $post_id, 'consignment_carrier_id', $Parcel->RecurringCarrierId );
-      update_post_meta( $post_id, 'consignment_product', $Parcel->RecurringConsignmentType );
-      update_post_meta( $post_id, 'consignment_services', $Parcel->RecurringConsignmentServices );
-      update_post_meta( $post_id, 'consignment_message', $Parcel->RecurringConsignmentMessage );
-      update_post_meta( $post_id, 'consignment_is_recurring', $Parcel->IsRecurring );
+      if ( $recurring ){
+        update_post_meta( $post_id, 'recurring_consignment_interval', $Parcel->RecurringInterval );
+        update_post_meta( $post_id, 'consignment_carrier_id', $Parcel->RecurringCarrierId );
+        update_post_meta( $post_id, 'consignment_product', $Parcel->RecurringConsignmentType );
+        update_post_meta( $post_id, 'consignment_services', $Parcel->RecurringConsignmentServices );
+        update_post_meta( $post_id, 'consignment_message', $Parcel->RecurringConsignmentMessage );
+        acf_updateField('consignment_items', $Parcel->RecurringConsignmentItems, $post_id);
+      }
+      else{
+        _log('single future consignment');
+        acf_updateField('consignment_items', $Parcel->Items, $post_id);
+        update_post_meta( $post_id, 'consignment_carrier_id', $Parcel->TransportAgreementId );
+        update_post_meta( $post_id, 'consignment_product', $Parcel->ParcelType );
+        update_post_meta( $post_id, 'consignment_services', $Parcel->ParcelServices );
+        update_post_meta( $post_id, 'consignment_message', $Parcel->ParcelMessage );
+        update_post_meta( $post_id, 'consignment_next_shipping_date', $Parcel->ShippingDate );
+      }
 
-      // _log('Parcel');
-      // _log($Parcel);
-      acf_updateField('consignment_items', $Parcel->RecurringConsignmentItems, $post_id);
+      _log('Parcel');
+      _log($Parcel);
 
-      // TODO
-      // is recurring
-      // Products: name, sku, count
 
       // copy meta values
       $address = $Parcel->WC_Order->get_address();
@@ -127,6 +143,9 @@ class Consignment{
       update_post_meta( $post_id, 'email', gi( $address, 'email' ) );
       update_post_meta( $post_id, 'phone', gi( $address, 'phone' ) );
 
+
+      // TODO ??
+      // Products: name, sku, count
 
       if ( !isset($args['ID']) ){
         self::addNote($Parcel->ID, $post_id);
@@ -165,14 +184,53 @@ class Consignment{
 
 
   public static function getConsignmentIdByOrderId( $order_id, $recurring=false ){
+    _log('Consignment::getConsignmentIdByOrderId('.$order_id.')');
     global $wpdb;
     $meta_key = 'consignment_order_id';
     if ( $recurring ){
       $meta_key = 'recurring_consignment_order_id';
     }
     $sql = sprintf("SELECT post_id FROM %s WHERE meta_key = '%s' and meta_value= '%s';", $wpdb->postmeta, $meta_key, $order_id );
+    _log($sql);
     return $wpdb->get_var($sql);
   }
+
+
+  public static function getAllRecurringConsignments(){
+    global $wpdb;
+    $sql =  "SELECT p.ID FROM  %s p, %s pm WHERE p.ID = pm.post_id AND p.post_type = 'consignment' AND pm.meta_key = 'consignment_is_recurring' and pm.meta_value = '1'";
+    $sql = sprintf($sql, $wpdb->posts, $wpdb->postmeta );
+
+    return $wpdb->get_col($sql);
+  }
+
+
+  public static function _updateNextShippingDate(){
+    $post_ids = self::getAllRecurringConsignments();
+    if ( is_array($post_ids) ){
+      foreach ($post_ids as $key => $post_id) {
+
+        if ( $interval = get_post_meta( $post_id, 'recurring_consignment_interval', true ) ){
+          $month = date('m');
+          $year = date('Y');
+
+          if ( date('d') > $interval ){
+            if ( $month != 12 ){
+              $month += 1;
+            }
+            else{
+              $month = 1;
+              $year += 1;
+            }
+          }
+
+          $new_shipping_date = $year.str_pad($month, 2, "0", STR_PAD_LEFT).str_pad($interval, 2, "0", STR_PAD_LEFT);
+          update_post_meta( $post_id, 'consignment_next_shipping_date', $new_shipping_date );
+        }
+      }
+    }
+  }
+
 
   public static function _registerPostType(){
 

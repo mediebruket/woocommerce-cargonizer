@@ -22,6 +22,7 @@ class CargonizerConfig{
   public static function getConfigs(){
     return array(
       'consignment' => array(
+        'post-id'  => __('ID', 'wc-cargonizer'),
         'consignment-receiver' => __('Receiver', 'wc-cargonizer'),
         'consignment-interval' => __('Interval', 'wc-cargonizer'),
         'consignment-next-shipping-date'  => __('Next shipping date', 'wc-cargonizer'),

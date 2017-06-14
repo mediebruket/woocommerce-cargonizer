@@ -6,15 +6,16 @@ class Parcel{
   public $Id;
   public $Items;
   public $IsCargonized;
-  public $Meta;
   public $Printer;
   public $ParcelType;
+  public $ParcelMessage;
   public $ShippingDate;
   public $TrackingProvider;
   public $TransportAgreements;
   public $TransportAgreementId;
   public $TransportAgreementProduct;
   public $TransportAgreementProductType;
+  public $Meta;
   public $WC_Order;
 
 
@@ -36,6 +37,7 @@ class Parcel{
         $this->Printer        = $this->getPrinter();
         $this->ParcelType     = $this->getParcelType();
         $this->ParcelServices = $this->getParcelServices();
+        $this->ParcelMessage  = $this->getParcelMessage();
 
         // recurring
         $this->IsRecurring                  = $this->getIsRecurring();
@@ -83,6 +85,11 @@ class Parcel{
   }
 
 
+  function getParcelMessage(){
+    return gi($this->Meta, 'message_consignee' );
+  }
+
+
   function getRecurringCarrierId(){
     return gi($this->Meta, 'parcel_recurring_carrier_id');
     //_log($this->Printer);
@@ -108,11 +115,35 @@ class Parcel{
 
 
   function getRecurringConsignmentItems(){
+    // _log('Parcel::getRecurringConsignmentItems()');
+
     $items = acf_getField('parcel-recurring-consignment-items', $this->ID);
+
     if ( is_array($items) ){
       foreach ($items as $key => $item) {
         if ( isset($item['parcel_recurring_consignment_type']) ){
           $items[$key]['parcel_package_type'] = $item['parcel_recurring_consignment_type'];
+        }
+        if ( isset($item['parcel_recurring_consignment_description']) ){
+          $items[$key]['parcel_description'] = $item['parcel_recurring_consignment_description'];
+        }
+        if ( isset($item['parcel_recurring_consigment_weight']) ){
+          $items[$key]['parcel_weight'] = $item['parcel_recurring_consigment_weight'];
+        }
+        if ( isset($item['parcel_recurring_consignment_height']) ){
+          $items[$key]['parcel_height'] = $item['parcel_recurring_consignment_height'];
+        }
+        if ( isset($item['parcel_recurring_consignment_length']) ){
+          $items[$key]['parcel_length'] = $item['parcel_recurring_consignment_length'];
+        }
+        if ( isset($item['parcel_recurring_consignment_width']) ){
+          $items[$key]['parcel_width'] = $item['parcel_recurring_consignment_width'];
+        }
+        if ( isset($item['parcel_recurring_consignment_amount']) ){
+          $items[$key]['parcel_amount'] = $item['parcel_recurring_consignment_amount'];
+        }
+        if ( isset($item['parcel_recurring_consignment_type']) ){
+          $items[$key]['parcel_type'] = $item['parcel_recurring_consignment_type'];
         }
       }
     }
@@ -135,6 +166,7 @@ class Parcel{
     return gi($this->Meta, 'parcel_type');
     //_log($this->Printer);
   }
+
 
   function getParcelServices(){
     return maybe_unserialize( gi($this->Meta, 'parcel_services') );
@@ -307,7 +339,7 @@ class Parcel{
     $address = $this->WC_Order->get_address();
      // _log($address);
     // customer address
-    $export['consignments']['consignment']['parts']['consignee']['name']      = gi( $this->Meta, '_shipping_first_name' )." ".gi( $this->Meta,'_shipping_last_name' ); // customer address
+    $export['consignments']['consignment']['parts']['consignee']['name']      = gi( $this->Meta, '_shipping_first_name' )." ".gi( $this->Meta,'_shipping_last_name' );
     $export['consignments']['consignment']['parts']['consignee']['country']   = ( gi( $this->Meta, '_shipping_country' ) ) ? gi( $this->Meta, '_shipping_country' ) : 'NO';
     $export['consignments']['consignment']['parts']['consignee']['postcode']  = gi( $this->Meta, '_shipping_postcode' );
     $export['consignments']['consignment']['parts']['consignee']['city']      = gi( $this->Meta, '_shipping_city' );
@@ -316,7 +348,8 @@ class Parcel{
 
 
     if ( ! trim($export['consignments']['consignment']['parts']['consignee']['name']) ){
-      $export['consignments']['consignment']['parts']['consignee']['name'] = gi( $this->Meta, '_billing_first_name' )." ".gi( $this->Meta,'_billing_last_name' ); // customer address
+      // customer address
+      $export['consignments']['consignment']['parts']['consignee']['name'] = gi( $this->Meta, '_billing_first_name' )." ".gi( $this->Meta,'_billing_last_name' );
     }
 
     if ( !$export['consignments']['consignment']['parts']['consignee']['country'] ) {
@@ -483,7 +516,7 @@ class Parcel{
         }
       }
 
-      _log($placeholders);
+      // _log($placeholders);
 
       $notification = array(
         'subject' => get_option('cargonizer-customer-notification-subject'),

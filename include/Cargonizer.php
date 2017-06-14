@@ -18,6 +18,9 @@ class Cargonizer{
     add_filter('acf/load_field/name=consignment_carrier_id', array($this, 'acf_setTransportAgreements'), 30 );
     add_filter('acf/load_field/name=transport_agreement', array($this, 'acf_setTransportAgreements'), 40 );
 
+    add_filter('acf/load_field/name=parcel-recurring-consignment-interval', array($this, 'acf_setRecurringConsignmentInterval'), 40 );
+    add_filter('acf/load_field/name=recurring_consignment_interval', array($this, 'acf_setRecurringConsignmentInterval'), 40 );
+
     add_filter('acf/load_field/name=parcel_printer', array($this, 'acf_setParcelPrinter'), 20 );
     add_filter('acf/load_field/name=parcel_type', array($this, 'acf_setCarrierProducts'), 10 );
     add_filter('acf/load_field/name=parcel_package_type', array($this, 'acf_setParcelTypes'), 10 );
@@ -114,6 +117,14 @@ class Cargonizer{
     }
 
 
+    return $field;
+  }
+
+
+  function acf_setRecurringConsignmentInterval( $field ){
+    for( $i=1; $i<=30; $i++ ){
+      $field['choices'][$i] = sprintf( __('every %sth', 'wc-cargonizer'), $i );
+    }
     return $field;
   }
 
@@ -256,29 +267,24 @@ class Cargonizer{
       return false;
     }
 
-
-    if ( $Parcel = $this->isOrder(true ) ){
-
-
+    if ( $Parcel = $this->isOrder(true) ){
       //_log($Parcel);
       if ( $Parcel->isReady($force=false) ){
-
-
+        _log('Parcel is ready');
         // send to queue
         if ( $Parcel->hasFutureShippingDate() ){
           _log('has future date');
           // TODO check if is not cargonized
           Consignment::createOrUpdate( $Parcel, $recurring=false );
-
         }
-        // create consignment now
-        else{
+        else{ // create consignment now
           _log('create consignment now');
           $CargonizeXml = new CargonizeXml( $Parcel->prepareExport() );
           $CargonizerApi = new CargonizerApi();
           $result = null;
 
           // _log($CargonizeXml);
+          // TO DO uncomment
           //$result = $CargonizerApi->postConsignment($CargonizeXml->Xml);
 
           if ( $result ){
@@ -291,14 +297,14 @@ class Cargonizer{
           }
         }
 
-        if ( $Parcel->IsRecurring ){
-          _log('create recurring');
-          Consignment::createOrUpdate( $Parcel, $recurring=true );
-        }
-
       }
-      // else{
-      //   _log('not ready');
+      else{
+        _log('not ready');
+      }
+
+      // if ( $Parcel->IsRecurring ){
+      //   _log('create recurring');
+      //   Consignment::createOrUpdate( $Parcel, $recurring=true );
       // }
     }
   }

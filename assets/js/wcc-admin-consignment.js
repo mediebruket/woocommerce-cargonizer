@@ -2,6 +2,7 @@ var TransportAgreement = null;
 var TransportProduct = null;
 acf_consignment_product = '593e70ff3f520';
 acf_consignment_product_services = '593e71193f521';
+acf_consignment_product_services = '593e71193f521';
 
 jQuery(document).ready(function(){
   if ( jQuery('body.post-type-consignment').length ){
@@ -13,7 +14,30 @@ jQuery(document).ready(function(){
 function initConsignment(){
   updateConsignmentCarrierProducts();
   updateConsignmentProductServices( false );
-  //  updateRecurringConsignmentProductTypes();
+  updateConsignmentItems();
+
+  // changed carrier
+  jQuery('#acf-field_'+acf_consignment_carrier_id).change(function(){
+    _log('changed carrier');
+    var new_carrier_id = getConsignmentCarrierId();
+    _log(new_carrier_id);
+    if ( typeof new_carrier_id !== 'undefined' && new_carrier_id.length ){
+      Consignment.CarrierId = new_carrier_id;
+      // Consignment.CarrierProduct = null;
+      // _log(Consignment);
+      updateConsignmentCarrierProducts();
+      updateConsignmentProductServices();
+      updateConsignmentItems();
+    }
+  });
+
+
+  // changed carrier product
+  jQuery('#acf-field_'+acf_consignment_product).change(function(){
+    _log('changed carrier product');
+    updateConsignmentProductServices();
+    updateConsignmentItems();
+  });
 }
 
 
@@ -22,20 +46,17 @@ function getConsignmentCarrierId(){
 }
 
 
-function updateConsignmentCarrierProducts() {
+function updateConsignmentCarrierProducts(){
   _log('updateConsignmentCarrierProducts');
+
   carrier_id = Consignment.CarrierId;
-  _log(carrier_id);
+  // _log(carrier_id);
 
   var options = getCarrierProducts( carrier_id );
-
-  _log(options);
-
+  // _log(options);
   if ( options.length ){
     jQuery('#acf-field_'+acf_consignment_product).html(options);
-
-
-    _log('set saved value');
+    // _log('set saved value');
     // _log(Parcel.RecurringConsignmentType);
     if ( typeof Consignment.CarrierProduct !== 'undefined' ){
       var options = jQuery('#acf-field_'+acf_consignment_product+' option');
@@ -55,7 +76,6 @@ function updateConsignmentCarrierProducts() {
 
 
 function updateConsignmentProductServices(){
-
   product_services = getProductServices( acf_consignment_product, acf_consignment_product_services );
   // _log(product_services);
   if ( product_services ){
@@ -70,3 +90,21 @@ function updateConsignmentProductServices(){
   }
 }
 
+
+function updateConsignmentItems(){
+  _log('updateConsignmentItems');
+  var acf_id = '593e7277efc1a';
+  if ( TransportProduct && typeof TransportProduct.types !== 'undefined' ){
+    var options = makeOption( 'select parcel type', '' );
+    for ( type_index in TransportProduct.types ){
+      // _log( type_index );
+      options += makeOption( TransportProduct.types[type_index], type_index );
+    }
+  }
+  jQuery('.acf-field.acf-field-'+acf_id+' select').html(options);
+
+  // select current
+  if ( typeof Consignment.Items === 'object' && Consignment.Items.length ){
+    updateItemTypes( Consignment.Items, acf_id );
+  }
+}

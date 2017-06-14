@@ -3,8 +3,9 @@
 add_filter( 'manage_edit-shop_order_columns', array('CargonizerAdmin', 'newCustomOrderColumn' ) );
 add_action( 'manage_shop_order_posts_custom_column', array('CargonizerAdmin', 'setCustomOrderColumnValue' ), 1 );
 add_action( 'woocommerce_admin_order_data_after_order_details', array('CargonizerAdmin', 'showResetLink' ), 1 );
-add_filter( 'manage_edit-consignment_columns' , array('CargonizerAdmin', 'registerEditColumns') );
-add_action( 'manage_consignment_posts_custom_column' , array('CargonizerAdmin', 'fillCustomColumns') , 10, 2 );
+add_filter( 'manage_edit-consignment_columns' , array('CargonizerAdmin', '_registerEditColumns') );
+add_action( 'manage_consignment_posts_custom_column' , array('CargonizerAdmin', '_fillCustomColumns') , 10, 2 );
+add_filter( 'manage_edit-consignment_sortable_columns', array('CargonizerAdmin', '_registerSortableColumns') );
 
 
 
@@ -202,7 +203,7 @@ class CargonizerAdmin{
 
       wp_register_script( 'wcc-admin', $path. '/js/wcc-admin.js', false, '1.0.0' );
       wp_register_script( 'wcc-admin-consignment', $path. '/js/wcc-admin-consignment.js', false, '1.0.0' );
-      wp_register_script( 'wcc-admin-action', $path. '/js/wcc-admin-action.js', false, '1.0.0' );
+      wp_register_script( 'wcc-admin-action', $path. '/js/wcc-admin-action.js', false, '1.0.1' );
       wp_register_script( 'wcc-admin-html', $path. '/js/wcc-admin-html.js', false, '1.0.0' );
       wp_enqueue_script( 'wcc-admin-html' );
       wp_enqueue_script( 'wcc-admin-action' );
@@ -214,7 +215,7 @@ class CargonizerAdmin{
 
 
   function addTransportAgreements(){
-    _log('addTransportAgreements');
+    // _log('addTransportAgreements');
     $this->Options = new CargonizerOptions();
     $agreements = array();
     $ta = $this->Options->get('TransportAgreements');
@@ -229,10 +230,8 @@ class CargonizerAdmin{
       $carrier_id = $_GET['post'];
       $post = get_post($carrier_id);
 
-      _log($post->post_type);
       if ( $post->post_type == 'shop_order' ){
         $Parcel = new Parcel($_GET['post']);
-        // _log($Parcel);
         // _log($Parcel->TransportAgreementId);
         // _log($Parcel->ParcelType);
         // _log($Parcel->ParcelServices);
@@ -309,15 +308,12 @@ class CargonizerAdmin{
   }
 
 
-   public static function registerEditColumns($columns) {
+  public static function _registerSortableColumns( $columns ) {
+    $columns['consignment-next-shipping-date'] = 'consignment-next-shipping-date';
+    return $columns;
+  }
 
-    // , mottaker,
-    // intervall ( f. eks. hver 15. ),
-    // neste avsendingsdato ( f. eks. 15.06 ),
-    // sporingskode,
-    // consignment id +
-    //  en hurtigknapp som oppretter et oppdrag hos Cargonizer og printer ut etiketten.
-
+   public static function _registerEditColumns($columns) {
     unset($columns['tags']);
     unset($columns['date']);
     return array_merge( $columns, CargonizerConfig::getConfig('consignment') );
@@ -326,12 +322,15 @@ class CargonizerAdmin{
 
 
 
-  public static function fillCustomColumns( $column, $post_id ) {
+  public static function _fillCustomColumns( $column, $post_id ) {
     if ( self::isCustomConsignmentColumn($column) ){
       $Consignment = new Consignment ( $post_id );
       $post_meta = get_post_custom( $post_id );
       // echo self::getField($column, $post_id );
-      if ( $column == 'consignment-receiver'){
+      if ( $column == 'post-id' ){
+        echo $post_id;
+      }
+      elseif ( $column == 'consignment-receiver'){
         echo gi($post_meta, '_shipping_first_name').' '.gi($post_meta, '_shipping_last_name');
       }
       else if ( $column == 'consignment-interval' ){
@@ -343,20 +342,8 @@ class CargonizerAdmin{
         }
       }
       else if ( $column == 'consignment-next-shipping-date' ){
-        if ( $interval = gi($post_meta, 'recurring_consignment_interval') ){
-          $month = date('m');
-          $year = date('Y');
-          if ( date('d') > $interval ){
-            if ( $month != 12 ){
-              $month += 1;
-            }
-            else{
-              $month = 1;
-              $year += 1;
-            }
-          }
-
-          printf('%s.%s.%s', $interval, $month, $year);
+        if ( $date = gi($post_meta, 'consignment_next_shipping_date') ){
+          echo date('d.m.Y', strtotime($date) );
         }
       }
       else if ( $column == 'consignment-actions'){

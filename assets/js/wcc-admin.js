@@ -35,7 +35,14 @@ function initRecurringConsignment(){
     updateRecurringConsignmentCarrierProducts( carrier_id, false );
     updateRecurringConsignmentProductServices(false );
     updateRecurringConsignmentProductTypes();
-  })
+  });
+
+
+  jQuery('#acf-field_'+acf_recurring_consignment_type).change(function(){
+    _log('change');
+    updateRecurringConsignmentProductServices(false );
+    updateRecurringConsignmentProductTypes();
+  });
 }
 
 
@@ -71,13 +78,12 @@ function initPrintBtn(){
 
 
 function initOrderConsignment(){
-  // _log('initCarrier');
-
   // changed carrier
   jQuery('#acf-field_'+acf_carrier_id).change(function(){
     var carrier_id = getCarrierId();
     updateCarrierProducts( carrier_id );
     updateProductServices();
+    updateProductTypes();
   });
 
   // changed product
@@ -91,15 +97,14 @@ function initOrderConsignment(){
   // if carrier exists
   if ( jQuery('#acf-field_'+acf_carrier_id).length ){
     var carrier_id = jQuery('#acf-field_'+acf_carrier_id).val();
+
     if ( carrier_id ){
       updateCarrierProducts( carrier_id );
 
       if ( parcel_carrier_product.length ){
-        // _log('has carrier product');
-        var query = '#acf-field_56cec446a4498 option[value="'+parcel_carrier_product+'"]';
+        var query = '#acf-field_'+acf_parcel_type+' option[value="'+parcel_carrier_product+'"]';
         jQuery(query).attr('selected', true);
       }
-
 
       updateProductServices();
       if ( typeof parcel_carrier_product_services !== 'undefined' &&  parcel_carrier_product_services != null && parcel_carrier_product_services.length ){
@@ -108,7 +113,6 @@ function initOrderConsignment(){
           jQuery('input[value="'+parcel_carrier_product_services[i]+'"]').attr('checked', true);
         };
       }
-
       updateProductTypes();
     }
   }
@@ -193,11 +197,11 @@ function getCarrierProducts( carrier_id ){
 
 
 function getProductServices( product_field_id, services_field_id ){
-  // _log('getProductServices');
+  _log('getProductServices');
   var product_services = null;
   var product_id = jQuery('#acf-field_'+product_field_id).val();
 
-  // _log(product_id);
+  _log(product_id);
   if ( typeof product_id !== 'undefined' && product_id != 0 ){
     var identifier = null;
     // _log(product_id);
@@ -208,7 +212,7 @@ function getProductServices( product_field_id, services_field_id ){
       identifier = pid_tmp[0];
     }
 
-    // _log( 'identifier '+ identifier );
+    _log( 'identifier '+ identifier );
     TransportProduct = null;
 
     if ( identifier ){
@@ -224,8 +228,8 @@ function getProductServices( product_field_id, services_field_id ){
     }
 
 
-    // _log('TransportProduct');
-    // _log(TransportProduct);
+    _log('TransportProduct');
+    _log(TransportProduct);
     product_services = '';
     if ( typeof TransportProduct.services !== 'undefined' ){
       // _log( 'Services: '+TransportProduct.services.length);
