@@ -5,7 +5,7 @@ acf_consignment_product_services = '593e71193f521';
 acf_consignment_product_services = '593e71193f521';
 
 jQuery(document).ready(function(){
-  if ( jQuery('body.post-type-consignment').length ){
+  if ( jQuery('body.post-type-consignment').length && jQuery('#postID').val() ){
     initConsignment();
   }
 });
@@ -18,9 +18,7 @@ function initConsignment(){
 
   // changed carrier
   jQuery('#acf-field_'+acf_consignment_carrier_id).change(function(){
-    _log('changed carrier');
     var new_carrier_id = getConsignmentCarrierId();
-    _log(new_carrier_id);
     if ( typeof new_carrier_id !== 'undefined' && new_carrier_id.length ){
       Consignment.CarrierId = new_carrier_id;
       // Consignment.CarrierProduct = null;
@@ -34,7 +32,6 @@ function initConsignment(){
 
   // changed carrier product
   jQuery('#acf-field_'+acf_consignment_product).change(function(){
-    _log('changed carrier product');
     updateConsignmentProductServices();
     updateConsignmentItems();
   });

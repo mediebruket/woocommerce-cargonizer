@@ -27,6 +27,7 @@ class CargonizerConfig{
         'consignment-interval' => __('Interval', 'wc-cargonizer'),
         'consignment-next-shipping-date'  => __('Next shipping date', 'wc-cargonizer'),
         'consignment-actions'  => __('Actions', 'wc-cargonizer'),
+        'consignment-status'  => __('Status', 'wc-cargonizer'),
       )
     );
   }

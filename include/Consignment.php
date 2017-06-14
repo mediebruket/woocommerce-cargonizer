@@ -1,6 +1,7 @@
 <?php
 add_action( 'init', array('Consignment', '_registerPostType'), 10 );
 add_action( 'init', array('Consignment', '_updateNextShippingDate'), 20 );
+add_action( 'pre_get_posts', array('Consignment', '_orderConsignmentsByShippingDate'), 20 );
 
 class Consignment{
   public $ID;
@@ -10,6 +11,7 @@ class Consignment{
   public $CarrierProductId;
   public $CarrierProductType;
   public $CarrierProductService;
+  public $History;
   public $IsRecurring;
   public $IsCargonized;
   public $Items;
@@ -25,6 +27,7 @@ class Consignment{
     $this->CarrierProductServices   = $this->getCarrierProductServices();
     $this->Items            = $this->getItems();
     $this->IsRecurring      = $this->isRecurring();
+    $this->History          = $this->getHistory();
 
     if ( $this->CarrierProduct ){
       $tmp = explode('|', $this->CarrierProduct );
@@ -150,9 +153,172 @@ class Consignment{
       if ( !isset($args['ID']) ){
         self::addNote($Parcel->ID, $post_id);
       }
-
     }
   }
+
+
+  function getHistory(){
+    _log('getHistory');
+    _log($this->Meta['consignment_history']);
+    return $this->Meta['consignment_history'];
+  }
+
+
+  function updateHistory(){
+    $consignment = array();
+    $consignment['created_at'] = '2017-01-02';
+    $consignment['consignment_id'] = '2017-01-02';
+    $consignment['consignment_tracking_code'] = rand(9999999, 999999999);
+    $consignment['consignment_tracking_url'] = '<a href="#">show</a>';
+    $consignment['consignment_pdf'] = '<a href="#">download</a>';
+
+    add_post_meta( $this->Id, 'consignment_history', $consignment, false );
+  }
+
+
+  function prepareExport(){
+    _log('Consignment::prepareExport');
+
+    //_log($this->Meta);
+    // _log('prepareExport');
+    // _log($this->Items);
+    // http://www.logistra.no/api-documentation/12-utviklerinformasjon/16-api-consignments.html
+    $export['consignments']['consignment']['_attr'] =
+      array(
+        'transport_agreement' => $this->CarrierId,
+        'estimate' => "true",
+        'print' => ( get_option('cargonizer-print-on-export' ) == 'on' ) ? true : false
+        );
+
+    $export['consignments']['consignment']['values'] = array(
+      0 => array(
+        'value' => array(
+          '_attr' =>
+            array(
+              'name' => 'order',
+              'value' => $this->ID
+            )
+          )
+        )
+    );
+    $export['consignments']['consignment']['transfer'] = 'true';
+    $export['consignments']['consignment']['booking_request'] = 'true';
+    $export['consignments']['consignment']['product'] = $this->CarrierProductId;
+
+    //
+    // ---------------- addresses ----------------
+    //
+
+     // _log($address);
+    // customer address
+    $export['consignments']['consignment']['parts']['consignee']['name']      = gi( $this->Meta, '_shipping_first_name' )." ".gi( $this->Meta,'_shipping_last_name' );
+    $export['consignments']['consignment']['parts']['consignee']['country']   = ( gi( $this->Meta, '_shipping_country' ) ) ? gi( $this->Meta, '_shipping_country' ) : 'NO';
+    $export['consignments']['consignment']['parts']['consignee']['postcode']  = gi( $this->Meta, '_shipping_postcode' );
+    $export['consignments']['consignment']['parts']['consignee']['city']      = gi( $this->Meta, '_shipping_city' );
+    $export['consignments']['consignment']['parts']['consignee']['address1']  = gi( $this->Meta, '_shipping_address_1' );
+    $export['consignments']['consignment']['parts']['consignee']['address2']  = gi( $this->Meta, '_shipping_address_2' );
+
+
+    if ( ! trim($export['consignments']['consignment']['parts']['consignee']['name']) ){
+      // customer address
+      $export['consignments']['consignment']['parts']['consignee']['name'] = gi( $this->Meta, '_billing_first_name' )." ".gi( $this->Meta,'_billing_last_name' );
+    }
+
+    if ( !$export['consignments']['consignment']['parts']['consignee']['country'] ) {
+      $export['consignments']['consignment']['parts']['consignee']['country'] = ( gi( $this->Meta, '_billing_country' ) ) ? gi( $this->Meta, '_billing_country' ) : 'NO';
+    }
+
+    if ( !$export['consignments']['consignment']['parts']['consignee']['postcode'] ){
+      $export['consignments']['consignment']['parts']['consignee']['postcode'] = gi( $this->Meta, '_billing_postcode' );
+    }
+
+    if ( !$export['consignments']['consignment']['parts']['consignee']['city'] ){
+      $export['consignments']['consignment']['parts']['consignee']['city']  = gi( $this->Meta, '_billing_city' );
+    }
+
+    if ( !$export['consignments']['consignment']['parts']['consignee']['address1'] ){
+      $export['consignments']['consignment']['parts']['consignee']['address1']= gi( $this->Meta, '_billing_address_1' );
+    }
+
+    if ( !$export['consignments']['consignment']['parts']['consignee']['address2'] ){
+      $export['consignments']['consignment']['parts']['consignee']['address2'] = gi( $this->Meta, '_billing_address_2' );
+    }
+
+
+    $export['consignments']['consignment']['parts']['consignee']['email']     = gi( $this->Meta, 'email' );
+    $export['consignments']['consignment']['parts']['consignee']['mobile']    = gi( $this->Meta, 'phone' );
+
+
+    // return address
+    $export['consignments']['consignment']['parts']['return_address']['name']     = get_option('cargonizer-return-address-name');
+    $export['consignments']['consignment']['parts']['return_address']['country']  = get_option('cargonizer-return-address-country');
+    $export['consignments']['consignment']['parts']['return_address']['postcode'] = get_option('cargonizer-return-address-postcode');
+    $export['consignments']['consignment']['parts']['return_address']['city']     = get_option('cargonizer-return-address-city');
+    $export['consignments']['consignment']['parts']['return_address']['address1'] = get_option('cargonizer-return-address-address1');
+
+
+    // set consignee
+    $export['consignments']['consignment']['consignee'] =  $export['consignments']['consignment']['parts']['consignee'];
+
+
+    // ---------------- items ----------------
+    //
+    // <item type="PK" amount="1" weight="22" volume="122" description="Something else"/>
+
+    $export['consignments']['consignment']['items'] = array(); // packages
+    foreach ($this->Items as $key => $item) {
+      $array = array('item' => null );
+
+      $parcel_weight = null;
+      if ( $pw = gi( $item, 'parcel_weight' ) ){
+        $parcel_weight = $pw;
+      }
+
+      $item_attributes =
+        array(
+          'type'        => ( $parcel_type = gi( $item, 'parcel_package_type' ) ) ? $parcel_type : $this->TransportAgreementProductType,
+          // 'type'        => 'package',
+          'amount'      => gi( $item, 'parcel_amount' ),
+          'weight'      => $parcel_weight,
+          'length'      => gi( $item, 'parcel_length' ),
+          'width'       => gi( $item, 'parcel_width' ),
+          'height'      => gi( $item, 'parcel_height' ),
+          'description' => gi($item, 'parcel_description' ),
+        );
+
+      $item_attributes['volume'] = $item_attributes['length']*$item_attributes['width']*$item_attributes['height'];
+
+      $array['item']['_attr'] = $item_attributes;
+
+
+      $export['consignments']['consignment']['items'][]= $array;
+    }
+
+
+    if ( $parcel_services = gi( $this->Meta, 'consignment_services') ){
+      $services = maybe_unserialize($parcel_services);
+
+      if ( is_array($services) && !empty($services) ){
+        foreach ($services as $key => $identifier) {
+          // <service id="bring_e_varsle_for_utlevering"></service>
+          $array = array('service' => null );
+          $array['service']['_attr'] = array(
+            'id' => $identifier
+            );
+          $export['consignments']['consignment']['services'][] = $array; // packages
+
+        }
+      }
+    }
+
+    $export['consignments']['consignment']['messages']['consignor'] = 'messages-consignor';
+    $export['consignments']['consignment']['messages']['consignee'] = gi( $this->Meta, 'consignment_message');
+
+    // _log($export);
+    return $export;
+  }
+
+
 
 
   public static function addNote( $order_id, $consignment_id ){
@@ -229,6 +395,22 @@ class Consignment{
         }
       }
     }
+  }
+
+
+  public static function _orderConsignmentsByShippingDate( $query ){
+    if ( gi($_GET, 'post_type') == 'consignment' && gi($_GET, 'orderby') == 'consignment-next-shipping-date'){
+      $order = 'desc';
+      if ( $o = gi($_GET, 'order') ){
+        $order = $o;
+        $query->set( 'meta_key', 'consignment_next_shipping_date' );
+        $query->set( 'order', $order );
+        $query->set( 'orderby', 'meta_value_num' );
+
+      }
+    }
+
+    return $query;
   }
 
 

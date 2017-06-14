@@ -190,3 +190,21 @@ div[data-name='parcel-consignment-copy'] .acf-input label:before{
   font: normal normal normal 14px/1 FontAwesome;
 
 }
+
+tr.consignment-active th,
+tr.consignment-active td
+{
+  background-color: #9acfea !important;
+}
+
+
+tr.consignment-created th,
+tr.consignment-created td
+{
+  background-color: #b2dba1 !important;
+}
+
+
+.acf-field-5940c85af6b7d table {
+  width: 100%;
+}

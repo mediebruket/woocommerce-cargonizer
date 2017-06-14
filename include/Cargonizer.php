@@ -8,7 +8,9 @@ class Cargonizer{
   function __construct(){
     $this->Settings = new CargonizerOptions();
 
-    add_action( 'wp_ajax_wcc_print_order', array( $this, 'printOrder' ) );
+    add_action( 'wp_ajax_wcc_print_order', array( $this, '_printOrder' ) );
+    add_action( 'wp_ajax_wcc_create_consignment', array( $this, '_createConsignment' ) );
+
     add_action( 'save_post', array($this, 'createConsignment'), 10, 1 );
     add_action( 'init',  array($this, 'resetConsignment') , 10, 2 );
 
@@ -17,6 +19,8 @@ class Cargonizer{
     add_filter('acf/load_field/name=parcel_recurring_carrier_id', array($this, 'acf_setTransportAgreements'), 20 );
     add_filter('acf/load_field/name=consignment_carrier_id', array($this, 'acf_setTransportAgreements'), 30 );
     add_filter('acf/load_field/name=transport_agreement', array($this, 'acf_setTransportAgreements'), 40 );
+
+    add_filter('acf/load_field/key=field_5940c85af6b7d', array($this, 'acf_filterHistory'), 40, 1 );
 
     add_filter('acf/load_field/name=parcel-recurring-consignment-interval', array($this, 'acf_setRecurringConsignmentInterval'), 40 );
     add_filter('acf/load_field/name=recurring_consignment_interval', array($this, 'acf_setRecurringConsignmentInterval'), 40 );
@@ -43,6 +47,38 @@ class Cargonizer{
 
   function setMailContentType(){
     return 'text/html';
+  }
+
+  function acf_filterHistory($field){
+    global $post_id;
+
+
+    if ( $post_id  ){
+      $Consignment = new Consignment($post_id);
+
+      $history = null;
+
+      if ( is_array($Consignment->History) ){
+        foreach ($Consignment->History as $key => $row) {
+          $log = maybe_unserialize($row );
+          _log($log);
+          $history .= sprintf(
+              '<tr><td>%s</td> <td>%s</td> <td>%s</td> <td><a href="%s">show</a></td> <td><a href="%s">download</a></td></tr>',
+              $log['created_at'],
+              $log['consignment_id'],
+              $log['consignment_tracking_code'],
+              strip_tags($log['consignment_tracking_url']),
+              strip_tags($log['consignment_pdf'])
+            );
+          _log($log);
+        }
+      }
+
+      $field['message'] = str_replace('@acf_history@', $history, $field['message'] );
+
+    }
+
+    return $field;
   }
 
 
@@ -385,8 +421,37 @@ class Cargonizer{
     return $args;
   }
 
+  function _createConsignment(){
+    _log('Cargonizer::_createConsignment()');
+    $response = '1';
+    if ( isset($_POST['order_id']) && is_numeric($_POST['order_id']) ){
+      _log('create new Consignment');
+      $Consignment = new Consignment( $_POST['order_id'] );
+      _log('prepare export');
+      $export = $Consignment->prepareExport();
+      _log($export);
+      $CargonizeXml = new CargonizeXml( $export );
+      $CargonizerApi = new CargonizerApi();
+      $result = true;
+      _log('to post to api');
 
-  function printOrder(){
+      //$result = $CargonizerApi->postConsignment($CargonizeXml->Xml);
+      if ( $result ){
+        // if ( is_array($result) && isset($result['consignments']['consignment']) ){
+          // update next shipping date
+          $Consignment->updateHistory();
+          // update history( $result['consignments']['consignment'] );
+          // notiyCustomer();
+        // }
+      }
+    }
+
+    echo $response;
+    wp_die();
+  }
+
+
+  function _printOrder(){
     _log('Cargonizer::printOrder');
 
     $response = '1';

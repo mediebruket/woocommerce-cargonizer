@@ -200,11 +200,14 @@ class CargonizerAdmin{
         echo '<link rel="stylesheet" href="'.$path .'css/'.$s.'" type="text/css" />' . "\n";
       }
       echo '<link rel="stylesheet" href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" integrity="sha384-dNpIIXE8U05kAbPhy3G1cz+yZmTzA6CY8Vg/u2L9xRnHjJiAK76m2BIEaSEV+/aU" crossorigin="anonymous">';
+      echo '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" >';
 
       wp_register_script( 'wcc-admin', $path. '/js/wcc-admin.js', false, '1.0.0' );
+      wp_register_script( 'wcc-admin-ajax', $path. '/js/wcc-admin-ajax.js', false, '1.0.0' );
       wp_register_script( 'wcc-admin-consignment', $path. '/js/wcc-admin-consignment.js', false, '1.0.0' );
       wp_register_script( 'wcc-admin-action', $path. '/js/wcc-admin-action.js', false, '1.0.1' );
       wp_register_script( 'wcc-admin-html', $path. '/js/wcc-admin-html.js', false, '1.0.0' );
+      wp_enqueue_script( 'wcc-admin-ajax' );
       wp_enqueue_script( 'wcc-admin-html' );
       wp_enqueue_script( 'wcc-admin-action' );
       wp_enqueue_script( 'wcc-admin-consignment' );
@@ -347,16 +350,19 @@ class CargonizerAdmin{
         }
       }
       else if ( $column == 'consignment-actions'){
-        printf('<a href="#" class="consignment-action"><i class="fa fa-paper-plane" aria-hidden="true"></i></a> ');
-        printf('<a href="#" class="consignment-action"><i class="fa fa-print" aria-hidden="true"></i></a>');
+        printf('<a href="#" class="consignment-action ajax-create-consignment" data-post_id="%s" ><i class="fa fa-paper-plane" aria-hidden="true"></i></a>', $post_id  );
+        printf('<a href="#" class="consignment-action ajax-print-consignment"><i class="fa fa-print" aria-hidden="true"></i></a>');
 
         if ( $Consignment->OrderId && is_numeric($Consignment->OrderId) ){
           printf('<a href="%s" class="consignment-action" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i></a>', get_edit_post_link( $Consignment->OrderId) );
         }
 
       }
+      else if ( $column == 'consignment-status'){
+        echo '<div class="alert alert-success" role="alert"><center>OK</center></div>';
+      }
       else{
-        echo $column;
+        echo null;
       }
 
     }
