@@ -5,7 +5,7 @@ acf_consignment_product_services = '593e71193f521';
 acf_consignment_product_services = '593e71193f521';
 
 jQuery(document).ready(function(){
-  if ( jQuery('body.post-type-consignment').length && jQuery('#postID').val() ){
+  if ( jQuery('body.post-type-consignment').length && jQuery('#post_ID').val() ){
     initConsignment();
   }
 });

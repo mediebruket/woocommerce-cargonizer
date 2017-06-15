@@ -8,10 +8,7 @@ class Cargonizer{
   function __construct(){
     $this->Settings = new CargonizerOptions();
 
-    add_action( 'wp_ajax_wcc_print_order', array( $this, '_printOrder' ) );
-    add_action( 'wp_ajax_wcc_create_consignment', array( $this, '_createConsignment' ) );
-
-    add_action( 'save_post', array($this, 'createConsignment'), 10, 1 );
+    add_action( 'save_post', array($this, 'saveConsignment'), 10, 1 );
     add_action( 'init',  array($this, 'resetConsignment') , 10, 2 );
 
     // add_filter('wc_shipment_tracking_get_providers', array($this, 'setCustomProvider') ); ???
@@ -45,36 +42,229 @@ class Cargonizer{
   }
 
 
-  function setMailContentType(){
+  function getTransportAgreementChoices(){
+
+    $choices = array();
+    $agreements = $this->Settings->get('TransportAgreements');
+    if ( is_array($agreements) ){
+      foreach ($agreements as $key => $a) {
+        $choices[$a['id']] = $a['title'];
+      }
+    }
+
+    return $choices;
+  }
+
+
+  function saveConsignment( $post_id ){
+    if ( !isset($_REQUEST['post_ID']) or $_REQUEST['post_ID'] != $post_id ){
+      return false;
+    }
+
+    if ( $Parcel = $this->isOrder(true) ){
+      //_log($Parcel);
+
+      $consignment_post_id = null;
+      $is_future = ($Parcel->hasFutureShippingDate()) ? true : false;
+
+      if ( $is_future ){
+        $consignment_post_id = Consignment::createOrUpdate( $Parcel, $recurring=false );
+      }
+
+      if ( $Parcel->isReady($force=false) && !$is_future ){
+        _log('Parcel is ready');
+        if ( $cid = Consignment::createOrUpdate( $Parcel, $recurring=false ) ){
+          _log('consignment created/updated: '.$cid);
+          _log('create consignment now');
+          $result = self::_createConsignment($cid);
+          if ( is_array($result) && isset($result['consignments']['consignment']) ){
+            update_post_meta( $Parcel->ID, 'is_cargonized', '1' );
+            $Parcel->saveConsignmentDetails( $consignment = $result['consignments']['consignment'] );
+            $this->addNote( $Parcel );
+          }
+        }
+      }
+      else{
+        _log('not ready or has future shipping date');
+      }
+
+      // TODO enable
+      // if ( $Parcel->IsRecurring ){
+      //   _log('create recurring');
+      //   Consignment::createOrUpdate( $Parcel, $recurring=true );
+      // }
+    }
+  }
+
+
+  function addNote( $Parcel, $type = 'exported' ){
+    _log('Cargonizer::addNote('.$Parcel->ID.')');
+
+    $data = array(
+      'comment_post_ID'       => $Parcel->ID,
+      'comment_author'        => 'WooCommerce Cargonizer',
+      'comment_author_email'  => get_option('admin_email' ),
+      'comment_content'       => sprintf( __('Cargonizer: Parcel %s', 'wc-cargonizer'), $type ),
+      'comment_agent'         => 'WooCommerce Cargonizer',
+      'comment_type'          => 'order_note',
+      'comment_parent'        => 0,
+      'user_id'               => 1,
+      'comment_author_IP'     => 'null',
+      'comment_date'          => current_time('mysql'),
+      'comment_approved'      => 1,
+    );
+
+    if ( $type == 'exported' ){
+      $data['comment_content'] = '<br/>'.sprintf( __('Consignment id: %s', 'wc-cargonizer'), get_post_meta( $Parcel->ID, 'consignment_id', true ) );
+    }
+
+
+    if ( wp_insert_comment($data) ){
+      _log('new note added');
+    }
+    else{
+      _log('error: wp_insert_comment');
+      _log($data);
+    }
+  }
+
+
+  function isOrder($object=true ){
+    global $post;
+
+    if ( isset($post->post_type) && $post->post_type == 'shop_order' ){
+      if ( $object ){
+        return new Parcel($post->ID);
+      }
+      else{
+        return $post->ID;
+      }
+
+    }
+    else{
+      return null;
+    }
+  }
+
+
+  function isConsignment($object=true ){
+    global $post;
+
+    if ( isset($post->post_type) && $post->post_type == 'consignment' ){
+      if ( $object ){
+        return new Consignment($post->ID);
+      }
+      else{
+        return $post->ID;
+      }
+
+    }
+    else{
+      return null;
+    }
+  }
+
+
+  function setCustomProvider($args){
+    $args['Norway']['Cargonizer'] = 'tracking_url';
+    ksort($args);
+
+    return $args;
+  }
+
+
+
+  public static function _createConsignment( $post_id  ){
+    _log('Cargonizer::_createConsignment()');
+
+    $response = false;
+    if ( is_numeric($post_id) ){
+      _log('create new Consignment');
+      $Consignment = new Consignment( $post_id );
+      _log('prepare export');
+
+      $CargonizeXml = new CargonizeXml( $Consignment->prepareExport() );
+      $CargonizerApi = new CargonizerApi();
+      $result = true;
+      _log('post consignment');
+
+      $result = $CargonizerApi->postConsignment($CargonizeXml->Xml);
+      if ( $result ){
+        // _log($result);
+        if ( is_array($result) && isset($result['consignments']['consignment']) ){
+          _log('success');
+          $response = $result;
+          // update next shipping date
+          // _log($result);
+          $Consignment->setNextShippingDate( $auto_inc=true );
+          if ( $new_entry = $Consignment->updateHistory( $result['consignments']['consignment'] ) ){
+            $Consignment->notifyCustomer( $new_entry );
+          }
+
+        }
+        else{
+          _log('error');
+          _log($result);
+        }
+      }
+      else{
+        _log('no result');
+      }
+    }
+
+    return $response;
+  }
+
+
+  function resetConsignment(){
+    if ( _is($_GET, 'wcc_action') == 'reset_consignment' ){
+
+      $order_id = _is($_GET, 'post');
+      if ( is_numeric($order_id) ){
+
+        //delete_post_meta( $order_id, $meta_key, $meta_value );
+        $Parcel = new Parcel($order_id);
+        $Parcel->reset();
+        $this->addNote( $Parcel, 'reset' );
+
+        if ( $location = get_edit_post_link($order_id) ){
+          wp_redirect( str_replace('&amp;', '&', $location) );
+          die();
+        }
+      }
+    }
+  }
+
+
+
+   function setMailContentType(){
     return 'text/html';
   }
 
   function acf_filterHistory($field){
     global $post_id;
 
-
     if ( $post_id  ){
       $Consignment = new Consignment($post_id);
 
-      $history = null;
+      $html = null;
 
       if ( is_array($Consignment->History) ){
-        foreach ($Consignment->History as $key => $row) {
-          $log = maybe_unserialize($row );
-          _log($log);
-          $history .= sprintf(
-              '<tr><td>%s</td> <td>%s</td> <td>%s</td> <td><a href="%s">show</a></td> <td><a href="%s">download</a></td></tr>',
+        foreach ( $Consignment->History as $key => $log) {
+          // _log($log);
+          $html .= sprintf(
+              '<tr><td>%s</td> <td>%s</td> <td>%s</td> <td><a href="%s" target="_blank">show</a></td> <td><a href="%s" target="_blank">download</a></td></tr>',
               $log['created_at'],
               $log['consignment_id'],
               $log['consignment_tracking_code'],
               strip_tags($log['consignment_tracking_url']),
               strip_tags($log['consignment_pdf'])
             );
-          _log($log);
+          // _log($log);
         }
       }
 
-      $field['message'] = str_replace('@acf_history@', $history, $field['message'] );
+      $field['message'] = str_replace('@acf_history@', $html, $field['message'] );
 
     }
 
@@ -262,30 +452,14 @@ class Cargonizer{
   }
 
 
-  function getTransportAgreementChoices(){
-
-    $choices = array();
-    $agreements = $this->Settings->get('TransportAgreements');
-    if ( is_array($agreements) ){
-      foreach ($agreements as $key => $a) {
-        $choices[$a['id']] = $a['title'];
-      }
-    }
-
-    return $choices;
-  }
-
 
   function acf_setParcelPrinter($field){
-    //_log('Cargonizer::acf_setParcelPrinter');
-
-    if ( $Parcel = $this->isOrder() ){
-      // _log($this->Settings);
-      if ( $printers = CargonizerOptions::getPrinterList() ){
-        $field['choices'] = array();
-        foreach ($printers as $printer_id => $printer_name) {
-          $field['choices'][$printer_id] = $printer_name;
-        }
+    // _log('Cargonizer::acf_setParcelPrinter');
+    // _log($this->Settings);
+    if ( $printers = CargonizerOptions::getPrinterList() ){
+      $field['choices'] = array();
+      foreach ($printers as $printer_id => $printer_name) {
+        $field['choices'][$printer_id] = $printer_name;
       }
     }
 
@@ -296,221 +470,6 @@ class Cargonizer{
 
     return $field;
   }
-
-
-  function createConsignment( $post_id ){
-    if ( !isset($_REQUEST['post_ID']) or $_REQUEST['post_ID'] != $post_id ){
-      return false;
-    }
-
-    if ( $Parcel = $this->isOrder(true) ){
-      //_log($Parcel);
-      if ( $Parcel->isReady($force=false) ){
-        _log('Parcel is ready');
-        // send to queue
-        if ( $Parcel->hasFutureShippingDate() ){
-          _log('has future date');
-          // TODO check if is not cargonized
-          Consignment::createOrUpdate( $Parcel, $recurring=false );
-        }
-        else{ // create consignment now
-          _log('create consignment now');
-          $CargonizeXml = new CargonizeXml( $Parcel->prepareExport() );
-          $CargonizerApi = new CargonizerApi();
-          $result = null;
-
-          // _log($CargonizeXml);
-          // TO DO uncomment
-          //$result = $CargonizerApi->postConsignment($CargonizeXml->Xml);
-
-          if ( $result ){
-            if ( is_array($result) && isset($result['consignments']['consignment']) ){
-              update_post_meta( $Parcel->ID, 'is_cargonized', '1' );
-              $Parcel->saveConsignment( $consignment = $result['consignments']['consignment'] );
-              $Parcel->notiyCustomer();
-              $this->addNote( $Parcel );
-            }
-          }
-        }
-
-      }
-      else{
-        _log('not ready');
-      }
-
-      // if ( $Parcel->IsRecurring ){
-      //   _log('create recurring');
-      //   Consignment::createOrUpdate( $Parcel, $recurring=true );
-      // }
-    }
-  }
-
-
-  function addNote( $Parcel, $type = 'exported' ){
-    _log('Cargonizer::addNote('.$Parcel->ID.')');
-
-    $data = array(
-      'comment_post_ID'       => $Parcel->ID,
-      'comment_author'        => 'WooCommerce Cargonizer',
-      'comment_author_email'  => get_option('admin_email' ),
-      'comment_content'       => sprintf( __('Cargonizer: Parcel %s', 'wc-cargonizer'), $type ),
-      'comment_agent'         => 'WooCommerce Cargonizer',
-      'comment_type'          => 'order_note',
-      'comment_parent'        => 0,
-      'user_id'               => 1,
-      'comment_author_IP'     => 'null',
-      'comment_date'          => current_time('mysql'),
-      'comment_approved'      => 1,
-    );
-
-    if ( $type == 'exported' ){
-      $data['comment_content'] = '<br/>'.sprintf( __('Consignment id: %s', 'wc-cargonizer'), get_post_meta( $Parcel->ID, 'consignment_id', true ) );
-    }
-
-
-    if ( wp_insert_comment($data) ){
-      _log('new note added');
-    }
-    else{
-      _log('error: wp_insert_comment');
-      _log($data);
-    }
-  }
-
-
-  function isOrder($object=true ){
-    global $post;
-
-    if ( isset($post->post_type) && $post->post_type == 'shop_order' ){
-      if ( $object ){
-        return new Parcel($post->ID);
-      }
-      else{
-        return $post->ID;
-      }
-
-    }
-    else{
-      return null;
-    }
-  }
-
-
-  function isConsignment($object=true ){
-    global $post;
-
-    if ( isset($post->post_type) && $post->post_type == 'consignment' ){
-      if ( $object ){
-        return new Consignment($post->ID);
-      }
-      else{
-        return $post->ID;
-      }
-
-    }
-    else{
-      return null;
-    }
-  }
-
-
-  function setCustomProvider($args){
-    $args['Norway']['Cargonizer'] = 'tracking_url';
-    ksort($args);
-
-    return $args;
-  }
-
-  function _createConsignment(){
-    _log('Cargonizer::_createConsignment()');
-    $response = '1';
-    if ( isset($_POST['order_id']) && is_numeric($_POST['order_id']) ){
-      _log('create new Consignment');
-      $Consignment = new Consignment( $_POST['order_id'] );
-      _log('prepare export');
-      $export = $Consignment->prepareExport();
-      _log($export);
-      $CargonizeXml = new CargonizeXml( $export );
-      $CargonizerApi = new CargonizerApi();
-      $result = true;
-      _log('to post to api');
-
-      //$result = $CargonizerApi->postConsignment($CargonizeXml->Xml);
-      if ( $result ){
-        // if ( is_array($result) && isset($result['consignments']['consignment']) ){
-          // update next shipping date
-          $Consignment->updateHistory();
-          // update history( $result['consignments']['consignment'] );
-          // notiyCustomer();
-        // }
-      }
-    }
-
-    echo $response;
-    wp_die();
-  }
-
-
-  function _printOrder(){
-    _log('Cargonizer::printOrder');
-
-    $response = '1';
-    if ( isset($_POST['order_id']) && is_numeric($_POST['order_id']) ){
-      $Parcel = new Parcel( $_POST['order_id'] );
-
-      _log('ConsignmentId: '.$Parcel->ConsignmentId);
-      _log('Printer: '. $Parcel->Printer);
-
-      if ( !$Parcel->ConsignmentId ){
-        $response = 'Missing consignment id';
-      }
-
-      if ( !$Parcel->Printer ){
-        $response = 'Missing printer_abort(printer_handle)';
-      }
-
-      if ( $Parcel->ConsignmentId && $Parcel->Printer ){
-        $Api = new CargonizerApi();
-        if ( $Api->postLabel( $Parcel->ConsignmentId, $Parcel->Printer ) == 'Printing' ){
-          $printer = $Parcel->Printer;
-          if ( $ta = get_transient( 'wcc_printer_list' ) ){
-            if ( isset( $ta[$Parcel->Printer] ) ){
-              $printer = $ta[$Parcel->Printer]. " (".$Parcel->Printer.")";
-            }
-          }
-          $response = 'Label was printed on printer '.$printer;
-        }
-        else{
-          $response = 'Could not connect to Cargonizer';
-        }
-
-      }
-
-    }
-    echo $response;
-    wp_die();
-  }
-
-
-  function resetConsignment(){
-    if ( _is($_GET, 'wcc_action') == 'reset_consignment' ){
-
-      $order_id = _is($_GET, 'post');
-      if ( is_numeric($order_id) ){
-
-        //delete_post_meta( $order_id, $meta_key, $meta_value );
-        $Parcel = new Parcel($order_id);
-        $Parcel->reset();
-        $this->addNote( $Parcel, 'reset' );
-
-        if ( $location = get_edit_post_link($order_id) ){
-          wp_redirect( str_replace('&amp;', '&', $location) );
-          die();
-        }
-      }
-    }
-  }
-
 
 
 } // end of class

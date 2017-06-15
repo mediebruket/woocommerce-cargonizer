@@ -330,11 +330,11 @@ class CargonizerAdmin{
       $Consignment = new Consignment ( $post_id );
       $post_meta = get_post_custom( $post_id );
       // echo self::getField($column, $post_id );
-      if ( $column == 'post-id' ){
+      if ( $column == 'consignment-post-id' ){
         echo $post_id;
       }
       elseif ( $column == 'consignment-receiver'){
-        echo gi($post_meta, '_shipping_first_name').' '.gi($post_meta, '_shipping_last_name');
+        echo gi($post_meta, '_shipping_last_name').', <br/>'.gi($post_meta, '_shipping_first_name');
       }
       else if ( $column == 'consignment-interval' ){
         if ( $interval = gi($post_meta, 'recurring_consignment_interval') ){
@@ -350,8 +350,11 @@ class CargonizerAdmin{
         }
       }
       else if ( $column == 'consignment-actions'){
-        printf('<a href="#" class="consignment-action ajax-create-consignment" data-post_id="%s" ><i class="fa fa-paper-plane" aria-hidden="true"></i></a>', $post_id  );
-        printf('<a href="#" class="consignment-action ajax-print-consignment"><i class="fa fa-print" aria-hidden="true"></i></a>');
+        printf('<a href="#" class="consignment-action ajax-create-consignment" data-post_id="%s" title="create new consignment"><i class="fa fa-paper-plane" aria-hidden="true"></i></a>', $post_id  );
+        if ( isset($Consignment->History[0]) ){
+          printf('<a href="#" class="consignment-action ajax-print-consignment" data-post_id="%s" title="print the latest consignment"><i class="fa fa-print" aria-hidden="true"></i></a>', $post_id);
+        }
+
 
         if ( $Consignment->OrderId && is_numeric($Consignment->OrderId) ){
           printf('<a href="%s" class="consignment-action" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i></a>', get_edit_post_link( $Consignment->OrderId) );
@@ -359,13 +362,44 @@ class CargonizerAdmin{
 
       }
       else if ( $column == 'consignment-status'){
-        echo '<div class="alert alert-success" role="alert"><center>OK</center></div>';
+        $next_shipping_date = gi($post_meta, 'consignment_next_shipping_date');
+        // _log('$next_shipping_date');
+        // _log($next_shipping_date);
+        $today = date('Ymd');
+        // _log($today);
+        $warning_time = 1; // TODO warning time = setting
+
+        $wtd =  $next_shipping_date - $today ;
+        // _log($wtd);
+        if ( $wtd == 0 or $wtd == 1 ){
+          echo self::makeStatus( 'warning', __('Create consignment', 'wc-cargonizer') );
+        }
+        else if ( $wtd < 0 ){
+         echo self::makeStatus( 'danger', __('Delay in dispatch', 'wc-cargonizer') );
+        }
+        else{
+          echo self::makeStatus('success', __('OK', 'wc-cargonizer') );
+        }
+      }
+      else if( $column == 'consignment-last-shipping-date'){
+        if ( $Consignment->LastShippingDate ){
+          echo date('d.m.Y @ H:i', strtotime($Consignment->LastShippingDate) );
+        }
+        else{
+          echo 'n/a';
+        }
+
       }
       else{
         echo null;
       }
 
     }
+  }
+
+
+  public static function makeStatus( $status, $text ){
+    return sprintf( '<div class="alert alert-%s" role="alert">%s</div>', $status, $text );
   }
 
 

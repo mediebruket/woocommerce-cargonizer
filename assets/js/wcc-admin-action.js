@@ -26,8 +26,8 @@ function updateRecurringConsignmentProductServices( copy ){
   _log('updateRecurringConsignmentProductServices');
   product_services = getProductServices( acf_recurring_consignment_type, acf_recurring_consignment_services );
 
-  _log('product_services');
-  _log(product_services);
+  // _log('product_services');
+  // _log(product_services);
   if ( product_services ){
     jQuery('.acf-field.acf-field-'+acf_recurring_consignment_services+' .acf-checkbox-list').html( product_services );
 
@@ -134,7 +134,7 @@ function updateProductTypes(){
     jQuery('.acf-field.acf-field-'+acf_consignment_items+' select').html(options);
 
     // set select attribute
-    if ( typeof Parcel.Items === 'object' && Parcel.Items.length ){
+    if ( typeof Parcel.Items === 'object' && Parcel.Items && Parcel.Items.length ){
       updateItemTypes( Parcel.Items, acf_consignment_items );
     }
   }

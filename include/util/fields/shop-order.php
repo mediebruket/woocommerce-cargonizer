@@ -285,10 +285,10 @@ acf_add_local_field_group(
     ),
     array(
       'key' => 'field_56cd6cad3cbf3',
-      'label' => 'Create consignment',
+      'label' => 'Create consignment now',
       'name' => 'create_consignment',
       'type' => 'true_false',
-      'instructions' => 'To create a consignment on cargonizer.no: Enable this checkox if carrier is selected and the parcel(s) added.',
+      'instructions' => 'To create a consignment on cargonizer.no:<br/>- Will only work if shipping date is empty<br/>- Enable this checkox if carrier is selected and the parcel(s) added.',
       'required' => 0,
       'conditional_logic' => null,
       'wrapper' => array('width' => '','class' => '','id' => '',),

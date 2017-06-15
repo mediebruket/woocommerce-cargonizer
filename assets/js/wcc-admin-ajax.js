@@ -1,22 +1,65 @@
 jQuery(document).ready(
   function(){
     initAjaxCreateConsignment();
+    initAjaxPrintLatestConsignment();
   }
 );
+
+function initAjaxPrintLatestConsignment(){
+  jQuery('.ajax-print-consignment').click(function(e){
+    e.preventDefault();
+    _log('click');
+    var cid = jQuery(this).attr('data-post_id');
+    _log(cid);
+
+    var parent =  jQuery(this).parents('.type-consignment');
+    var status =  parent.find('.consignment-status .alert');
+      // _log(status);
+    var status_class = status.attr('class');
+    // _log(status_class);
+    status.attr('class', 'alert');
+
+    status.text('Printing consignment');
+
+    var data = {
+        'action': 'wcc_print_latest_consignment',
+        'order_id': cid
+      };
+
+    jQuery.post(ajaxurl, data, function(response) {
+      _log('finished');
+      _log(response);
+
+      if ( typeof response === 'undefined' || response == '0' ){
+        status.addClass('alert-danger');
+      }
+      else{
+        _log('success');
+        status.addClass('alert-success');
+        status.text(response);
+      }
+
+    });
+
+  });
+}
+
 
 function initAjaxCreateConsignment(){
   jQuery('.ajax-create-consignment').click(
     function(e){
       e.preventDefault();
-      _log('click');
       var cid = jQuery(this).attr('data-post_id');
 
-      _log(cid);
-
+      // _log(cid);
       var parent =  jQuery(this).parents('.type-consignment');
+      var status =  parent.find('.consignment-status .alert');
+      // _log(status);
+      var status_class = status.attr('class');
+      // _log(status_class);
+      status.attr('class', 'alert');
 
-      parent.addClass('consignment-active');
-
+      status.text('Creating new consignment');
 
       var data = {
         'action': 'wcc_create_consignment',
@@ -29,17 +72,14 @@ function initAjaxCreateConsignment(){
         response = jQuery.trim(response);
 
         if ( typeof response !== 'undefined' && response != '1' ){
-          _log('error');
+          status.addClass('alert-danger');
         }
         else if ( response == '1' ){
           _log('success');
-          parent.removeClass('consignment-active');
-          parent.addClass('consignment-created');
+          status.addClass('alert-success');
+          status.text('New consignment created');
         }
-
       });
-
-
     }
   );
 }

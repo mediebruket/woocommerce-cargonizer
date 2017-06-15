@@ -1,6 +1,6 @@
 <?php
 add_action( 'init', array('Consignment', '_registerPostType'), 10 );
-add_action( 'init', array('Consignment', '_updateNextShippingDate'), 20 );
+// add_action( 'init', array('Consignment', '_updateNextShippingDates'), 20 );
 add_action( 'pre_get_posts', array('Consignment', '_orderConsignmentsByShippingDate'), 20 );
 
 class Consignment{
@@ -15,7 +15,11 @@ class Consignment{
   public $IsRecurring;
   public $IsCargonized;
   public $Items;
+  public $NextShippingDate;
+  public $LastShippingDate;
   public $OrderId;
+  public $Printer;
+  public $RecurringInterval;
   public $Meta;
 
   function __construct( $post_id ){
@@ -27,7 +31,17 @@ class Consignment{
     $this->CarrierProductServices   = $this->getCarrierProductServices();
     $this->Items            = $this->getItems();
     $this->IsRecurring      = $this->isRecurring();
+    $this->ReceiverEmail    = $this->getReceiverEmail();
+    $this->ReceiverPhone    = $this->getReceiverPhone();
+
+    $this->RecurringInterval = $this->getRecurringInterval();
+
+
     $this->History          = $this->getHistory();
+    $this->Printer          = $this->getPrinter();
+
+    $this->NextShippingDate  = $this->getNextShippingDate();
+    $this->LastShippingDate  = $this->getLastShippingDate();
 
     if ( $this->CarrierProduct ){
       $tmp = explode('|', $this->CarrierProduct );
@@ -36,6 +50,17 @@ class Consignment{
     }
     // _log($this);
   }
+
+
+
+  function update( $meta_key, $meta_value ){
+    update_post_meta( $this->Id, $meta_key, $meta_value );
+  }
+
+  function set( $attr, $value ){
+    $this->$attr = $value;
+  }
+
 
 
   function getPostMeta(){
@@ -47,13 +72,51 @@ class Consignment{
     return gi($this->Meta, 'recurring_consignment_order_id');
   }
 
+
   function isRecurring(){
     return gi($this->Meta, 'consignment_is_recurring');
   }
 
 
+  function getReceiverEmail(){
+    return gi($this->Meta, 'email');
+  }
+
+
+  function getReceiverPhone(){
+    return gi($this->Meta, 'phone');
+  }
+
+
+  function getPrinter(){
+    return gi($this->Meta, 'parcel_printer');
+  }
+
+
   function getItems(){
     return acf_getField('consignment_items', $this->ID);
+  }
+
+
+  function getRecurringInterval(){
+    return gi($this->Meta, 'recurring_consignment_interval');
+  }
+
+
+  function getNextShippingDate(){
+    return gi($this->Meta, 'consignment_next_shipping_date');
+  }
+
+
+  function getLastShippingDate(){
+    $date = null;
+    // _log('$this->History');
+    // _log($this->History[0]['created_at']);
+    if ( is_array($this->History) && isset($this->History[0]) && isset($this->History[0]['created_at']) ){
+      $date = $this->History[0]['created_at'];
+    }
+
+    return $date;
   }
 
 
@@ -72,10 +135,9 @@ class Consignment{
   }
 
 
-
   public static function createOrUpdate( $Parcel, $recurring=false ){
     _log('Consignment::createOrUpdate('.$Parcel->ID.')');
-
+    $post_id = null;
     //_log($Parcel);
     $args = array(
       'post_author' => get_current_user_id(),
@@ -96,12 +158,16 @@ class Consignment{
     if ( $post_id = wp_insert_post( $args ) ){
       _log('consignment: '.$post_id);
 
+      // _log('Parcel');
+      // _log($Parcel);
+
       $meta_order_key = 'consignment_order_id';
       if ( $recurring ){
         $meta_order_key = 'recurring_consignment_order_id';
       }
       update_post_meta( $post_id, $meta_order_key, $Parcel->ID );
       update_post_meta( $post_id, 'consignment_is_recurring', $recurring );
+      update_post_meta( $post_id, 'parcel_printer', $Parcel->Printer );
 
       if ( $recurring ){
         update_post_meta( $post_id, 'recurring_consignment_interval', $Parcel->RecurringInterval );
@@ -121,20 +187,7 @@ class Consignment{
         update_post_meta( $post_id, 'consignment_next_shipping_date', $Parcel->ShippingDate );
       }
 
-      _log('Parcel');
-      _log($Parcel);
-
-
       // copy meta values
-      $address = $Parcel->WC_Order->get_address();
-      update_post_meta( $post_id, '_shipping_first_name', gi( $Parcel->Meta, '_shipping_first_name' ) );
-      update_post_meta( $post_id, '_shipping_last_name',  gi( $Parcel->Meta, '_shipping_last_name' ) );
-      update_post_meta( $post_id, '_shipping_country',    gi( $Parcel->Meta, '_shipping_country' ) );
-      update_post_meta( $post_id, '_shipping_postcode',   gi( $Parcel->Meta, '_shipping_postcode' ) );
-      update_post_meta( $post_id, '_shipping_city',       gi( $Parcel->Meta, '_shipping_city' ) );
-      update_post_meta( $post_id, '_shipping_address_1',  gi( $Parcel->Meta, '_shipping_address_1' ) );
-      update_post_meta( $post_id, '_shipping_address_2',  gi( $Parcel->Meta, '_shipping_address_2' ) );
-
       update_post_meta( $post_id, '_billing_first_name',  gi( $Parcel->Meta, '_billing_first_name' ) );
       update_post_meta( $post_id, '_billing_last_name',   gi( $Parcel->Meta, '_billing_last_name' ) );
       update_post_meta( $post_id, '_billing_country',     gi( $Parcel->Meta, '_billing_country' ) );
@@ -143,36 +196,131 @@ class Consignment{
       update_post_meta( $post_id, '_billing_address_1',   gi( $Parcel->Meta, '_billing_address_1' ) );
       update_post_meta( $post_id, '_billing_address_2',   gi( $Parcel->Meta, '_billing_address_2' ) );
 
+
+      // firstname
+      $sfn = gi( $Parcel->Meta, '_shipping_first_name' );
+      if ( !$sfn ){
+        $sfn =  gi( $Parcel->Meta, '_billing_first_name' );
+      }
+      update_post_meta( $post_id, '_shipping_first_name', $sfn );
+
+      // lastname
+      $sln = gi( $Parcel->Meta, '_shipping_last_name' );
+      if ( !$sln ){
+        $sln = gi( $Parcel->Meta, '_billing_last_name' );
+      }
+      update_post_meta( $post_id, '_shipping_last_name', $sln );
+
+      // country
+      $sc = gi( $Parcel->Meta, '_shipping_country' );
+      if ( !$sc ){
+        $sc = gi( $Parcel->Meta, '_billing_city' ) ;
+      }
+      update_post_meta( $post_id, '_shipping_country', $sc );
+
+      // postcode
+      $spc = gi( $Parcel->Meta, '_shipping_postcode' );
+      if ( !$spc  ){
+        $spc = gi( $Parcel->Meta, '_billing_postcode' );
+      }
+      update_post_meta( $post_id, '_shipping_postcode', $spc );
+
+      // city
+      $sc = gi( $Parcel->Meta, '_shipping_city' );
+      if ( !$sc ){
+        $sc = gi( $Parcel->Meta, '_billing_city' );
+      }
+      update_post_meta( $post_id, '_shipping_city', $sc );
+
+
+      // address 1
+      $sa1 = gi( $Parcel->Meta, '_shipping_address_1' );
+      if ( !$sa1 ){
+        $sa1 = gi( $Parcel->Meta, '_billing_address_1' );
+      }
+      update_post_meta( $post_id, '_shipping_address_1', $sa1 );
+
+      // address 2
+      $sa2 = gi( $Parcel->Meta, '_shipping_address_2' );
+      if ( !$sa2 ){
+        $sa2 =  gi( $Parcel->Meta, '_billing_address_2' );
+      }
+      update_post_meta( $post_id, '_shipping_address_2', $sa2 );
+
+
+      $address = $Parcel->WC_Order->get_address();
       update_post_meta( $post_id, 'email', gi( $address, 'email' ) );
       update_post_meta( $post_id, 'phone', gi( $address, 'phone' ) );
-
-
-      // TODO ??
-      // Products: name, sku, count
 
       if ( !isset($args['ID']) ){
         self::addNote($Parcel->ID, $post_id);
       }
     }
+
+    return $post_id;
   }
 
 
   function getHistory(){
-    _log('getHistory');
-    _log($this->Meta['consignment_history']);
-    return $this->Meta['consignment_history'];
+    // _log('Consignment::getHistory()');
+    $history = array();
+    if ( isset($this->Meta['consignment_history']) ){
+      $cm = $this->Meta['consignment_history'];
+      // _log($cm);
+      if ( is_array($cm) ){
+        foreach ($cm as $key => $row) {
+          $history[] = maybe_unserialize($row );
+        }
+      }
+    }
+
+    return array_reverse( $history );
   }
 
 
-  function updateHistory(){
-    $consignment = array();
-    $consignment['created_at'] = '2017-01-02';
-    $consignment['consignment_id'] = '2017-01-02';
-    $consignment['consignment_tracking_code'] = rand(9999999, 999999999);
-    $consignment['consignment_tracking_url'] = '<a href="#">show</a>';
-    $consignment['consignment_pdf'] = '<a href="#">download</a>';
+  function updateHistory( $consignment ){
+    _log('Consignment::updateHistory()');
+    // _log($consignment);
 
-    add_post_meta( $this->Id, 'consignment_history', $consignment, false );
+    $new_entry = array();
+
+    if ( $created_at = $consignment['created-at']['$'] ){
+      $new_entry['created_at'] = $created_at;
+    }
+
+    if ( $number = $consignment['number'] ){
+      $new_entry['consignment_tracking_code'] = $number;
+    }
+
+
+    if ( $tracking_url = $consignment['tracking-url'] ){
+      $new_entry['consignment_tracking_url'] = $tracking_url;
+    }
+
+
+    if( $pdf = $consignment['consignment-pdf'] ){
+      $new_entry['consignment_pdf'] = $pdf;
+    }
+
+    if ( $consignment['bundles']['bundle'] ){
+      $bundle = $consignment['bundles']['bundle'];
+      $new_entry['consignment_id'] = null;
+      if ( isset($bundle[0]) ){
+        $new_entry['consignment_id'] = $bundle[0]['consignment-id']['$'];
+      }
+      else {
+       $new_entry['consignment_id'] = $bundle['consignment-id']['$'];
+      }
+    }
+
+    if( !empty($new_entry) ){
+      add_post_meta( $this->Id, 'consignment_history', $new_entry, false );
+      _log('history updated');
+      return $new_entry;
+    }
+    else{
+      return false;
+    }
   }
 
 
@@ -276,7 +424,7 @@ class Consignment{
 
       $item_attributes =
         array(
-          'type'        => ( $parcel_type = gi( $item, 'parcel_package_type' ) ) ? $parcel_type : $this->TransportAgreementProductType,
+          'type'        => ( $parcel_type = gi( $item, 'parcel_package_type' ) ) ? $parcel_type : $this->CarrierProductType,
           // 'type'        => 'package',
           'amount'      => gi( $item, 'parcel_amount' ),
           'weight'      => $parcel_weight,
@@ -319,7 +467,71 @@ class Consignment{
   }
 
 
+  public static function getPlaceholders(){
+    return array( '@order_id@', '@shop_name@', '@parcel_tracking_url@', '@parcel_tracking_link@', '@parcel_tracking_code@', '@parcel_date@' );
+  }
 
+
+  function notifyCustomer( $history_entry ){
+    _log('Consignment::notifyCustomer()');
+    // update meta fields
+    //$this->Meta = get_post_custom($this->ID );
+
+    if ( $email = $this->ReceiverEmail ){
+
+      $tmp_placeholders = self::getPlaceholders();
+      $placeholders = array();
+      _log('generate placeholders');
+      foreach ($tmp_placeholders as $pi => $ph) {
+
+        $placeholders[$ph] = null;
+
+        if ( $ph == '@order_id@'){
+          $placeholders[$ph] = $this->ID;
+        }
+        elseif ( $ph == '@shop_name@'){
+          $placeholders[$ph] = get_bloginfo('name' );
+        }
+        elseif ( $ph == '@parcel_tracking_url@'){
+          $placeholders[$ph] = gi($history_entry, 'consignment_tracking_url');
+        }
+        elseif ( $ph == '@parcel_tracking_link@'){
+          $placeholders[$ph] = sprintf('<a href="%s">%s</a>', gi($history_entry, 'consignment_tracking_url'), gi($history_entry, 'consignment_tracking_code') );
+        }
+        elseif ( $ph == '@parcel_tracking_code@'){
+          $placeholders[$ph] = gi($history_entry, 'consignment_tracking_code');
+        }
+        elseif ( $ph == '@parcel_date@'){
+          $placeholders[$ph] = date( get_option( 'date_format' ), strtotime(gi($history_entry, 'created_at')) );
+        }
+      }
+
+      // _log($placeholders);
+
+      $notification = array(
+        'subject' => get_option('cargonizer-customer-notification-subject'),
+        'message' => nl2br(htmlentities( get_option('cargonizer-customer-notification-message') , ENT_QUOTES, "UTF-8")),
+        );
+
+      foreach ($notification as $key => $string) {
+        foreach ( $placeholders as $ph => $ph_value ) {
+          $string = str_replace($ph, $ph_value, $string);
+        }
+
+        $notification[$key] = $string;
+      }
+
+      wp_mail( $email, $notification['subject'], $notification['message'] );
+      _log('notification sent to: '.$email);
+      _log('$notification');
+      _log($notification);
+
+    }
+    else{
+      _log('no customer mail');
+    }
+
+  }
 
   public static function addNote( $order_id, $consignment_id ){
     _log('Consignment::addNote('.$order_id.')');
@@ -371,30 +583,52 @@ class Consignment{
   }
 
 
-  public static function _updateNextShippingDate(){
+  public static function _updateNextShippingDates(){
     $post_ids = self::getAllRecurringConsignments();
     if ( is_array($post_ids) ){
       foreach ($post_ids as $key => $post_id) {
-
         if ( $interval = get_post_meta( $post_id, 'recurring_consignment_interval', true ) ){
-          $month = date('m');
-          $year = date('Y');
-
-          if ( date('d') > $interval ){
-            if ( $month != 12 ){
-              $month += 1;
-            }
-            else{
-              $month = 1;
-              $year += 1;
-            }
-          }
-
-          $new_shipping_date = $year.str_pad($month, 2, "0", STR_PAD_LEFT).str_pad($interval, 2, "0", STR_PAD_LEFT);
-          update_post_meta( $post_id, 'consignment_next_shipping_date', $new_shipping_date );
+          update_post_meta( $post_id, 'consignment_next_shipping_date', self:: calcNextShippingDate( $interval ) );
         }
       }
     }
+  }
+
+
+  function setNextShippingDate( $auto_inc=false ){
+    _log('Consignment::setNextShippingDate()');
+    if ( $this->IsRecurring && $this->RecurringInterval ){
+      if ( $nsd = self:: calcNextShippingDate( $this->RecurringInterval, $auto_inc ) ){
+        _log($nsd);
+        $this->update( 'consignment_next_shipping_date', $nsd );
+        $this->set('NextShippingDate', $nsd);
+      }
+    }
+  }
+
+
+  public static function calcNextShippingDate( $interval, $auto_inc=false ){
+
+    if ( is_numeric($interval) && $interval > 0 ){
+      $month = date('m');
+      $year = date('Y');
+
+      if ( date('d') > $interval or $auto_inc ){
+        if ( $month != 12 ){
+          $month += 1;
+        }
+        else{
+          $month = 1;
+          $year += 1;
+        }
+      }
+
+      return $year.str_pad($month, 2, "0", STR_PAD_LEFT).str_pad($interval, 2, "0", STR_PAD_LEFT);
+    }
+    else{
+      return null;
+    }
+
   }
 
 

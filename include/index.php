@@ -13,3 +13,4 @@ include('CargonizeXml.php');
 include('Cargonizer.php');
 include('CargonizerUpdater.php');
 include('Consignment.php');
+include('CargonizerAjax.php');

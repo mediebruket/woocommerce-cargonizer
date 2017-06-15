@@ -173,13 +173,21 @@ body.post-type-consignment #edit-slug-box{
   color: #333;
 }
 
-#consignment-interval,
+
 #consignment-next-shipping-date,
 #consignment-actions
 {
   width:12%;
 }
 
+#consignment-interval,
+#consignment-post-id{
+  width: 6%;
+}
+
+#consignment-status{
+  width: 18%;
+}
 
 #acf-field_593e32538dbca-1{
   opacity: 0;
@@ -207,4 +215,8 @@ tr.consignment-created td
 
 .acf-field-5940c85af6b7d table {
   width: 100%;
+}
+
+.alert{
+text-align: center;
 }

@@ -22,12 +22,13 @@ class CargonizerConfig{
   public static function getConfigs(){
     return array(
       'consignment' => array(
-        'post-id'  => __('ID', 'wc-cargonizer'),
+        'consignment-post-id'  => __('ID', 'wc-cargonizer'),
         'consignment-receiver' => __('Receiver', 'wc-cargonizer'),
         'consignment-interval' => __('Interval', 'wc-cargonizer'),
         'consignment-next-shipping-date'  => __('Next shipping date', 'wc-cargonizer'),
         'consignment-actions'  => __('Actions', 'wc-cargonizer'),
         'consignment-status'  => __('Status', 'wc-cargonizer'),
+        'consignment-last-shipping-date'  => __('Last shipping date', 'wc-cargonizer'),
       )
     );
   }
