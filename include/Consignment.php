@@ -25,12 +25,12 @@ class Consignment{
   function __construct( $post_id ){
     $this->Id               = $this->ID = $post_id;
     $this->Meta             = $this->getPostMeta();
-    $this->OrderId          = $this->getOrderId();
     $this->CarrierId        = $this->getCarrierId();
     $this->CarrierProduct   = $this->getCarrierProduct();
     $this->CarrierProductServices   = $this->getCarrierProductServices();
     $this->Items            = $this->getItems();
     $this->IsRecurring      = $this->isRecurring();
+    $this->OrderId          = $this->getOrderId();
     $this->ReceiverEmail    = $this->getReceiverEmail();
     $this->ReceiverPhone    = $this->getReceiverPhone();
 
@@ -69,7 +69,12 @@ class Consignment{
 
 
   function getOrderId(){
-    return gi($this->Meta, 'recurring_consignment_order_id');
+    if ( $this->IsRecurring ){
+      return gi($this->Meta, 'recurring_consignment_order_id');
+    }
+    else{
+      return gi($this->Meta, 'consignment_order_id');
+    }
   }
 
 
@@ -169,6 +174,11 @@ class Consignment{
       update_post_meta( $post_id, 'consignment_is_recurring', $recurring );
       update_post_meta( $post_id, 'parcel_printer', $Parcel->Printer );
 
+      // user id
+      update_post_meta( $post_id, 'customer_id', gi($Parcel->Meta, '_customer_user' )  );
+
+      // products
+
       if ( $recurring ){
         update_post_meta( $post_id, 'recurring_consignment_interval', $Parcel->RecurringInterval );
         update_post_meta( $post_id, 'consignment_carrier_id', $Parcel->RecurringCarrierId );
@@ -178,7 +188,7 @@ class Consignment{
         acf_updateField('consignment_items', $Parcel->RecurringConsignmentItems, $post_id);
       }
       else{
-        _log('single future consignment');
+        _log('single consignment');
         acf_updateField('consignment_items', $Parcel->Items, $post_id);
         update_post_meta( $post_id, 'consignment_carrier_id', $Parcel->TransportAgreementId );
         update_post_meta( $post_id, 'consignment_product', $Parcel->ParcelType );

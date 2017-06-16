@@ -2,8 +2,77 @@ jQuery(document).ready(
   function(){
     initAjaxCreateConsignment();
     initAjaxPrintLatestConsignment();
+    initAjaxCreateConsignments();
   }
 );
+
+function initAjaxCreateConsignments(){
+  jQuery("#ajax-create-consignments").click(function(e){
+    e.preventDefault();
+    _log('click');
+    var posts = jQuery('#the-list input[name^=post]:checked').map(
+                  function(idx, elem) {
+                    return jQuery(elem).val();
+                  }
+                ).get();
+
+    if ( posts.length ){
+      createConsignments( posts, 0 );
+    }
+
+  });
+}
+
+
+
+
+function createConsignments( posts, index ){
+  _log('createConsignments');
+
+  if ( typeof index === 'undefined' ){
+    index = 0;
+  }
+
+  _log(index);
+  _log(posts);
+
+  if ( typeof posts[index] !== 'undefined' && posts[index] && !isNaN(posts[index] ) ){
+    var cid = posts[index];
+    var parent = jQuery('#post-'+cid );
+    var status = parent.find('.consignment-status .alert');
+    // _log(status);
+    var status_class = status.attr('class');
+    // _log(status_class);
+    status.attr('class', 'alert');
+
+    status.text('Creating new consignment');
+
+    var data = {
+      'action': 'wcc_create_consignment',
+      'order_id': cid
+    };
+
+    jQuery.post( ajaxurl, data, function(response) {
+      console.log('response');
+      console.log(response);
+      response = jQuery.trim(response);
+
+      if ( typeof response !== 'undefined' && response != '1' ){
+        status.addClass('alert-danger');
+      }
+      else if ( response == '1' ){
+        _log('success');
+        status.addClass('alert-success');
+        status.text('New consignment created');
+      }
+
+      createConsignments(posts, ++index );
+    });
+  }
+}
+
+
+
 
 function initAjaxPrintLatestConsignment(){
   jQuery('.ajax-print-consignment').click(function(e){
@@ -50,36 +119,7 @@ function initAjaxCreateConsignment(){
     function(e){
       e.preventDefault();
       var cid = jQuery(this).attr('data-post_id');
-
-      // _log(cid);
-      var parent =  jQuery(this).parents('.type-consignment');
-      var status =  parent.find('.consignment-status .alert');
-      // _log(status);
-      var status_class = status.attr('class');
-      // _log(status_class);
-      status.attr('class', 'alert');
-
-      status.text('Creating new consignment');
-
-      var data = {
-        'action': 'wcc_create_consignment',
-        'order_id': cid
-      };
-
-      jQuery.post(ajaxurl, data, function(response) {
-        console.log('response');
-        console.log(response);
-        response = jQuery.trim(response);
-
-        if ( typeof response !== 'undefined' && response != '1' ){
-          status.addClass('alert-danger');
-        }
-        else if ( response == '1' ){
-          _log('success');
-          status.addClass('alert-success');
-          status.text('New consignment created');
-        }
-      });
+      createConsignments( [cid], 0 );
     }
   );
 }

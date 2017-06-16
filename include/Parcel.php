@@ -20,6 +20,7 @@ class Parcel{
 
 
   function __construct($post_id){
+
     if ( is_numeric($post_id) ){
       // set woocommerce order object
       $this->WC_Order = new WC_Order($post_id);
@@ -51,6 +52,20 @@ class Parcel{
         $this->ConsignmentId = $this->getConsignmentId();
         $this->getTransportAgreementSettings();
         $this->Items = $this->getItems();
+
+        $this->Products = $this->WC_Order->get_items();
+
+        if ( is_array($this->Products) ){
+          foreach ($this->Products as $key => $product) {
+            $this->Products[$key]['is_subscription'] = WC_Subscriptions_Product::is_subscription( $product['product_id'] ) ;
+            unset($this->Products[$key]['item_meta_array']);
+            unset($this->Products[$key]['item_meta']);
+            unset($this->Products[$key]['line_tax_data']);
+          }
+
+        }
+        _log($this->Products);
+
 
       }
     }

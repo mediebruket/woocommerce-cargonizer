@@ -6,6 +6,7 @@ add_action( 'woocommerce_admin_order_data_after_order_details', array('Cargonize
 add_filter( 'manage_edit-consignment_columns' , array('CargonizerAdmin', '_registerEditColumns') );
 add_action( 'manage_consignment_posts_custom_column' , array('CargonizerAdmin', '_fillCustomColumns') , 10, 2 );
 add_filter( 'manage_edit-consignment_sortable_columns', array('CargonizerAdmin', '_registerSortableColumns') );
+add_action( 'manage_posts_extra_tablenav', array('CargonizerAdmin', '_addBatchButton') );
 
 
 
@@ -330,6 +331,14 @@ class CargonizerAdmin{
       $Consignment = new Consignment ( $post_id );
       $post_meta = get_post_custom( $post_id );
       // echo self::getField($column, $post_id );
+      //
+      // get products subscription products => $Consignment->Products;
+      // $Consignment->UserId;
+      // for each products
+      // wcs_user_has_subscription( $Consignment->UserId, $product_id, $status );
+
+      // has_term( array('subscription', 'variable-subscription' ),  $taxonomy='product_type', $product_id );
+
       if ( $column == 'consignment-post-id' ){
         echo $post_id;
       }
@@ -351,10 +360,10 @@ class CargonizerAdmin{
       }
       else if ( $column == 'consignment-actions'){
         printf('<a href="#" class="consignment-action ajax-create-consignment" data-post_id="%s" title="create new consignment"><i class="fa fa-paper-plane" aria-hidden="true"></i></a>', $post_id  );
+
         if ( isset($Consignment->History[0]) ){
           printf('<a href="#" class="consignment-action ajax-print-consignment" data-post_id="%s" title="print the latest consignment"><i class="fa fa-print" aria-hidden="true"></i></a>', $post_id);
         }
-
 
         if ( $Consignment->OrderId && is_numeric($Consignment->OrderId) ){
           printf('<a href="%s" class="consignment-action" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i></a>', get_edit_post_link( $Consignment->OrderId) );
@@ -370,11 +379,17 @@ class CargonizerAdmin{
         $warning_time = 1; // TODO warning time = setting
 
         $wtd =  $next_shipping_date - $today ;
+
+        $ok = false;
+        if ( !$Consignment->IsRecurring && $Consignment->LastShippingDate ){
+          $ok = true;
+        }
+
         // _log($wtd);
         if ( $wtd == 0 or $wtd == 1 ){
           echo self::makeStatus( 'warning', __('Create consignment', 'wc-cargonizer') );
         }
-        else if ( $wtd < 0 ){
+        else if ( $wtd < 0 && !$ok ){
          echo self::makeStatus( 'danger', __('Delay in dispatch', 'wc-cargonizer') );
         }
         else{
@@ -411,6 +426,13 @@ class CargonizerAdmin{
     }
     else{
       return false;
+    }
+  }
+
+
+  public static function _addBatchButton( $x=null ){
+    if ( gi($_GET, 'post_type') == 'consignment' ){
+      echo '<div class="alignleft actions"><a href="#" id="ajax-create-consignments" class="button"><i class="fa fa-paper-plane" aria-hidden="true"></i> Create new consignment </a></div>';
     }
   }
 
