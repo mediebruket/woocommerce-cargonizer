@@ -307,6 +307,8 @@ class Consignment{
   }
 
 
+
+
   function hasSubscriptionWarning(){
     _log('Consignment::hasSubscriptionWarning()');
     $warning = false;
@@ -319,15 +321,22 @@ class Consignment{
           _log($this->SubscriptionProducts);
 
           foreach ( $this->SubscriptionProducts as $key => $product_id ) {
-            if ( !wcs_user_has_subscription( $this->CustomerId, $product_id  ) ){
+            // if ( !wcs_user_has_subscription( $this->CustomerId, $product_id  ) ){
+            //   $warning = true;
+            //   break;
+            // }
+            if (
+              // if has subscription product and subscription is not active
+              $this->isSubscriptionProduct($product_id) && !$this->isSubscriptionProductActive($product_id)
+              or
+              $this->Subscriptions->post_status != 'wc-active' // if subscription has an end date
+            )
+            {
               $warning = true;
               break;
             }
           }
         }
-        // else{
-        //   _log('no subscription products');
-        // }
       }
       // else{
       //   _log('not recurring');
