@@ -310,7 +310,7 @@ class Consignment{
 
 
   function hasSubscriptionWarning(){
-    _log('Consignment::hasSubscriptionWarning()');
+    // _log('Consignment::hasSubscriptionWarning()');
     $warning = false;
 
     if ( function_exists('wcs_user_has_subscription') ){
@@ -727,7 +727,7 @@ class Consignment{
   function setNextShippingDate( $auto_inc=false ){
     _log('Consignment::setNextShippingDate()');
     if ( $this->IsRecurring && $this->RecurringInterval ){
-      if ( $nsd = self:: calcNextShippingDate( $this->RecurringInterval, $auto_inc ) ){
+      if ( $nsd = self::calcNextShippingDate( $this->RecurringInterval, $auto_inc ) ){
         _log($nsd);
         $this->update( 'consignment_next_shipping_date', $nsd );
         $this->set('NextShippingDate', $nsd);

@@ -5,7 +5,7 @@ class Cargonizer{
   protected $WC_Order;
   protected $Settings;
 
-  function __construct(){
+  function __construct( ){
     $this->Settings = new CargonizerOptions();
 
     add_action( 'save_post', array($this, 'saveConsignment'), 10, 1 );
@@ -79,11 +79,6 @@ class Cargonizer{
           _log('consignment created/updated: '.$cid);
           _log('create consignment now');
           $result = self::_createConsignment($cid);
-          if ( is_array($result) && isset($result['consignments']['consignment']) ){
-            update_post_meta( $Parcel->ID, 'is_cargonized', '1' );
-            $Parcel->saveConsignmentDetails( $consignment = $result['consignments']['consignment'] );
-            $this->addNote( $Parcel );
-          }
         }
       }
       else{
@@ -98,36 +93,7 @@ class Cargonizer{
   }
 
 
-  function addNote( $Parcel, $type = 'exported' ){
-    _log('Cargonizer::addNote('.$Parcel->ID.')');
 
-    $data = array(
-      'comment_post_ID'       => $Parcel->ID,
-      'comment_author'        => 'WooCommerce Cargonizer',
-      'comment_author_email'  => get_option('admin_email' ),
-      'comment_content'       => sprintf( __('Cargonizer: Parcel %s', 'wc-cargonizer'), $type ),
-      'comment_agent'         => 'WooCommerce Cargonizer',
-      'comment_type'          => 'order_note',
-      'comment_parent'        => 0,
-      'user_id'               => 1,
-      'comment_author_IP'     => 'null',
-      'comment_date'          => current_time('mysql'),
-      'comment_approved'      => 1,
-    );
-
-    if ( $type == 'exported' ){
-      $data['comment_content'] = '<br/>'.sprintf( __('Consignment id: %s', 'wc-cargonizer'), get_post_meta( $Parcel->ID, 'consignment_id', true ) );
-    }
-
-
-    if ( wp_insert_comment($data) ){
-      _log('new note added');
-    }
-    else{
-      _log('error: wp_insert_comment');
-      _log($data);
-    }
-  }
 
 
   function isOrder($object=true ){
@@ -202,6 +168,17 @@ class Cargonizer{
             $Consignment->notifyCustomer( $new_entry );
           }
 
+          // update order
+          if ( $Consignment->OrderId ){
+            _log('has order id');
+            $Parcel = new Parcel( $Consignment->OrderId );
+            $Parcel->setCargonized();
+            $Parcel->saveConsignmentDetails( $consignment = $result['consignments']['consignment'] );
+            $Parcel->addNote();
+          }
+          else{
+            _log('no order id');
+          }
         }
         else{
           _log('error');
@@ -223,10 +200,9 @@ class Cargonizer{
       $order_id = _is($_GET, 'post');
       if ( is_numeric($order_id) ){
 
-        //delete_post_meta( $order_id, $meta_key, $meta_value );
         $Parcel = new Parcel($order_id);
         $Parcel->reset();
-        $this->addNote( $Parcel, 'reset' );
+        $Parcel->addNote( 'reset' );
 
         if ( $location = get_edit_post_link($order_id) ){
           wp_redirect( str_replace('&amp;', '&', $location) );
@@ -271,34 +247,39 @@ class Cargonizer{
 
       $html = $rows = null;
 
-      if ( is_array($Consignment->OrderProducts) ){
-        foreach ( $Consignment->OrderProducts as $key => $product) {
-          // _log('$product');
-          // _log($product);
-          // _log($log);
-          $status = CargonizerIcons::ok();
-          // _log($Consignment->Subscriptions);
-          $post_status = str_replace('wc-', null, $Consignment->Subscriptions->post_status);
+      if ( is_array($Consignment->OrderProducts) && !empty($Consignment->OrderProducts) ){
+        if ( isset($Consignment->Subscriptions) && $Consignment->Subscriptions ){
+          foreach ( $Consignment->OrderProducts as $key => $product) {
+            // _log('$product');
+            // _log($product);
+            // _log($log);
+            $status = CargonizerIcons::ok();
+            // _log($Consignment->Subscriptions);
+            $post_status = null;
 
-          if (
-            // if has subscription product and subscription is not active
-            $Consignment->isSubscriptionProduct($product['product_id']) && !$Consignment->isSubscriptionProductActive($product['product_id'])
-            or
-            $post_status != 'active' // if subscription has an end date
+              $post_status = str_replace('wc-', null, $Consignment->Subscriptions->post_status);
 
-          ){
-            $status = CargonizerIcons::warning();
+
+            if (
+              // if has subscription product and subscription is not active
+              $Consignment->isSubscriptionProduct($product['product_id']) && !$Consignment->isSubscriptionProductActive($product['product_id'])
+              or
+              $post_status != 'active' // if subscription has an end date
+
+            ){
+              $status = CargonizerIcons::warning();
+            }
+
+            $rows .= sprintf(
+                '<tr><td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td> <td >%s</td></tr>',
+                $product['product_id'],
+                $product['name'],
+                $product['qty'],
+                ( ($product['is_subscription']) ? 'yes' : 'no' ),
+                $status. ' <a href="'.get_edit_post_link( $Consignment->Subscriptions->ID ).'" target="_blank">'.$post_status.'</a>'
+            );
+            // _log($log);
           }
-
-          $rows .= sprintf(
-              '<tr><td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td> <td >%s</td></tr>',
-              $product['product_id'],
-              $product['name'],
-              $product['qty'],
-              ( ($product['is_subscription']) ? 'yes' : 'no' ),
-              $status. ' <a href="'.get_edit_post_link( $Consignment->Subscriptions->ID ).'" target="_blank">'.$post_status.'</a>'
-          );
-          // _log($log);
         }
       }
 

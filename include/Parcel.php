@@ -196,6 +196,41 @@ class Parcel{
     return  gi($this->Meta, 'is_cargonized');
   }
 
+  function setCargonized(){
+    update_post_meta( $this->ID, 'is_cargonized', '1' );
+  }
+
+
+  function addNote( $type = 'exported' ){
+    _log('Cargonizer::addNote('.$this->ID.')');
+
+    $data = array(
+      'comment_post_ID'       => $this->ID,
+      'comment_author'        => 'WooCommerce Cargonizer',
+      'comment_author_email'  => get_option('admin_email' ),
+      'comment_content'       => sprintf( __('Cargonizer: Parcel %s', 'wc-cargonizer'), $type ),
+      'comment_agent'         => 'WooCommerce Cargonizer',
+      'comment_type'          => 'order_note',
+      'comment_parent'        => 0,
+      'user_id'               => 1,
+      'comment_author_IP'     => 'null',
+      'comment_date'          => current_time('mysql'),
+      'comment_approved'      => 1,
+    );
+
+    if ( $type == 'exported' ){
+      $data['comment_content'] = '<br/>'.sprintf( __('Consignment id: %s', 'wc-cargonizer'), get_post_meta( $this->ID, 'consignment_id', true ) );
+    }
+
+    if ( wp_insert_comment($data) ){
+      _log('new note added');
+    }
+    else{
+      _log('error: wp_insert_comment');
+      _log($data);
+    }
+  }
+
 
   function reset(){
     _log('Parcell::reset('.$this->ID.')');
@@ -299,6 +334,9 @@ class Parcel{
   public static function _getTransportAgreements(){
     return get_transient('transport_agreements');
   }
+
+
+
 
 
   function saveConsignmentDetails( $consignment ){

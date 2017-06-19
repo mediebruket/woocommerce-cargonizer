@@ -31,7 +31,6 @@ class CargonizerAdmin{
         array( $this, 'adminPage')
       );
 
-
     $page = add_submenu_page(
         'woocommerce',
         __( 'Consignments', 'wc-cargonizer' ),
@@ -39,6 +38,7 @@ class CargonizerAdmin{
         'read',
         'edit.php?post_type=consignment'
     );
+
   }
 
 

@@ -50,7 +50,7 @@ class CargonizerAjax{
 
 
   function _createConsignment(){
-    _log('CargonizerAjax::_createConsignment');
+    _log('CargonizerAjax::_createConsignment()');
 
     $response = 0;
     if ( isset($_POST['order_id']) && is_numeric($_POST['order_id']) ){

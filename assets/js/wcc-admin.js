@@ -115,6 +115,9 @@ function checkIfCargonized(){
     // checkbox
     jQuery('.acf-field.acf-field-59086fd6633fa input').attr('disabled', true );
 
+    // date
+    jQuery('div[data-name=parcel_shipping_date] input').attr('disabled', true );
+
     // parcels
     jQuery('.acf-field.acf-field-56cc575e16e1c input, #acf-field_56cead8e7fd30').attr('readonly', true);
     jQuery('.acf-field.acf-field-56cc575e16e1c select').attr('disabled', true);
