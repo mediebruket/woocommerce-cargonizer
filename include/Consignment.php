@@ -1,6 +1,6 @@
 <?php
 add_action( 'init', array('Consignment', '_registerPostType'), 10 );
-// add_action( 'init', array('Consignment', '_updateNextShippingDates'), 20 );
+add_action( 'init', array('Consignment', '_updateNextShippingDates'), 20 );
 add_action( 'pre_get_posts', array('Consignment', '_orderConsignmentsByShippingDate'), 20 );
 
 class Consignment{
@@ -11,6 +11,7 @@ class Consignment{
   public $CarrierProductId;
   public $CarrierProductType;
   public $CarrierProductService;
+  public $CustomerId;
   public $History;
   public $IsRecurring;
   public $IsCargonized;
@@ -18,8 +19,10 @@ class Consignment{
   public $NextShippingDate;
   public $LastShippingDate;
   public $OrderId;
+  public $OrderProducts;
   public $Printer;
   public $RecurringInterval;
+  public $Subscriptions;
   public $Meta;
 
   function __construct( $post_id ){
@@ -30,7 +33,11 @@ class Consignment{
     $this->CarrierProductServices   = $this->getCarrierProductServices();
     $this->Items            = $this->getItems();
     $this->IsRecurring      = $this->isRecurring();
+    $this->CustomerId          = $this->getCustomerId();
     $this->OrderId          = $this->getOrderId();
+    $this->OrderProducts    = $this->getOrderProducts();
+    $this->SubscriptionProducts    = $this->getSubscriptionProducts();
+    $this->Subscriptions    = $this->getSubscriptionsByOrderId();
     $this->ReceiverEmail    = $this->getReceiverEmail();
     $this->ReceiverPhone    = $this->getReceiverPhone();
 
@@ -75,6 +82,16 @@ class Consignment{
     else{
       return gi($this->Meta, 'consignment_order_id');
     }
+  }
+
+
+  function getOrderProducts(){
+    return maybe_unserialize( gi($this->Meta, 'consignment_order_products') );
+  }
+
+
+  function getCustomerId(){
+    return gi($this->Meta, 'customer_id');
   }
 
 
@@ -175,9 +192,11 @@ class Consignment{
       update_post_meta( $post_id, 'parcel_printer', $Parcel->Printer );
 
       // user id
-      update_post_meta( $post_id, 'customer_id', gi($Parcel->Meta, '_customer_user' )  );
+      update_post_meta( $post_id, 'customer_id', gi($Parcel->Meta, '_customer_user' ) );
 
       // products
+      update_post_meta( $post_id, 'consignment_order_products', $Parcel->Products );
+
 
       if ( $recurring ){
         update_post_meta( $post_id, 'recurring_consignment_interval', $Parcel->RecurringInterval );
@@ -286,6 +305,97 @@ class Consignment{
 
     return array_reverse( $history );
   }
+
+
+  function hasSubscriptionWarning(){
+    _log('Consignment::hasSubscriptionWarning()');
+    $warning = false;
+
+    if ( function_exists('wcs_user_has_subscription') ){
+      if ( $this->IsRecurring && $this->CustomerId ){
+
+        if ( is_array($this->SubscriptionProducts) && !empty($this->SubscriptionProducts) ){
+          _log('has pids');
+          _log($this->SubscriptionProducts);
+
+          foreach ( $this->SubscriptionProducts as $key => $product_id ) {
+            if ( !wcs_user_has_subscription( $this->CustomerId, $product_id  ) ){
+              $warning = true;
+              break;
+            }
+          }
+        }
+        // else{
+        //   _log('no subscription products');
+        // }
+      }
+      // else{
+      //   _log('not recurring');
+      // }
+    }
+
+
+    return $warning;
+  }
+
+
+  function isSubscriptionProductActive( $product_id ){
+    _log('Consignment::isSubscriptionProductActive('.$product_id.')');
+    $is_active = true;
+    if ( function_exists('wcs_user_has_subscription') ){
+      if ( !wcs_user_has_subscription( $this->CustomerId, $product_id ) ){
+        $is_active = false;
+      }
+      else {
+        if ( $this->OrderId ){
+
+        }
+      }
+    }
+
+
+    return $is_active;
+  }
+
+
+  function getSubscriptionsByOrderId( $order_id =null ){
+    if ( !$order_id ){
+      $order_id = $this->OrderId;
+    }
+    global $wpdb;
+    $sql = "SELECT * FROM %s WHERE post_type ='shop_subscription' AND post_parent = '%s' ";
+    $sql = sprintf($sql, $wpdb->posts, $order_id);
+
+    return $wpdb->get_row($sql);
+  }
+
+
+  function isSubscriptionProduct( $product_id ){
+    if ( is_numeric(array_search($product_id, $this->SubscriptionProducts)) ){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+
+
+  function getSubscriptionProducts(){
+    $product_ids = array();
+
+    if ( is_array($this->OrderProducts) ){
+      foreach ($this->OrderProducts as $key => $p) {
+        if ( isset($p['is_subscription']) && $p['is_subscription'] ){
+          $product_ids[] = $p['product_id'];
+        }
+      }
+    }
+
+    return $product_ids;
+  }
+
+
+
 
 
   function updateHistory( $consignment ){

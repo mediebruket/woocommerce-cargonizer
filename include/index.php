@@ -11,6 +11,7 @@ include('util/XmlConverter.php');
 include('Parcel.php');
 include('CargonizeXml.php');
 include('Cargonizer.php');
+include('CargonizerIcons.php');
 include('CargonizerUpdater.php');
 include('Consignment.php');
 include('CargonizerAjax.php');

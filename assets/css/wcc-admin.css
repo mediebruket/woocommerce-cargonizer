@@ -168,6 +168,11 @@ body.post-type-consignment #edit-slug-box{
           border-radius: 3px;
 }
 
+
+.consignment-action.warning{
+  color: #cc0000;
+}
+
 .consignment-action:hover{
   border-color: #333;
   color: #333;
@@ -213,10 +218,20 @@ tr.consignment-created td
 }
 
 
-.acf-field-5940c85af6b7d table {
+.acf-field-5940c85af6b7d table,
+.acf-field-59477f6eddf36 table
+ {
   width: 100%;
 }
 
 .alert{
 text-align: center;
+}
+
+.status-ok{
+  color: green;
+}
+
+.status-warning{
+  color: #cc0000;
 }

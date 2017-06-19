@@ -317,13 +317,12 @@ class CargonizerAdmin{
     return $columns;
   }
 
-   public static function _registerEditColumns($columns) {
+
+  public static function _registerEditColumns($columns) {
     unset($columns['tags']);
     unset($columns['date']);
     return array_merge( $columns, CargonizerConfig::getConfig('consignment') );
   }
-
-
 
 
   public static function _fillCustomColumns( $column, $post_id ) {
@@ -359,14 +358,19 @@ class CargonizerAdmin{
         }
       }
       else if ( $column == 'consignment-actions'){
-        printf('<a href="#" class="consignment-action ajax-create-consignment" data-post_id="%s" title="create new consignment"><i class="fa fa-paper-plane" aria-hidden="true"></i></a>', $post_id  );
+
+        if ( $Consignment->hasSubscriptionWarning() ){
+          printf('<a href="%s" class="consignment-action warning" target="_blank">'.CargonizerIcons::warning().'</a>', get_edit_post_link( $Consignment->Id) );
+        }
+
+        printf('<a href="#" class="consignment-action ajax-create-consignment" data-post_id="%s" title="create new consignment">'.CargonizerIcons::consignment().'</a>', $post_id  );
 
         if ( isset($Consignment->History[0]) ){
-          printf('<a href="#" class="consignment-action ajax-print-consignment" data-post_id="%s" title="print the latest consignment"><i class="fa fa-print" aria-hidden="true"></i></a>', $post_id);
+          printf('<a href="#" class="consignment-action ajax-print-consignment" data-post_id="%s" title="print the latest consignment">'.CargonizerIcons::printer().'</a>', $post_id);
         }
 
         if ( $Consignment->OrderId && is_numeric($Consignment->OrderId) ){
-          printf('<a href="%s" class="consignment-action" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i></a>', get_edit_post_link( $Consignment->OrderId) );
+          printf('<a href="%s" class="consignment-action" target="_blank">'.CargonizerIcons::link().'</a>', get_edit_post_link( $Consignment->OrderId) );
         }
 
       }
@@ -432,7 +436,7 @@ class CargonizerAdmin{
 
   public static function _addBatchButton( $x=null ){
     if ( gi($_GET, 'post_type') == 'consignment' ){
-      echo '<div class="alignleft actions"><a href="#" id="ajax-create-consignments" class="button"><i class="fa fa-paper-plane" aria-hidden="true"></i> Create new consignment </a></div>';
+      echo '<div class="alignleft actions"><a href="#" id="ajax-create-consignments" class="button">'.CargonizerIcons::consignment().' '. _('Create new consignment', 'wc-cargonizer'). '</a></div>';
     }
   }
 

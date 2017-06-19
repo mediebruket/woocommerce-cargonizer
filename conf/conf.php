@@ -7,8 +7,8 @@ class CargonizerConfig{
     $configs = self::getConfigs();
 
     if ( $index ){
-      if ( $config = _is($configs, $index) ){
-        return $config;
+      if ( isset($configs[$index]) ){
+        return $configs[$index];
       }
       else{
         return null;

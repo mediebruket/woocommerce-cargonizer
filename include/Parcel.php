@@ -62,11 +62,8 @@ class Parcel{
             unset($this->Products[$key]['item_meta']);
             unset($this->Products[$key]['line_tax_data']);
           }
-
         }
-        _log($this->Products);
-
-
+        // _log($this->Products);
       }
     }
   }
@@ -302,27 +299,6 @@ class Parcel{
   public static function _getTransportAgreements(){
     return get_transient('transport_agreements');
   }
-
-  // function getTransportAgreements($force_update=false){
-  //   _log('getTransportAgreements');
-  //   $ta = get_transient('transport_agreements');
-
-  //   if ( $ta && !$force_update ){
-  //     _log('transient');
-  //     $this->TransportAgreements = $ta;
-  //   }
-  //   else{
-  //     _log('no transient');
-  //     $Api = new CargonizerApi(true);
-  //     _log($Api->TransportAgreements);
-  //     $this->setTransportAgreements( $Api->TransportAgreements['transport-agreements']['transport-agreement'] );
-  //   }
-  // }
-
-
-  // public static function getPlaceholders(){
-  //   return array( '@order_id@', '@shop_name@', '@parcel_tracking_url@', '@parcel_tracking_link@', '@parcel_tracking_code@', '@parcel_date@' );
-  // }
 
 
   function saveConsignmentDetails( $consignment ){

@@ -18,6 +18,8 @@ class Cargonizer{
     add_filter('acf/load_field/name=transport_agreement', array($this, 'acf_setTransportAgreements'), 40 );
 
     add_filter('acf/load_field/key=field_5940c85af6b7d', array($this, 'acf_filterHistory'), 40, 1 );
+    add_filter('acf/load_field/key=field_59477f6eddf36', array($this, 'acf_filterOrderProducts'), 40, 1 );
+    add_filter('acf/load_field/key=field_59477faf14b71', array($this, 'acf_filterCustomerId'), 40, 1 );
 
     add_filter('acf/load_field/name=parcel-recurring-consignment-interval', array($this, 'acf_setRecurringConsignmentInterval'), 40 );
     add_filter('acf/load_field/name=recurring_consignment_interval', array($this, 'acf_setRecurringConsignmentInterval'), 40 );
@@ -88,11 +90,10 @@ class Cargonizer{
         _log('not ready or has future shipping date');
       }
 
-      // TODO enable
-      // if ( $Parcel->IsRecurring ){
-      //   _log('create recurring');
-      //   Consignment::createOrUpdate( $Parcel, $recurring=true );
-      // }
+      if ( $Parcel->IsRecurring ){
+        _log('create recurring');
+        Consignment::createOrUpdate( $Parcel, $recurring=true );
+      }
     }
   }
 
@@ -240,6 +241,81 @@ class Cargonizer{
    function setMailContentType(){
     return 'text/html';
   }
+
+
+  function acf_filterCustomerId( $field ){
+    global $post_id;
+
+    $customer_id = null;
+    if ( $post_id  ){
+      $Consignment = new Consignment($post_id);
+      _log('1');
+      _log($Consignment->CustomerId);
+      if ( $Consignment->CustomerId ){
+
+        $customer_id = $Consignment->CustomerId;
+      }
+    }
+
+    $field['message'] = str_replace('@acf_consignment_customer_id@', $customer_id, $field['message'] );
+
+    return $field;
+  }
+
+
+  function acf_filterOrderProducts( $field ){
+    global $post_id;
+
+    if ( $post_id  ){
+      $Consignment = new Consignment($post_id);
+
+      $html = $rows = null;
+
+      if ( is_array($Consignment->OrderProducts) ){
+        foreach ( $Consignment->OrderProducts as $key => $product) {
+          // _log('$product');
+          // _log($product);
+          // _log($log);
+          $status = CargonizerIcons::ok();
+          // _log($Consignment->Subscriptions);
+          $post_status = str_replace('wc-', null, $Consignment->Subscriptions->post_status);
+
+          if (
+            // if has subscription product and subscription is not active
+            $Consignment->isSubscriptionProduct($product['product_id']) && !$Consignment->isSubscriptionProductActive($product['product_id'])
+            or
+            $post_status != 'active' // if subscription has an end date
+
+          ){
+            $status = CargonizerIcons::warning();
+          }
+
+          $rows .= sprintf(
+              '<tr><td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td> <td >%s</td></tr>',
+              $product['product_id'],
+              $product['name'],
+              $product['qty'],
+              ( ($product['is_subscription']) ? 'yes' : 'no' ),
+              $status. ' <a href="'.get_edit_post_link( $Consignment->Subscriptions->ID ).'" target="_blank">'.$post_status.'</a>'
+          );
+          // _log($log);
+        }
+      }
+
+      if ( $rows ){
+        $th = '<tr> <th>%s</th> <th>%s</th> <th>%s</th> <th>%s</th> <th>%s</th>';
+        $th = sprintf( $th, __('Id', 'wc-cargonizer'), __('Name', 'wc-cargonizer'), __('Count', 'wc-cargonizer'), __('Subscription', 'wc-cargonizer'), __('Status') );
+        $html = '<table>'. $th.$rows. '</table>';
+      }
+
+      $field['message'] = str_replace('@acf_consignment_products@', $html, $field['message'] );
+
+    }
+
+
+    return $field;
+  }
+
 
   function acf_filterHistory($field){
     global $post_id;
@@ -425,7 +501,6 @@ class Cargonizer{
   }
 
 
-
   function acf_setTransportAgreements($field){
     // _log('Cargonizer::acf_setTransportAgreements');
     // _log($field);
@@ -450,7 +525,6 @@ class Cargonizer{
 
     return $field;
   }
-
 
 
   function acf_setParcelPrinter($field){
