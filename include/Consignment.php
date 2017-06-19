@@ -726,8 +726,23 @@ class Consignment{
 
   function setNextShippingDate( $auto_inc=false ){
     _log('Consignment::setNextShippingDate()');
+    // has Subscription
+    // check Subs
     if ( $this->IsRecurring && $this->RecurringInterval ){
-      if ( $nsd = self::calcNextShippingDate( $this->RecurringInterval, $auto_inc ) ){
+
+      $nsd = self::calcNextShippingDate( $this->RecurringInterval, $auto_inc );
+      $active = true;
+      if ( $this->hasSubscriptionWarning() ){
+        $end_date = get_post_meta( $this->Subscription->ID, '_schedule_end', true );
+
+        if ( $end_date < $nsd ){
+          $active = false;
+        }
+        // get schedule end date
+        // if end date > $nsd => yes
+      }
+
+      if ( $nsd && $active ){
         _log($nsd);
         $this->update( 'consignment_next_shipping_date', $nsd );
         $this->set('NextShippingDate', $nsd);
