@@ -42,6 +42,7 @@ class CargonizerApi{
     return $result;
   }
 
+
   function getPrinters(){
     // curl -g -XGET -H'X-Cargonizer-Key: b38515a578db604ba77f063801155add075a56e4' -H'X-Cargonizer-Sender: 1142' 'http://sandbox.cargonizer.no/transport_agreements.xml'
     _log('CargonizerApi::getPrinters()');
@@ -78,7 +79,7 @@ class CargonizerApi{
 
   function postConsignment($xml){
     // curl -g -XGET -H'X-Cargonizer-Key: b38515a578db604ba77f063801155add075a56e4' -H'X-Cargonizer-Sender: 1142' 'http://sandbox.cargonizer.no/transport_agreements.xml'
-    _log('getTransportAgreements');
+    _log('CargonizerApi::postConsignment()');
 
     $headers =
       array(
@@ -101,6 +102,20 @@ class CargonizerApi{
     }
 
     return $agreement;
+  }
+
+
+  function estimateCosts( $xml ){
+    // curl -g -XPOST -d@consignment.xml -H'X-Cargonizer-Key: 12345' -H'X-Cargonizer-Sender: 678' 'http://cargonizer.no/consignment_costs.xml'
+
+    _log('CargonizerApi::estimateCosts()');
+
+    $headers =
+      array(
+        'Content-Type' =>  'application/xml'
+      );
+
+    return $this->rest('consignment_costs.xml', $headers, 'POST', $xml, $debug=true );
   }
 
 

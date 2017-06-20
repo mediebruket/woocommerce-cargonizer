@@ -5,7 +5,7 @@ if ( !function_exists('gi') ){
   function gi( $array, $index ){
     if ( isset($array[$index]) ){
 
-      if ( is_string($array[$index]) ){
+      if ( is_string($array[$index]) or is_numeric($array[$index]) ){
         return $array[$index];
       }
       elseif ( is_string($array[$index][0]) ){
@@ -20,7 +20,7 @@ if ( !function_exists('gi') ){
 }
 
 if ( !function_exists('_is') ){
-  
+
   function _is( $array, $index ) {
     gi($array, $index);
   }

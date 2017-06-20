@@ -331,12 +331,14 @@ class Parcel{
   }
 
 
-  public static function _getTransportAgreements(){
-    return get_transient('transport_agreements');
+  public static function getPlaceholders(){
+    return array( '@order_id@', '@shop_name@', '@parcel_tracking_url@', '@parcel_tracking_link@', '@parcel_tracking_code@', '@parcel_date@' );
   }
 
 
-
+  public static function _getTransportAgreements(){
+    return get_transient('transport_agreements');
+  }
 
 
   function saveConsignmentDetails( $consignment ){

@@ -2,6 +2,7 @@
 add_action( 'init', array('Consignment', '_registerPostType'), 10 );
 add_action( 'init', array('Consignment', '_updateNextShippingDates'), 20 );
 add_action( 'pre_get_posts', array('Consignment', '_orderConsignmentsByShippingDate'), 20 );
+add_filter( 'woocommerce_package_rates' , array('Consignment', '_setShippingCosts'), 10, 2 );
 
 class Consignment{
   public $ID;
@@ -27,6 +28,8 @@ class Consignment{
 
   function __construct( $post_id ){
 
+    $this->Id = $this->ID = $post_id;
+
     // existing consignment
     if ( is_numeric($post_id) ){
       $this->init();
@@ -35,51 +38,50 @@ class Consignment{
     $this->CarrierId        = $this->getCarrierId();
     $this->CarrierProduct   = $this->getCarrierProduct();
     $this->CarrierProductServices   = $this->getCarrierProductServices();
-    
+
     if ( $this->CarrierProduct ){
       $tmp = explode('|', $this->CarrierProduct );
       $this->CarrierProductId    = ( isset($tmp[0]) ) ? $tmp[0] : null;
       $this->CarrierProductType  =  ( isset($tmp[1]) ) ? $tmp[1] : null;
     }
-    
+
     // _log($this);
   }
 
   function init(){
-    $this->Id               = $this->ID = $post_id;
     $this->Meta             = $this->getPostMeta();
-
     $this->Items            = $this->getItems();
     $this->IsRecurring      = $this->isRecurring();
-    $this->CustomerId          = $this->getCustomerId();
+    $this->CustomerId       = $this->getCustomerId();
     $this->OrderId          = $this->getOrderId();
     $this->OrderProducts    = $this->getOrderProducts();
     $this->SubscriptionProducts    = $this->getSubscriptionProducts();
     $this->Subscriptions    = $this->getSubscriptionsByOrderId();
     $this->ReceiverEmail    = $this->getReceiverEmail();
     $this->ReceiverPhone    = $this->getReceiverPhone();
-
     $this->RecurringInterval = $this->getRecurringInterval();
-
 
     $this->History          = $this->getHistory();
     $this->Printer          = $this->getPrinter();
 
     $this->NextShippingDate  = $this->getNextShippingDate();
     $this->LastShippingDate  = $this->getLastShippingDate();
-
   }
-
 
 
   function update( $meta_key, $meta_value ){
     update_post_meta( $this->Id, $meta_key, $meta_value );
   }
 
+
   function set( $attr, $value ){
     $this->$attr = $value;
   }
 
+
+  function setMeta( $attr, $value ){
+    $this->Meta[$attr] = $value;
+  }
 
 
   function getPostMeta(){
@@ -132,6 +134,8 @@ class Consignment{
   }
 
 
+
+
   function getRecurringInterval(){
     return gi($this->Meta, 'recurring_consignment_interval');
   }
@@ -167,7 +171,21 @@ class Consignment{
 
 
   function getCarrierProduct(){
-    gi($this->Meta, 'consignment_product');
+    $consignment_product = gi($this->Meta, 'consignment_product');
+
+    // _log('$consignment_product');
+    // _log($consignment_product);
+    if ( !$consignment_product ){
+      $consignment_product = get_option('cargonizer-delivery-services' );
+
+      if ( isset($consignment_product[0]) ){
+        $consignment_product = $consignment_product[0];
+      }
+
+      // _log($consignment_product);
+    }
+
+    return $consignment_product;
   }
 
 
@@ -326,8 +344,6 @@ class Consignment{
   }
 
 
-
-
   function hasSubscriptionWarning(){
     // _log('Consignment::hasSubscriptionWarning()');
     $warning = false;
@@ -421,9 +437,6 @@ class Consignment{
 
     return $product_ids;
   }
-
-
-
 
 
   function updateHistory( $consignment ){
@@ -582,7 +595,15 @@ class Consignment{
           'description' => gi($item, 'parcel_description' ),
         );
 
-      $item_attributes['volume'] = $item_attributes['length']*$item_attributes['width']*$item_attributes['height'];
+
+      if ( $volume = gi($item, 'parcel_volume' ) ){
+        $item_attributes['volume'] = $volume;
+      }
+      else{
+        $item_attributes['volume'] = $item_attributes['length']*$item_attributes['width']*$item_attributes['height'];
+      }
+
+
 
       $array['item']['_attr'] = $item_attributes;
 
@@ -822,7 +843,96 @@ class Consignment{
     else{
       return $html;
     }
+  }
 
+
+  public static function _setShippingCosts($rates, $package){
+    _log('Consignment::setShippingCosts()');
+    // _log($rates);
+    // _log($package);
+
+    if ( isset($package['contents']) && !empty($package['contents']) ){
+      $products = $package['contents'];
+      // _log( 'has: ' .count($products). ' items' );
+      $parcel = array(
+          'width' => 0,
+          'height' => 0,
+          'length' => 0,
+          'weight' => 0,
+          'volume' => 0
+        );
+
+      foreach ($products as $key => $p) {
+        $qty = $p['quantity'];
+        // _log('$qty: '.$qty);
+
+        $WC_P = new WC_Product( $p['product_id']);
+        $width = $WC_P->get_width();
+        $height = $WC_P->get_height();
+        $length = $WC_P->get_length();
+        $weight = $WC_P->get_weight();
+        $volume = 0;
+
+        if ( $width && $height && $length ){
+          $volume = $width * $height * $length / 1000;
+          // _log('volume: '.$volume);
+        }
+
+        $parcel['volume'] += $volume * $qty;
+        $parcel['weight'] += ($weight * $qty);
+      }
+
+
+      $Consignment = new Consignment( null );
+
+      if ( isset($package['destination']) && !empty($package['destination']) ){
+        _log('set destination');
+        $Consignment->setMeta( '_shipping_first_name', 'Ola' );
+        $Consignment->setMeta( '_shipping_last_name', 'Nordmann' );
+        $Consignment->setMeta( '_shipping_postcode', $package['destination']['postcode'] );
+        $Consignment->setMeta( '_shipping_country', $package['destination']['country'] );
+        $Consignment->setMeta( '_shipping_city', $package['destination']['country'] );
+        $Consignment->setMeta( '_shipping_address_1', $package['destination']['address'] );
+        $Consignment->setMeta( '_shipping_address_2', $package['destination']['address_2'] );
+      }
+      else{
+        _log('no destination ');
+        _log($package);
+      }
+
+      $Consignment->Items[] =
+        array(
+          'parcel_package_type' => $Consignment->CarrierProductType,
+          'parcel_amount' => 1,
+          'parcel_length' => null,
+          'parcel_width'  => null,
+          'parcel_height' => null,
+          'parcel_description' => 'cost estimation',
+          'parcel_weight' => $parcel['weight'],
+          'parcel_volume' => $parcel['volume'],
+        );
+
+
+      // _log('$Consignment');
+      // _log($Consignment);
+
+      $CargonizeXml = new CargonizeXml( $Consignment->prepareExport() );
+      $CargonizerApi = new CargonizerApi();
+      $result = $CargonizerApi->estimateCosts( $CargonizeXml->Xml );
+
+      _log($result['consignment-cost']);
+      if ( isset($result['consignment-cost']['estimated-cost']) && is_array($result['consignment-cost']['estimated-cost']) ){
+        _log('new costs');
+        _log($rates);
+        $rates['flat_rate:1']->cost = $result['consignment-cost']['estimated-cost']['$'];
+        $rates['flat_rate:1']->taxes = array( 1 => $result['consignment-cost']['estimated-cost']['$'] - $result['consignment-cost']['net-amount']['$']);
+      }
+      _log($rates);
+
+    }
+
+
+    return $rates;
   }
 
 

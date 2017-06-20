@@ -194,14 +194,14 @@ class CargonizerAdmin{
       $path = $plugin_path.'assets/';
 
       // $scripts = array( 'bootstrap-datepicker.js', 'bootstrap-datepicker.no.js', 'datepicker.js', 'forms.js',  'jquery.validate.min.js', 'messages_no.js' );
-      $styles = array( 'wcc-admin.css' );
+      $styles = array( 'wcc-admin.css', 'wcc-bootstrap-alerts.css' );
 
       // include stylesheets
       foreach ($styles as $s) {
         echo '<link rel="stylesheet" href="'.$path .'css/'.$s.'" type="text/css" />' . "\n";
       }
       echo '<link rel="stylesheet" href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" integrity="sha384-dNpIIXE8U05kAbPhy3G1cz+yZmTzA6CY8Vg/u2L9xRnHjJiAK76m2BIEaSEV+/aU" crossorigin="anonymous">';
-      echo '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" >';
+      // echo '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" >';
 
       wp_register_script( 'wcc-admin', $path. '/js/wcc-admin.js', false, '1.0.0' );
       wp_register_script( 'wcc-admin-ajax', $path. '/js/wcc-admin-ajax.js', false, '1.0.0' );
@@ -247,10 +247,9 @@ class CargonizerAdmin{
         printf( '<script>var parcel_is_cargonized=%s</script>', (( $Parcel->IsCargonized ) ? 'true' : 'false') ) ;
       }
       else if ( $post->post_type = 'consignment' ){
-        _log($_REQUEST);
         Consignment::getJsonObject( $_GET['post'], $echo = true );
       }
-      
+
 
     }
     elseif ( gi($_REQUEST, 'post_type') == 'consignment' ) {
