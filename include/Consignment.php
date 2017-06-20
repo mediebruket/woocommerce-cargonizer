@@ -26,11 +26,29 @@ class Consignment{
   public $Meta;
 
   function __construct( $post_id ){
-    $this->Id               = $this->ID = $post_id;
-    $this->Meta             = $this->getPostMeta();
+
+    // existing consignment
+    if ( is_numeric($post_id) ){
+      $this->init();
+    }
+
     $this->CarrierId        = $this->getCarrierId();
     $this->CarrierProduct   = $this->getCarrierProduct();
     $this->CarrierProductServices   = $this->getCarrierProductServices();
+    
+    if ( $this->CarrierProduct ){
+      $tmp = explode('|', $this->CarrierProduct );
+      $this->CarrierProductId    = ( isset($tmp[0]) ) ? $tmp[0] : null;
+      $this->CarrierProductType  =  ( isset($tmp[1]) ) ? $tmp[1] : null;
+    }
+    
+    // _log($this);
+  }
+
+  function init(){
+    $this->Id               = $this->ID = $post_id;
+    $this->Meta             = $this->getPostMeta();
+
     $this->Items            = $this->getItems();
     $this->IsRecurring      = $this->isRecurring();
     $this->CustomerId          = $this->getCustomerId();
@@ -50,12 +68,6 @@ class Consignment{
     $this->NextShippingDate  = $this->getNextShippingDate();
     $this->LastShippingDate  = $this->getLastShippingDate();
 
-    if ( $this->CarrierProduct ){
-      $tmp = explode('|', $this->CarrierProduct );
-      $this->CarrierProductId    = ( isset($tmp[0]) ) ? $tmp[0] : null;
-      $this->CarrierProductType  =  ( isset($tmp[1]) ) ? $tmp[1] : null;
-    }
-    // _log($this);
   }
 
 
@@ -143,12 +155,19 @@ class Consignment{
 
 
   function getCarrierId(){
-    return gi($this->Meta, 'consignment_carrier_id');
+    $carrier_id = gi($this->Meta, 'consignment_carrier_id');
+
+    if ( !$carrier_id  ){
+      $carrier_id = get_option('cargonizer-delivery-company-id' );
+    }
+
+
+    return $carrier_id;
   }
 
 
   function getCarrierProduct(){
-    return gi($this->Meta, 'consignment_product');
+    gi($this->Meta, 'consignment_product');
   }
 
 
@@ -789,6 +808,21 @@ class Consignment{
     }
 
     return $query;
+  }
+
+
+  public static function getJsonObject( $post_id, $echo = true ){
+    $Consignment = new Consignment($post_id);
+
+    $html = sprintf( '<script>var Consignment=%s;</script>', json_encode($Consignment) );
+
+    if ( $echo ){
+      echo $html;
+    }
+    else{
+      return $html;
+    }
+
   }
 
 

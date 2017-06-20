@@ -4,7 +4,7 @@ acf_consignment_product = '593e70ff3f520';
 acf_consignment_product_services = '593e71193f521';
 acf_consignment_product_services = '593e71193f521';
 
-jQuery(document).ready(function(){
+jQuery(window).load(function(){
   if ( jQuery('body.post-type-consignment').length && jQuery('#post_ID').val() ){
     initConsignment();
   }
@@ -78,10 +78,12 @@ function updateConsignmentProductServices(){
   if ( product_services ){
     jQuery('.acf-field.acf-field-'+acf_consignment_product_services+' .acf-checkbox-list').html( product_services );
 
-    if ( typeof Consignment.CarrierProductServices !== 'undefined' && Consignment.CarrierProductServices.length ){
-      jQuery.each( Consignment.CarrierProductServices, function(index, service ){
-        // _log(service);
-        jQuery('.acf-field.acf-field-'+acf_consignment_product_services+' .acf-checkbox-list input[value='+service+']').attr('checked', true );
+    if ( typeof Consignment.CarrierProductServices !== 'undefined' 
+          && Consignment.CarrierProductServices != null
+            && Consignment.CarrierProductServices.length ){
+            jQuery.each( Consignment.CarrierProductServices, function(index, service ){
+            // _log(service);
+            jQuery('.acf-field.acf-field-'+acf_consignment_product_services+' .acf-checkbox-list input[value='+service+']').attr('checked', true );
       });
     }
   }
@@ -101,7 +103,9 @@ function updateConsignmentItems(){
   jQuery('.acf-field.acf-field-'+acf_id+' select').html(options);
 
   // select current
-  if ( typeof Consignment.Items === 'object' && Consignment.Items.length ){
-    updateItemTypes( Consignment.Items, acf_id );
+  if ( typeof Consignment.Items === 'object' 
+        && Consignment.Items != null
+          && Consignment.Items.length ){
+        updateItemTypes( Consignment.Items, acf_id );
   }
 }

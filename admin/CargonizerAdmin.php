@@ -205,7 +205,7 @@ class CargonizerAdmin{
 
       wp_register_script( 'wcc-admin', $path. '/js/wcc-admin.js', false, '1.0.0' );
       wp_register_script( 'wcc-admin-ajax', $path. '/js/wcc-admin-ajax.js', false, '1.0.0' );
-      wp_register_script( 'wcc-admin-consignment', $path. '/js/wcc-admin-consignment.js', false, '1.0.0' );
+      wp_register_script( 'wcc-admin-consignment', $path. '/js/wcc-admin-consignment.js', false, '1.0.1' );
       wp_register_script( 'wcc-admin-action', $path. '/js/wcc-admin-action.js', false, '1.0.1' );
       wp_register_script( 'wcc-admin-html', $path. '/js/wcc-admin-html.js', false, '1.0.0' );
       wp_enqueue_script( 'wcc-admin-ajax' );
@@ -247,17 +247,18 @@ class CargonizerAdmin{
         printf( '<script>var parcel_is_cargonized=%s</script>', (( $Parcel->IsCargonized ) ? 'true' : 'false') ) ;
       }
       else if ( $post->post_type = 'consignment' ){
-        $Consignment = new Consignment($_GET['post']);
-        printf( '<script>var Consignment=%s;</script>', json_encode($Consignment) );
+        _log($_REQUEST);
+        Consignment::getJsonObject( $_GET['post'], $echo = true );
       }
+      
 
+    }
+    elseif ( gi($_REQUEST, 'post_type') == 'consignment' ) {
+      Consignment::getJsonObject( null, $echo = true );
     }
 
     printf( '<script>var transport_agreements=%s;</script>', json_encode($agreements) );
-
   }
-
-
 
 
   public static function newCustomOrderColumn($columns){
