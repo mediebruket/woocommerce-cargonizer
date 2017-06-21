@@ -57,16 +57,20 @@ class Parcel{
 
         if ( is_array($this->Products) ){
           foreach ($this->Products as $key => $product) {
-            $this->Products[$key]['is_subscription'] = WC_Subscriptions_Product::is_subscription( $product['product_id'] ) ;
-            unset($this->Products[$key]['item_meta_array']);
-            unset($this->Products[$key]['item_meta']);
-            unset($this->Products[$key]['line_tax_data']);
-          }
-        }
-        // _log($this->Products);
-      }
-    }
-  }
+
+            if ( class_exists('WC_Subscriptions_Product') ){
+              $this->Products[$key]['is_subscription'] = WC_Subscriptions_Product::is_subscription( $product['product_id'] );
+              unset($this->Products[$key]['item_meta_array']);
+              unset($this->Products[$key]['item_meta']);
+              unset($this->Products[$key]['line_tax_data']);
+            } // if
+
+          } // foreach
+        } // if
+
+      } // if post
+    } // if is numeric
+  } // construct
 
 
   function getPostMeta(){

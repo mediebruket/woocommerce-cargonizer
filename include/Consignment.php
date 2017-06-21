@@ -486,7 +486,7 @@ class Consignment{
 
 
   function prepareExport(){
-    _log('Consignment::prepareExport');
+    _log('Consignment::prepareExport()');
 
     //_log($this->Meta);
     // _log('prepareExport');
@@ -496,7 +496,7 @@ class Consignment{
       array(
         'transport_agreement' => $this->CarrierId,
         'estimate' => "true",
-        'print' => ( get_option('cargonizer-print-on-export' ) == 'on' ) ? true : false
+        'print' => ( get_option('cargonizer-print-on-export' ) == 'on' ) ? 'true' : 'false'
         );
 
     $export['consignments']['consignment']['values'] = array(
@@ -510,8 +510,9 @@ class Consignment{
           )
         )
     );
-    $export['consignments']['consignment']['transfer'] = 'true';
-    $export['consignments']['consignment']['booking_request'] = 'true';
+
+    $export['consignments']['consignment']['transfer'] = ( get_option('cargonizer-auto-transfer' ) == 'on' ) ? 'true' : 'false';
+    // $export['consignments']['consignment']['booking_request'] = 'false';
     $export['consignments']['consignment']['product'] = $this->CarrierProductId;
 
     //
@@ -567,7 +568,7 @@ class Consignment{
 
 
     // set consignee
-    $export['consignments']['consignment']['consignee'] =  $export['consignments']['consignment']['parts']['consignee'];
+    // $export['consignments']['consignment']['consignee'] =  $export['consignments']['consignment']['parts']['consignee'];
 
 
     // ---------------- items ----------------
@@ -604,10 +605,7 @@ class Consignment{
       }
 
 
-
       $array['item']['_attr'] = $item_attributes;
-
-
       $export['consignments']['consignment']['items'][]= $array;
     }
 
@@ -630,6 +628,9 @@ class Consignment{
 
     $export['consignments']['consignment']['messages']['consignor'] = 'messages-consignor';
     $export['consignments']['consignment']['messages']['consignee'] = gi( $this->Meta, 'consignment_message');
+
+    $export['consignments']['references']['consignor'] = $this->OrderId;
+    $export['consignments']['references']['consignee'] = $this->CustomerId;
 
     // _log($export);
     return $export;
@@ -851,7 +852,9 @@ class Consignment{
     // _log($rates);
     // _log($package);
 
-    if ( isset($package['contents']) && !empty($package['contents']) ){
+    $esc = get_option('cargonizer-estimate-shipping-costs');
+
+    if ( $esc && isset($package['contents']) && !empty($package['contents']) ){
       $products = $package['contents'];
       // _log( 'has: ' .count($products). ' items' );
       $parcel = array(
@@ -871,6 +874,8 @@ class Consignment{
         $height = $WC_P->get_height();
         $length = $WC_P->get_length();
         $weight = $WC_P->get_weight();
+
+
         $volume = 0;
 
         if ( $width && $height && $length ){
@@ -886,7 +891,7 @@ class Consignment{
       $Consignment = new Consignment( null );
 
       if ( isset($package['destination']) && !empty($package['destination']) ){
-        _log('set destination');
+        // _log('set destination');
         $Consignment->setMeta( '_shipping_first_name', 'Ola' );
         $Consignment->setMeta( '_shipping_last_name', 'Nordmann' );
         $Consignment->setMeta( '_shipping_postcode', $package['destination']['postcode'] );
@@ -894,44 +899,41 @@ class Consignment{
         $Consignment->setMeta( '_shipping_city', $package['destination']['country'] );
         $Consignment->setMeta( '_shipping_address_1', $package['destination']['address'] );
         $Consignment->setMeta( '_shipping_address_2', $package['destination']['address_2'] );
+
+        $Consignment->Items[] =
+            array(
+              'parcel_package_type' => $Consignment->CarrierProductType,
+              'parcel_amount' => 1,
+              'parcel_length' => null,
+              'parcel_width'  => null,
+              'parcel_height' => null,
+              'parcel_description' => 'cost estimation',
+              'parcel_weight' => $parcel['weight'],
+              'parcel_volume' => $parcel['volume'],
+            );
+
+        $CargonizeXml = new CargonizeXml( $Consignment->prepareExport() );
+        $CargonizerApi = new CargonizerApi();
+        $result = $CargonizerApi->estimateCosts( $CargonizeXml->Xml );
+
+        // _log($result['consignment-cost']);
+        if ( isset($result['consignment-cost']['estimated-cost']) && is_array($result['consignment-cost']['estimated-cost']) ){
+          foreach ($rates as $key => $value) {
+            if ( is_numeric( strpos($key, 'flat_rate') ) ) {
+              // _log($rates);
+              // _log($key);
+              $rates[$key]->cost = $result['consignment-cost']['estimated-cost']['$'];
+              $rates[$key]->taxes = array( 1 => $result['consignment-cost']['estimated-cost']['$'] *0.25 );
+            } // if
+          } // foreach
+        }// if
       }
       else{
         _log('no destination ');
         _log($package);
       }
-
-      $Consignment->Items[] =
-        array(
-          'parcel_package_type' => $Consignment->CarrierProductType,
-          'parcel_amount' => 1,
-          'parcel_length' => null,
-          'parcel_width'  => null,
-          'parcel_height' => null,
-          'parcel_description' => 'cost estimation',
-          'parcel_weight' => $parcel['weight'],
-          'parcel_volume' => $parcel['volume'],
-        );
-
-
-      // _log('$Consignment');
-      // _log($Consignment);
-
-      $CargonizeXml = new CargonizeXml( $Consignment->prepareExport() );
-      $CargonizerApi = new CargonizerApi();
-      $result = $CargonizerApi->estimateCosts( $CargonizeXml->Xml );
-
-      _log($result['consignment-cost']);
-      if ( isset($result['consignment-cost']['estimated-cost']) && is_array($result['consignment-cost']['estimated-cost']) ){
-        _log('new costs');
-        _log($rates);
-        $rates['flat_rate:1']->cost = $result['consignment-cost']['estimated-cost']['$'];
-        $rates['flat_rate:1']->taxes = array( 1 => $result['consignment-cost']['estimated-cost']['$'] - $result['consignment-cost']['net-amount']['$']);
-      }
-      _log($rates);
-
     }
-
-
+    // _log($rates);
     return $rates;
   }
 

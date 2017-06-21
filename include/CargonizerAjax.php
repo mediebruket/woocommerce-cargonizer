@@ -52,13 +52,22 @@ class CargonizerAjax{
   function _createConsignment(){
     _log('CargonizerAjax::_createConsignment()');
 
-    $response = 0;
+    $response = array('status' => null, 'message' => null);
     if ( isset($_POST['order_id']) && is_numeric($_POST['order_id']) ){
-      Cargonizer::_createConsignment( $_POST['order_id'] );
-      $response = 1;
+      $result = Cargonizer::_createConsignment( $_POST['order_id'] );
+      _log('result');
+      _log($result);
+      if ( is_array($result) && isset($result['consignments']['consignment']['id']['$']) ){
+        $response['status'] = 'ok';
+        $response['message'] = sprintf( __('New consignment created: %s', 'wc-cargonizer'),  $result['consignments']['consignment']['id']['$'] );
+      }
+      elseif ( is_string($result) ){
+        $response['status'] = 'error';
+        $response['message'] = $result;
+      }
     }
 
-    echo $response;
+    echo json_encode($response);
     wp_die();
   }
 

@@ -1,15 +1,16 @@
 jQuery(document).ready(
   function(){
-    initAjaxCreateConsignment();
-    initAjaxPrintLatestConsignment();
-    initAjaxCreateConsignments();
+    initAjaxCreateConsignment(); // single consignment
+    initAjaxPrintLatestConsignment(); // print the latest consignment one more time
+    initAjaxCreateConsignments(); // multiple consignments
   }
 );
 
+
+// creates multiple consignments
 function initAjaxCreateConsignments(){
   jQuery("#ajax-create-consignments").click(function(e){
     e.preventDefault();
-    _log('click');
     var posts = jQuery('#the-list input[name^=post]:checked').map(
                   function(idx, elem) {
                     return jQuery(elem).val();
@@ -19,22 +20,31 @@ function initAjaxCreateConsignments(){
     if ( posts.length ){
       createConsignments( posts, 0 );
     }
-
   });
+}
+
+
+// creates a consignment on click
+function initAjaxCreateConsignment(){
+  jQuery('.ajax-create-consignment').click(
+    function(e){
+      e.preventDefault();
+      var cid = jQuery(this).attr('data-post_id');
+      createConsignments( [cid], 0 );
+    }
+  );
 }
 
 
 
 
+// creates the consignment
 function createConsignments( posts, index ){
   _log('createConsignments');
 
   if ( typeof index === 'undefined' ){
     index = 0;
   }
-
-  _log(index);
-  _log(posts);
 
   if ( typeof posts[index] !== 'undefined' && posts[index] && !isNaN(posts[index] ) ){
     var cid = posts[index];
@@ -55,15 +65,21 @@ function createConsignments( posts, index ){
     jQuery.post( ajaxurl, data, function(response) {
       console.log('response');
       console.log(response);
-      response = jQuery.trim(response);
+      response = jQuery.parseJSON( jQuery.trim(response) );
 
-      if ( typeof response !== 'undefined' && response != '1' ){
-        status.addClass('alert-danger');
-      }
-      else if ( response == '1' ){
+
+      if ( typeof response !== 'undefined' && response.status == 'ok' ){
         _log('success');
         status.addClass('alert-success');
-        status.text('New consignment created');
+        status.text(response.message);
+      }
+      else if ( response.status == 'error' ){
+        _log('error');
+        status.addClass('alert-danger');
+        status.text(response.message);
+      }
+      else{
+        _log(response);
       }
 
       createConsignments(posts, ++index );
@@ -114,15 +130,6 @@ function initAjaxPrintLatestConsignment(){
 }
 
 
-function initAjaxCreateConsignment(){
-  jQuery('.ajax-create-consignment').click(
-    function(e){
-      e.preventDefault();
-      var cid = jQuery(this).attr('data-post_id');
-      createConsignments( [cid], 0 );
-    }
-  );
-}
 
 
 function initPrintBtn(){
