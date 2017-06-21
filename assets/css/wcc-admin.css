@@ -235,3 +235,10 @@ text-align: center;
 .status-warning{
   color: #cc0000;
 }
+
+
+.acf-field[data-key=field_5940c85af6b7d] table th,
+.acf-field[data-key=field_59477f6eddf36] table th
+{
+  text-align: left;
+}
