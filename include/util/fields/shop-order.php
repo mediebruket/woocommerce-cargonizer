@@ -466,6 +466,20 @@ acf_add_local_field_group(
     ),
 
     array(
+      'key' => 'field_593e2d45e2b4b',
+      'label' => 'Start date',
+      'name' => 'parcel_shipping_date',
+      'type' => 'date_picker',
+      'instructions' => '',
+      'required' => 0,
+      'conditional_logic' => 0,
+      'wrapper' => array('width' => '','class' => '','id' => '',),
+      'display_format' => 'd/m/Y',
+      'return_format' => 'Ymd',
+      'first_day' => 1,
+    ),
+
+    array(
       'key' => 'field_593e3056536ce',
       'label' => 'Carrier',
       'name' => 'parcel_recurring_carrier_id',

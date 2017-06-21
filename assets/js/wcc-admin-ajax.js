@@ -62,18 +62,17 @@ function createConsignments( posts, index ){
       'order_id': cid
     };
 
+
     jQuery.post( ajaxurl, data, function(response) {
-      console.log('response');
-      console.log(response);
+      // console.log('response');
+      // console.log(response);
       response = jQuery.parseJSON( jQuery.trim(response) );
-
-
       if ( typeof response !== 'undefined' && response.status == 'ok' ){
         _log('success');
         status.addClass('alert-success');
         status.text(response.message);
       }
-      else if ( response.status == 'error' ){
+      else if( typeof response !== 'undefined' && response.status == 'error' ){
         _log('error');
         status.addClass('alert-danger');
         status.text(response.message);
@@ -88,14 +87,11 @@ function createConsignments( posts, index ){
 }
 
 
-
-
 function initAjaxPrintLatestConsignment(){
   jQuery('.ajax-print-consignment').click(function(e){
     e.preventDefault();
-    _log('click');
     var cid = jQuery(this).attr('data-post_id');
-    _log(cid);
+    // _log(cid);
 
     var parent =  jQuery(this).parents('.type-consignment');
     var status =  parent.find('.consignment-status .alert');
@@ -112,9 +108,8 @@ function initAjaxPrintLatestConsignment(){
       };
 
     jQuery.post(ajaxurl, data, function(response) {
-      _log('finished');
-      _log(response);
-
+      // _log('finished');
+      // _log(response);
       if ( typeof response === 'undefined' || response == '0' ){
         status.addClass('alert-danger');
       }
@@ -123,7 +118,6 @@ function initAjaxPrintLatestConsignment(){
         status.addClass('alert-success');
         status.text(response);
       }
-
     });
 
   });

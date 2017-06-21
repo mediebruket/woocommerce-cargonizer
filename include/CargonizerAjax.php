@@ -55,15 +55,21 @@ class CargonizerAjax{
     $response = array('status' => null, 'message' => null);
     if ( isset($_POST['order_id']) && is_numeric($_POST['order_id']) ){
       $result = Cargonizer::_createConsignment( $_POST['order_id'] );
-      _log('result');
-      _log($result);
+      // _log('result');
+      // _log($result);
       if ( is_array($result) && isset($result['consignments']['consignment']['id']['$']) ){
         $response['status'] = 'ok';
         $response['message'] = sprintf( __('New consignment created: %s', 'wc-cargonizer'),  $result['consignments']['consignment']['id']['$'] );
       }
-      elseif ( is_string($result) ){
+      else{
         $response['status'] = 'error';
-        $response['message'] = $result;
+
+        if ( is_string($result) ){
+          $response['message'] = $result;
+        }
+        else if ( is_array($result) && isset($result[0]) ){
+          $response['message'] =  implode(',', $result);
+        }
       }
     }
 
@@ -74,7 +80,7 @@ class CargonizerAjax{
 
   function _printLatestConsignment(){
     _log('Cargonizer::_printLatestConsignment()');
-    _log($_POST);
+    // _log($_POST);
 
     $response = '0';
     if ( isset($_POST['order_id']) && is_numeric($_POST['order_id']) ){

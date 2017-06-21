@@ -35,10 +35,10 @@ class Cargonizer{
     add_filter('acf/load_field/name=parcel_recurring_consignment_height', array($this, 'acf_setDefaultHeight') );
 
     add_filter('acf/load_field/name=parcel_length', array($this, 'acf_setDefaultLength') );
-    add_filter('acf/load_field/name=parcel_recurring_length', array($this, 'acf_setDefaultLength') );
+    add_filter('acf/load_field/name=parcel_recurring_consignment_length', array($this, 'acf_setDefaultLength') );
 
     add_filter('acf/load_field/name=parcel_width', array($this, 'acf_setDefaultWidth') );
-    add_filter('acf/load_field/name=parcel_recurring_width', array($this, 'acf_setDefaultWidth') );
+    add_filter('acf/load_field/name=parcel_recurring_consignment_width', array($this, 'acf_setDefaultWidth') );
 
     add_filter( 'wp_mail_content_type', array($this, 'setMailContentType') );
   }
@@ -157,11 +157,11 @@ class Cargonizer{
       if ( $result ){
         // _log($result);
         if ( is_array($result) && isset($result['consignments']['consignment']['errors']) ){
-          _log('error');
+          _log('consignment: error');
           $response = $result['consignments']['consignment']['errors']['error'];
         }
         elseif ( is_array($result) && isset($result['consignments']['consignment']) ){
-          _log('success');
+          _log('consignment: success');
           $response = $result;
 
           $Consignment->setNextShippingDate( $auto_inc=true );
@@ -182,7 +182,7 @@ class Cargonizer{
           }
         }
         else{
-          _log('else error');
+          _log('consignment: else error');
           _log($result);
         }
       }
@@ -256,10 +256,7 @@ class Cargonizer{
             // _log($log);
             $status = CargonizerIcons::ok();
             // _log($Consignment->Subscriptions);
-            $post_status = null;
-
-              $post_status = str_replace('wc-', null, $Consignment->Subscriptions->post_status);
-
+            $post_status = str_replace('wc-', null, $Consignment->Subscriptions->post_status);
 
             if (
               // if has subscription product and subscription is not active
@@ -286,7 +283,14 @@ class Cargonizer{
 
       if ( $rows ){
         $th = '<tr> <th>%s</th> <th>%s</th> <th>%s</th> <th>%s</th> <th>%s</th>';
-        $th = sprintf( $th, __('Id', 'wc-cargonizer'), __('Name', 'wc-cargonizer'), __('Count', 'wc-cargonizer'), __('Subscription', 'wc-cargonizer'), __('Status') );
+        $th = sprintf(
+            $th,
+            __('Id', 'wc-cargonizer'),
+            __('Name', 'wc-cargonizer'),
+            __('Count', 'wc-cargonizer'),
+            __('Subscription', 'wc-cargonizer'),
+            __('Status')
+          );
         $html = '<table class="table">'. $th.$rows. '</table>';
       }
 

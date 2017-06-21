@@ -770,17 +770,22 @@ class Consignment{
     // has Subscription
     // check Subs
     if ( $this->IsRecurring && $this->RecurringInterval ){
+      _log('is recurring');
 
       $nsd = self::calcNextShippingDate( $this->RecurringInterval, $auto_inc );
       $active = true;
       if ( $this->hasSubscriptionWarning() ){
+        _log('has subscription warning');
         $end_date = get_post_meta( $this->Subscription->ID, '_schedule_end', true );
 
+        _log('end date: '.$end_date);
         if ( $end_date < $nsd ){
+          _log('end date is smaller than next shipping date');
           $active = false;
         }
-        // get schedule end date
-        // if end date > $nsd => yes
+      }
+      else{
+        _log('no warning');
       }
 
       if ( $nsd && $active ){
