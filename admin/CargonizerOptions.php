@@ -318,6 +318,20 @@ class CargonizerOptions{
         'type' => 'text',
         'value' => get_option('cargonizer-sandbox-api-sender'),
       ),
+      array(
+        'name' => 'cargonizer-estimate-shipping-costs',
+        'label' => __('Estimate shipping costs?'),
+        'type' => 'checkbox',
+        'value' => get_option('cargonizer-estimate-shipping-costs'),
+        'option' => 'on'
+      ),
+      array(
+        'name' => 'cargonizer-auto-transfer',
+        'label' => __('Transfer automatically to carrier?'),
+        'type' => 'checkbox',
+        'value' => get_option('cargonizer-auto-transfer'),
+        'option' => 'on'
+      ),
     );
   }
 

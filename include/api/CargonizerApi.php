@@ -15,14 +15,14 @@ class CargonizerApi{
   function __construct($set_transport_agreements=false){
 
     if ( get_option( 'cargonizer-sandbox-modus' ) ){
-      _log('sandbox');
+      // _log('sandbox');
       $this->Key    = get_option('cargonizer-sandbox-api-key' );
       $this->Sender = get_option('cargonizer-sandbox-api-sender' );
       $this->Domain = 'http://sandbox.cargonizer.no/';
       //_log($this);
     }
     else{
-      _log('prod');
+      // _log('prod');
       $this->Key    = get_option('cargonizer-api-key' );
       $this->Sender = get_option('cargonizer-api-sender' );
       $this->Domain = 'http://cargonizer.no/';
@@ -86,7 +86,7 @@ class CargonizerApi{
         'Content-Type' =>  'application/xml'
       );
 
-    return $this->rest('consignments.xml', $headers, 'POST', $xml, $debug=true );
+    return $this->rest('consignments.xml', $headers, 'POST', $xml, $debug=true, true );
   }
 
 
@@ -140,7 +140,7 @@ class CargonizerApi{
   }
 
 
-  function rest( $resource, $headers=array(), $method='GET', $xml=null, $debug=false){
+  function rest( $resource, $headers=array(), $method='GET', $xml=null, $debug=false, $force_response = false ){
     _log('Cargonizer::rest()');
 
     $default_headers =
@@ -184,14 +184,13 @@ class CargonizerApi{
       _log($response);
     }
 
-    if ( $status==200 or $status==201 or $status == 202 ){
-      if ( $status == 200 or $status == 201 ){
+    if ( $status==200 or $status==201 or $status == 202 or $force_response ){
+      if ( $status == 200 or $status == 201 or $status == 400 ){
         return xmlToArray( simplexml_load_string(wp_remote_retrieve_body($response)) );
       }
       else{
         return wp_remote_retrieve_body($response);
       }
-
     }
     else{
       return null;

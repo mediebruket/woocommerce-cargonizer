@@ -140,29 +140,30 @@ class Cargonizer{
   }
 
 
-
   public static function _createConsignment( $post_id  ){
-    _log('Cargonizer::_createConsignment()');
+    _log('Cargonizer::_createConsignment('.$post_id.')');
 
     $response = false;
     if ( is_numeric($post_id) ){
-      _log('create new Consignment');
-      $Consignment = new Consignment( $post_id );
-      _log('prepare export');
 
+      $Consignment = new Consignment( $post_id );
       $CargonizeXml = new CargonizeXml( $Consignment->prepareExport() );
       $CargonizerApi = new CargonizerApi();
       $result = true;
-      _log('post consignment');
+      // _log('post consignment');
 
       $result = $CargonizerApi->postConsignment($CargonizeXml->Xml);
+
       if ( $result ){
         // _log($result);
-        if ( is_array($result) && isset($result['consignments']['consignment']) ){
+        if ( is_array($result) && isset($result['consignments']['consignment']['errors']) ){
+          _log('error');
+          $response = $result['consignments']['consignment']['errors']['error'];
+        }
+        elseif ( is_array($result) && isset($result['consignments']['consignment']) ){
           _log('success');
           $response = $result;
-          // update next shipping date
-          // _log($result);
+
           $Consignment->setNextShippingDate( $auto_inc=true );
           if ( $new_entry = $Consignment->updateHistory( $result['consignments']['consignment'] ) ){
             $Consignment->notifyCustomer( $new_entry );
@@ -181,7 +182,7 @@ class Cargonizer{
           }
         }
         else{
-          _log('error');
+          _log('else error');
           _log($result);
         }
       }
@@ -286,7 +287,7 @@ class Cargonizer{
       if ( $rows ){
         $th = '<tr> <th>%s</th> <th>%s</th> <th>%s</th> <th>%s</th> <th>%s</th>';
         $th = sprintf( $th, __('Id', 'wc-cargonizer'), __('Name', 'wc-cargonizer'), __('Count', 'wc-cargonizer'), __('Subscription', 'wc-cargonizer'), __('Status') );
-        $html = '<table>'. $th.$rows. '</table>';
+        $html = '<table class="table">'. $th.$rows. '</table>';
       }
 
       $field['message'] = str_replace('@acf_consignment_products@', $html, $field['message'] );
@@ -304,12 +305,12 @@ class Cargonizer{
     if ( $post_id  ){
       $Consignment = new Consignment($post_id);
 
-      $html = null;
+      $rows = null;
 
       if ( is_array($Consignment->History) ){
         foreach ( $Consignment->History as $key => $log) {
           // _log($log);
-          $html .= sprintf(
+          $rows .= sprintf(
               '<tr><td>%s</td> <td>%s</td> <td>%s</td> <td><a href="%s" target="_blank">show</a></td> <td><a href="%s" target="_blank">download</a></td></tr>',
               $log['created_at'],
               $log['consignment_id'],
@@ -321,8 +322,18 @@ class Cargonizer{
         }
       }
 
-      $field['message'] = str_replace('@acf_history@', $html, $field['message'] );
+      $head =  '<tr> <th>%s</th> <th>%s</th> <th>%s</th> <th>%s</th> <th>%s</th> </tr>';
+      $head = sprintf(
+          $head,
+          __('Created at', 'wc-cargonizer'),
+          __('Consignment id', 'wc-cargonizer'),
+          __('Tracking code', 'wc-cargonizer'),
+          __('Tracking url', 'wc-cargonizer'),
+          __('PDF', 'wc-cargonizer')
+        );
+      $html = '<table class="table table-striped">'.$head.$rows.'</table>';
 
+      $field['message'] = str_replace('@acf_consignment_history@', $html, $field['message'] );
     }
 
     return $field;
