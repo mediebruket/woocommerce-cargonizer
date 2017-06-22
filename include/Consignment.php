@@ -754,12 +754,18 @@ class Consignment{
     if ( is_array($post_ids) ){
       foreach ($post_ids as $key => $post_id) {
         if ( $interval = get_post_meta( $post_id, 'recurring_consignment_interval', true ) ){
-          $nsd = self:: calcNextShippingDate( $interval );
+          $nsd = self::calcNextShippingDate( $interval );
           $ensd = get_post_meta( $post_id, 'consignment_next_shipping_date', true );
+          $sd = get_post_meta( $post_id, 'consignment_start_date', true );
 
-          if ( strtotime($nsd) > strtotime($ensd) ){
+          if ( strtotime($nsd) > strtotime($ensd) && strtotime($nsd) > strtotime($sd) ){
+            _log('update nsd');
             // TODO: check if exists start date && start date < $nsd
-            // update_post_meta( $post_id, 'consignment_next_shipping_date', $nsd );
+            update_post_meta( $post_id, 'consignment_next_shipping_date', $nsd );
+            _log('next shipping date updated ('.$post_id.'): ' .$nsd);
+          }
+          else{
+            _log('no update');
           }
         }
       }
