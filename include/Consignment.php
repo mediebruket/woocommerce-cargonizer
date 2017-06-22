@@ -1,6 +1,6 @@
 <?php
 add_action( 'init', array('Consignment', '_registerPostType'), 10 );
-add_action( 'init', array('Consignment', '_updateNextShippingDates'), 20 );
+add_action( 'init', array('Consignment', '_updateNextShippingDates'), 20 ); // OBS check next shipping date first
 add_action( 'pre_get_posts', array('Consignment', '_orderConsignmentsByShippingDate'), 20 );
 add_filter( 'woocommerce_package_rates' , array('Consignment', '_setShippingCosts'), 10, 2 );
 
@@ -352,9 +352,8 @@ class Consignment{
       if ( $this->IsRecurring && $this->CustomerId ){
 
         if ( is_array($this->SubscriptionProducts) && !empty($this->SubscriptionProducts) ){
-          _log('has pids');
-          _log($this->SubscriptionProducts);
-
+          // _log('has pids');
+          // _log($this->SubscriptionProducts);
           foreach ( $this->SubscriptionProducts as $key => $product_id ) {
             // if ( !wcs_user_has_subscription( $this->CustomerId, $product_id  ) ){
             //   $warning = true;
@@ -373,9 +372,6 @@ class Consignment{
           }
         }
       }
-      // else{
-      //   _log('not recurring');
-      // }
     }
 
 
@@ -388,11 +384,11 @@ class Consignment{
     $is_active = true;
     if ( function_exists('wcs_user_has_subscription') ){
       if ( !wcs_user_has_subscription( $this->CustomerId, $product_id ) ){
+        _log('no subscription: '.$product_id);
         $is_active = false;
       }
       else {
         if ( $this->OrderId ){
-
         }
       }
     }
@@ -739,7 +735,7 @@ class Consignment{
       $meta_key = 'recurring_consignment_order_id';
     }
     $sql = sprintf("SELECT post_id FROM %s WHERE meta_key = '%s' and meta_value= '%s';", $wpdb->postmeta, $meta_key, $order_id );
-    _log($sql);
+    // _log($sql);
     return $wpdb->get_var($sql);
   }
 
@@ -758,7 +754,13 @@ class Consignment{
     if ( is_array($post_ids) ){
       foreach ($post_ids as $key => $post_id) {
         if ( $interval = get_post_meta( $post_id, 'recurring_consignment_interval', true ) ){
-          update_post_meta( $post_id, 'consignment_next_shipping_date', self:: calcNextShippingDate( $interval ) );
+          $nsd = self:: calcNextShippingDate( $interval );
+          $ensd = get_post_meta( $post_id, 'consignment_next_shipping_date', true );
+
+          if ( strtotime($nsd) > strtotime($ensd) ){
+            // TODO: check if exists start date && start date < $nsd
+            // update_post_meta( $post_id, 'consignment_next_shipping_date', $nsd );
+          }
         }
       }
     }
@@ -789,8 +791,8 @@ class Consignment{
       }
 
       if ( $nsd && $active ){
-        _log($nsd);
         $this->update( 'consignment_next_shipping_date', $nsd );
+        _log('next shipping date updated: '.$nsd);
         $this->set('NextShippingDate', $nsd);
       }
     }

@@ -226,10 +226,7 @@ class Cargonizer{
     $customer_id = null;
     if ( $post_id  ){
       $Consignment = new Consignment($post_id);
-      _log('1');
-      _log($Consignment->CustomerId);
       if ( $Consignment->CustomerId ){
-
         $customer_id = $Consignment->CustomerId;
       }
     }

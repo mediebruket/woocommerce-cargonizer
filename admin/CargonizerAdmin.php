@@ -329,7 +329,7 @@ class CargonizerAdmin{
     if ( self::isCustomConsignmentColumn($column) ){
       $Consignment = new Consignment ( $post_id );
       $post_meta = get_post_custom( $post_id );
-      // echo self::getField($column, $post_id );
+      // echo self::getField($colƒumn, $post_id );
       //
       // get products subscription products => $Consignment->Products;
       // $Consignment->UserId;
@@ -378,19 +378,25 @@ class CargonizerAdmin{
         $next_shipping_date = gi($post_meta, 'consignment_next_shipping_date');
         // _log('$next_shipping_date');
         // _log($next_shipping_date);
-        $today = date('Ymd');
-        // _log($today);
-        $warning_time = 1; // TODO warning time = setting
 
-        $wtd =  $next_shipping_date - $today ;
+        $wtd = self::isInTime( $next_shipping_date, $today=date('Ymd') );
 
         $ok = false;
         if ( !$Consignment->IsRecurring && $Consignment->LastShippingDate ){
           $ok = true;
         }
 
+        if ( $Consignment->IsRecurring && !$wtd ){
+          // _log('recurring');
+          $wtd2 = self::isInTime( $next_shipping_date, date('Ymd', strtotime($Consignment->LastShippingDate)) );
+          if ( !$wtd2 ){
+            $ok = true;
+          }
+          // _log($wtd2);
+        }
+
         // _log($wtd);
-        if ( $wtd == 0 or $wtd == 1 ){
+        if ( !$wtd && !$ok ){
           echo self::makeStatus( 'warning', __('Create consignment', 'wc-cargonizer') );
         }
         else if ( $wtd < 0 && !$ok ){
@@ -407,13 +413,26 @@ class CargonizerAdmin{
         else{
           echo 'n/a';
         }
-
       }
       else{
         echo null;
       }
 
     }
+  }
+
+
+  public static function isInTime( $next_shipping_date, $check_date ){
+    $warning_time = 1; // TODO warning time = setting
+    $wtd = $next_shipping_date - $check_date;
+
+    if ( $wtd == 0 or $wtd == $warning_time ){
+      return false;
+    }
+    else{
+      return $wtd;
+    }
+
   }
 
 
