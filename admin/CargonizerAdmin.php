@@ -26,7 +26,7 @@ class CargonizerAdmin{
         'woocommerce',
         __( 'Cargonizer', 'wc-cargonizer' ),
         __( 'Cargonizer', 'wc-cargonizer' ),
-        'read',
+        0,
         WCC_Admin,
         array( $this, 'adminPage')
       );

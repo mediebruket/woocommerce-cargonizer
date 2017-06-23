@@ -976,21 +976,21 @@ class Consignment{
       'labels'               => $labels,
       'description'          => "",
       'public'               => true,
-      'exclude_from_search'  => false,
+      'exclude_from_search'  => true,
       'publicly_queryable'   => true,
       'show_ui'              => true,
-      'show_in_nav_menus'    => true,
-      'show_in_menu'         => true,
-      'show_in_admin_bar'    => true,
+      'show_in_nav_menus'    => false,
+      'show_in_menu'         => false,
+      'show_in_admin_bar'    => false,
       'menu_position'        => 42,
       'capability_type'      => 'post',
-      'hierarchical'         => true,
+      'hierarchical'         => false,
       'supports'             => array('title' ),
       'has_archive'          => true,
-      'rewrite'              => array('slug' => 'consignment', 'with_front' => FALSE),
+      'rewrite'              => false,
       'query_var'            => true,
       'can_export'           => true,
-      'taxonomies'           => array('post_tag')
+      'taxonomies'           => null
     );
     register_post_type( 'consignment' ,$args) ;
 
