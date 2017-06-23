@@ -6,6 +6,7 @@ class CargonizerOptions{
   protected $TransportCompanyId;
   protected $TransportServices;
   protected $DefaultPrinter;
+  protected $RecurringConsignmentWarningTime;
 
 
   function __construct(){
@@ -15,6 +16,7 @@ class CargonizerOptions{
     $this->PrintOnExport              = $this->getPrintOnExport();
     $this->TransportAgreements        = $this->getTransportAgreements();
     $this->SelectedTransportAgreement = $this->getSelectedTransportAgreement();
+    $this->RecurringConsignmentWarningTime = $this->getRecurringConsignmentWarningTime();
   }
 
 
@@ -70,6 +72,10 @@ class CargonizerOptions{
     return $output;
   }
 
+
+  function getRecurringConsignmentWarningTime(){
+    return get_option( 'cargonizer-recurring-consignments-warning-time', '1' );
+  }
 
   function getTransportCompanyId(){
     return get_option('cargonizer-delivery-company-id');
@@ -318,20 +324,6 @@ class CargonizerOptions{
         'type' => 'text',
         'value' => get_option('cargonizer-sandbox-api-sender'),
       ),
-      array(
-        'name' => 'cargonizer-estimate-shipping-costs',
-        'label' => __('Estimate shipping costs?'),
-        'type' => 'checkbox',
-        'value' => get_option('cargonizer-estimate-shipping-costs'),
-        'option' => 'on'
-      ),
-      array(
-        'name' => 'cargonizer-auto-transfer',
-        'label' => __('Transfer automatically to carrier?'),
-        'type' => 'checkbox',
-        'value' => get_option('cargonizer-auto-transfer'),
-        'option' => 'on'
-      ),
     );
   }
 
@@ -401,6 +393,28 @@ class CargonizerOptions{
         'type' => 'text',
         'value' => get_option('cargonizer-parcel-width'),
       ),
+      array(
+        'name'    => 'cargonizer-recurring-consignments-warning-time',
+        'label'   => __('Recurring consignments warning time'),
+        'desc' => __('Default 1 day'),
+        'type'    => 'text',
+        'value'   => $this->RecurringConsignmentWarningTime,
+      ),
+      array(
+        'name' => 'cargonizer-estimate-shipping-costs',
+        'label' => __('Estimate shipping costs?'),
+        'type' => 'checkbox',
+        'value' => get_option('cargonizer-estimate-shipping-costs'),
+        'option' => 'on'
+      ),
+      array(
+        'name' => 'cargonizer-auto-transfer',
+        'label' => __('Transfer automatically to carrier?'),
+        'type' => 'checkbox',
+        'value' => get_option('cargonizer-auto-transfer'),
+        'option' => 'on'
+      ),
+
     );
   }
 
