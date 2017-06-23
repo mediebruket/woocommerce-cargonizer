@@ -238,6 +238,7 @@ class Consignment{
       if ( $recurring ){
         update_post_meta( $post_id, 'recurring_consignment_interval', $Parcel->RecurringInterval );
         update_post_meta( $post_id, 'consignment_carrier_id', $Parcel->RecurringCarrierId );
+        update_post_meta( $post_id, 'consignment_start_date', $Parcel->RecurringStartDate );
         update_post_meta( $post_id, 'consignment_product', $Parcel->RecurringConsignmentType );
         update_post_meta( $post_id, 'consignment_services', $Parcel->RecurringConsignmentServices );
         update_post_meta( $post_id, 'consignment_message', $Parcel->RecurringConsignmentMessage );
@@ -754,18 +755,29 @@ class Consignment{
     if ( is_array($post_ids) ){
       foreach ($post_ids as $key => $post_id) {
         if ( $interval = get_post_meta( $post_id, 'recurring_consignment_interval', true ) ){
-          $nsd = self::calcNextShippingDate( $interval );
-          $ensd = get_post_meta( $post_id, 'consignment_next_shipping_date', true );
-          $sd = get_post_meta( $post_id, 'consignment_start_date', true );
+          $next_calculated_shipping_date = self::calcNextShippingDate( $interval );
+          $current_next_shipping_date = get_post_meta( $post_id, 'consignment_next_shipping_date', true );
+          $start_date = get_post_meta( $post_id, 'consignment_start_date', true );
 
-          if ( strtotime($nsd) > strtotime($ensd) && strtotime($nsd) > strtotime($sd) ){
-            _log('update nsd');
-            update_post_meta( $post_id, 'consignment_next_shipping_date', $nsd );
-            _log('next shipping date updated ('.$post_id.'): ' .$nsd);
+          $next_shipping_date = null;
+          if ( strtotime($next_calculated_shipping_date) > strtotime($current_next_shipping_date) ){
+            _log('calculated date is bigger than current date');
+            $next_shipping_date = $next_calculated_shipping_date;
           }
-          else{
-            _log('no update');
+
+          if ( strtotime($start_date) > strtotime($next_calculated_shipping_date) ){
+            _log('custom start date is bigger than next calculated shipping date');
+            $next_shipping_date = $start_date;
           }
+
+          if ( $next_shipping_date ){
+            _log('update next shipping date');
+            update_post_meta( $post_id, 'consignment_next_shipping_date', $next_shipping_date );
+            _log('next shipping date updated ('.$post_id.'): ' .$next_shipping_date );
+          }
+          //else{
+           // _log('no update');
+          //}
         }
       }
     }
@@ -989,7 +1001,7 @@ class Consignment{
       'rewrite'              => false,
       'query_var'            => true,
       'can_export'           => true,
-      'taxonomies'           => null
+      'taxonomies'           => array()
     );
     register_post_type( 'consignment' ,$args) ;
 

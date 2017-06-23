@@ -87,7 +87,7 @@ function initOrderConsignment(){
     if ( carrier_id ){
       updateCarrierProducts( carrier_id );
 
-      if ( parcel_carrier_product.length ){
+      if ( typeof parcel_carrier_product !== 'undefined' && parcel_carrier_product.length ){
         var query = '#acf-field_'+acf_parcel_type+' option[value="'+parcel_carrier_product+'"]';
         jQuery(query).attr('selected', true);
       }
