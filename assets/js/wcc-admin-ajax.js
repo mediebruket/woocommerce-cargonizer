@@ -33,6 +33,48 @@ function initAjaxCreateConsignment(){
       createConsignments( [cid], 0 );
     }
   );
+
+
+  jQuery('.ajax-main-create-consignment').click(
+    function(e){
+      e.preventDefault();
+
+      var status_box = jQuery('#wcc-admin-message');
+      var status_class = status_box.attr('class'); // save class
+      status_box.attr('class', 'wcc-admin-message alert alert-info active'); // reset class
+      var cid = jQuery(this).attr('data-post_id'); // get post id
+
+      if ( !isNaN(cid) ){ // post is numeric
+        status_box.html( 'Creating new consignments' ); // create new consignment
+
+        var data = {
+        'action': 'wcc_create_consignment',
+        'order_id': cid
+        };
+
+        jQuery.post( ajaxurl, data, function(response) {
+          response = jQuery.parseJSON( jQuery.trim(response) );
+          status_box.removeClass('alert-info');
+
+          if ( typeof response !== 'undefined' && response.status == 'ok' ){
+            _log('success');
+            status_box.html(response.message);
+            status_box.addClass('alert-success');
+          }
+          else if( typeof response !== 'undefined' && response.status == 'error' ){
+            _log('error');
+            status_box.addClass('alert-danger');
+            status_box.text(response.message);
+          }
+          else{
+            _log(response);
+          }
+        });
+
+
+      }
+    }
+  );
 }
 
 
@@ -100,7 +142,7 @@ function initAjaxPrintLatestConsignment(){
     // _log(status_class);
     status.attr('class', 'alert');
 
-    status.text('Printing consignment');
+    status.text('Printing latest consignment');
 
     var data = {
         'action': 'wcc_print_latest_consignment',
@@ -110,17 +152,63 @@ function initAjaxPrintLatestConsignment(){
     jQuery.post(ajaxurl, data, function(response) {
       // _log('finished');
       // _log(response);
-      if ( typeof response === 'undefined' || response == '0' ){
-        status.addClass('alert-danger');
-      }
-      else{
+       response = jQuery.parseJSON( jQuery.trim(response) );
+
+      if ( typeof response !== 'undefined' && response.status == 'ok' ){
         _log('success');
         status.addClass('alert-success');
-        status.text(response);
+        status.text(response.message);
       }
-    });
+      else if ( typeof response !== 'undefined' && response.status == 'error' ){
+        status.addClass('alert-danger');
+        status.text(response.message);
+      }
+      else{
+        _log(response);
+      }
+    }); // post-request
 
-  });
+  }); // listener
+
+
+  jQuery('.ajax-main-print-consignment').click(function(e){
+    e.preventDefault();
+    var status_box = jQuery('#wcc-admin-message');
+
+    status_box.attr('class', 'wcc-admin-message alert alert-info active'); // reset class
+
+    var cid = jQuery(this).attr('data-post_id'); // get post id
+
+    if ( !isNaN(cid) ){ // post is numeric
+      status_box.html( 'Printing latest consignment' ); // create new consignment
+
+      var data = {
+      'action': 'wcc_print_latest_consignment',
+      'order_id': cid
+      };
+
+      jQuery.post( ajaxurl, data, function(response) {
+        response = jQuery.parseJSON( jQuery.trim(response) );
+        status_box.removeClass('alert-info');
+
+        if ( typeof response !== 'undefined' && response.status == 'ok' ){
+          _log('success');
+          status_box.addClass('alert-success');
+          status_box.html(response.message);
+        }
+        else if ( typeof response !== 'undefined' && response.status == 'error' ){
+          _log('error');
+          status_box.addClass('alert-danger');
+          status_box.text(response.message);
+        }
+        else{
+          _log(response);
+        }
+      });
+    }
+
+  }); // listener
+
 }
 
 

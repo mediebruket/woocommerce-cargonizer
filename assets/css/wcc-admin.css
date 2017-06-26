@@ -242,3 +242,16 @@ text-align: center;
 {
   text-align: left;
 }
+
+.wcc-meta-box-consignment{
+  margin:10px 10px;
+}
+
+.wcc-admin-message{
+  display: none;
+  margin-top:20px;
+}
+
+.wcc-admin-message.active{
+  display: block;
+}

@@ -82,7 +82,8 @@ class CargonizerAjax{
     _log('Cargonizer::_printLatestConsignment()');
     // _log($_POST);
 
-    $response = '0';
+     $response = array('status' => null, 'message' => null);
+
     if ( isset($_POST['order_id']) && is_numeric($_POST['order_id']) ){
       $Consignment = new Consignment( $_POST['order_id'] );
 
@@ -95,11 +96,13 @@ class CargonizerAjax{
       _log('Printer: '. $Consignment->Printer);
 
       if ( !$consignment_id ){
-        $response = 'Missing consignment id';
+        $response['status'] = 'error';
+        $response['message'] = 'Missing consignment id';
       }
 
       if ( !$Consignment->Printer ){
-        $response = 'Missing printer_abort(printer_handle)';
+        $response['status'] = 'error';
+        $response['message'] = 'Missing printer_abort(printer_handle)';
       }
 
       if ( $consignment_id && $Consignment->Printer ){
@@ -111,16 +114,21 @@ class CargonizerAjax{
               $printer = $ta[$Consignment->Printer]. " (".$Consignment->Printer.")";
             }
           }
-          $response = 'Label was printed on printer '.$printer;
+          $response['status'] = 'ok';
+          $response['message'] = 'Label was printed on printer '.$printer;
         }
         else{
-          $response = 'Could not connect to Cargonizer';
+         $response['status']   = 'error';
+         $response['message']  = 'Could not connect to Cargonizer';
         }
       }
-
+    }
+    else{
+      $response['status'] = 'error';
+      $response['message'] = __('Missing post id', 'wc-cargonizer');
     }
 
-    echo $response;
+    echo json_encode($response);
     wp_die();
   }
 }

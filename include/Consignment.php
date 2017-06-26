@@ -759,14 +759,14 @@ class Consignment{
           $sd = get_post_meta( $post_id, 'consignment_start_date', true );
 
           if ( strtotime($nsd) > strtotime($ensd) && strtotime($nsd) > strtotime($sd) ){
-            _log('update nsd');
+            // _log('update nsd');
             // TODO: check if exists start date && start date < $nsd
             update_post_meta( $post_id, 'consignment_next_shipping_date', $nsd );
-            _log('next shipping date updated ('.$post_id.'): ' .$nsd);
+            // _log('next shipping date updated ('.$post_id.'): ' .$nsd);
           }
-          else{
-            _log('no update');
-          }
+          // else{
+          //   _log('no update');
+          // }
         }
       }
     }

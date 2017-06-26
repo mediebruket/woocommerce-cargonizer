@@ -7,6 +7,8 @@ add_filter( 'manage_edit-consignment_columns' , array('CargonizerAdmin', '_regis
 add_action( 'manage_consignment_posts_custom_column' , array('CargonizerAdmin', '_fillCustomColumns') , 10, 2 );
 add_filter( 'manage_edit-consignment_sortable_columns', array('CargonizerAdmin', '_registerSortableColumns') );
 add_action( 'manage_posts_extra_tablenav', array('CargonizerAdmin', '_addBatchButton') );
+add_action( 'post_submitbox_misc_actions', array('CargonizerAdmin', 'addCargonizerActions') );
+add_action( 'admin_notices', array('CargonizerAdmin', 'showAdminNotice' ) );
 
 
 
@@ -421,6 +423,26 @@ class CargonizerAdmin{
     }
   }
 
+
+  public static function addCargonizerActions( $post ){
+
+    if ( is_object($post) && $post->post_type == 'consignment' ){
+      $Consignment = new Consignment($post->ID);
+      echo '<div class="wcc-meta-box-consignment">';
+
+      printf('<a href="#" class="consignment-action ajax-main-create-consignment" data-post_id="%s" title="create new consignment">'.CargonizerIcons::consignment().'</a>', $Consignment->Id );
+      if ( isset($Consignment->History[0]) ){
+        printf('<a href="#" class="consignment-action ajax-main-print-consignment" data-post_id="%s" title="print the latest consignment">'.CargonizerIcons::printer().'</a>', $Consignment->Id );
+      }
+      echo '</div>';
+    }
+
+  }
+
+
+  public static function showAdminNotice(){
+    printf('<div class="wcc-admin-message alert" id="wcc-admin-message"></div>');
+  }
 
   public static function isInTime( $next_shipping_date, $check_date ){
     $warning_time = 1; // TODO warning time = setting
