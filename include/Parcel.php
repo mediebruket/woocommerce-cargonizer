@@ -39,9 +39,11 @@ class Parcel{
         $this->ParcelType     = $this->getParcelType();
         $this->ParcelServices = $this->getParcelServices();
         $this->ParcelMessage  = $this->getParcelMessage();
+        
 
         // recurring
         $this->IsRecurring                  = $this->getIsRecurring();
+        $this->RecurringStartDate           = $this->getRecurringStartDate();
         $this->RecurringCarrierId           = $this->getRecurringCarrierId();
         $this->RecurringConsignmentType     = $this->getRecurringConsignmentType();
         $this->RecurringConsignmentServices = $this->getRecurringConsignmentServices();
@@ -81,6 +83,11 @@ class Parcel{
   function getPrinter(){
     return gi($this->Meta, 'parcel_printer');
     //_log($this->Printer);
+  }
+
+  
+  function getRecurringStartDate(){
+    return gi($this->Meta, 'parcel_start_date');
   }
 
 

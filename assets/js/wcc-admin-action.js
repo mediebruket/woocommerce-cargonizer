@@ -43,7 +43,7 @@ function updateRecurringConsignmentProductServices( copy ){
       }
     }
     else{
-      if ( typeof Parcel.RecurringConsignmentServices !== 'undefined' && Parcel.RecurringConsignmentServices && Parcel.RecurringConsignmentServices.length ){
+      if ( typeof Parcel !== 'undefined' && typeof Parcel.RecurringConsignmentServices !== 'undefined' && Parcel.RecurringConsignmentServices && Parcel.RecurringConsignmentServices.length ){
         jQuery.each( Parcel.RecurringConsignmentServices, function(index, service ){
           // _log(service);
           jQuery('.acf-field.acf-field-'+acf_recurring_consignment_services+' .acf-checkbox-list input[value='+service+']').attr('checked', true );
@@ -73,7 +73,7 @@ function updateRecurringConsignmentCarrierProducts( carrier_id, copy ){
     else{
       // _log('set saved value');
       // _log(Parcel.RecurringConsignmentType);
-      if ( typeof Parcel.RecurringConsignmentType !== 'undefined' ){
+      if ( typeof Parcel !== 'undefined' && typeof Parcel.RecurringConsignmentType !== 'undefined' ){
         var options = jQuery('#acf-field_'+acf_recurring_consignment_type+' option');
         if ( typeof options == 'object' && options.length ){
           // _log(options);
@@ -134,7 +134,7 @@ function updateProductTypes(){
     jQuery('.acf-field.acf-field-'+acf_consignment_items+' select').html(options);
 
     // set select attribute
-    if ( typeof Parcel.Items === 'object' && Parcel.Items && Parcel.Items.length ){
+    if ( typeof Parcel !== 'undefined' && typeof Parcel.Items === 'object' && Parcel.Items && Parcel.Items.length ){
       updateItemTypes( Parcel.Items, acf_consignment_items );
     }
   }
@@ -152,7 +152,7 @@ function updateRecurringConsignmentProductTypes(){
     }
     jQuery('.acf-field.acf-field-'+acf_recurring_consignment_items+' select').html(options);
 
-    if ( typeof Parcel.RecurringConsignmentItems !== 'undefined' && Parcel.RecurringConsignmentItems && Parcel.RecurringConsignmentItems.length ){
+    if ( typeof Parcel !== 'undefined' && typeof Parcel.RecurringConsignmentItems !== 'undefined' && Parcel.RecurringConsignmentItems && Parcel.RecurringConsignmentItems.length ){
       updateItemTypes( Parcel.RecurringConsignmentItems, acf_recurring_consignment_items );
     }
   }

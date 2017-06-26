@@ -47,7 +47,7 @@ class CargonizerAdmin{
   function getTabs(){
     return array(
       'apiPage'           => __('API', 'wc-cargonizer'),
-      'generalPage'       => __('General', 'wc-cargonizer'),
+      'generalPage'       => __('Carrier', 'wc-cargonizer'),
       'parcelPage'        => __('Parcel', 'wc-cargonizer'),
       'notificationPage'  => __('Notification', 'wc-cargonizer'),
       'addressPage'       => __('Address', 'wc-cargonizer'),
@@ -76,7 +76,7 @@ class CargonizerAdmin{
   }
 
 
-	function apiPage(){
+  function apiPage(){
     if ( isset($_POST['update']) ){
       $this->Options->updateOptions('Api');
       $this->showUpdateMessage ( __( 'API settings updated', 'wc-cargonizer' ) );
@@ -355,7 +355,18 @@ class CargonizerAdmin{
         }
       }
       else if ( $column == 'consignment-next-shipping-date' ){
-        if ( $date = gi($post_meta, 'consignment_next_shipping_date') ){
+        $next_sd = gi($post_meta, 'consignment_next_shipping_date');
+        $start_sd = gi($post_meta, 'consignment_start_date');
+
+        $date = null;
+        if ( $next_sd ){
+          $date = $next_sd;
+        }
+        if ( $start_sd && $start_sd > $next_sd ){
+          $date = $start_sd;
+        }
+
+        if ( $date ){
           echo date('d.m.Y', strtotime($date) );
         }
       }
@@ -445,7 +456,7 @@ class CargonizerAdmin{
   }
 
   public static function isInTime( $next_shipping_date, $check_date ){
-    $warning_time = 1; // TODO warning time = setting
+    $warning_time = get_option( 'cargonizer-recurring-consignments-warning-time', '1' );
     $wtd = $next_shipping_date - $check_date;
 
     if ( $wtd == 0 or $wtd == $warning_time ){
