@@ -24,6 +24,9 @@ class Cargonizer{
     add_filter('acf/load_field/name=parcel-recurring-consignment-interval', array($this, 'acf_setRecurringConsignmentInterval'), 40 );
     add_filter('acf/load_field/name=recurring_consignment_interval', array($this, 'acf_setRecurringConsignmentInterval'), 40 );
 
+    add_filter('acf/load_field/name=parcel_print_on_post', array($this, 'acf_setParcelPrintOnPost'), 20 );
+    add_filter('acf/load_field/name=consignment_print_on_export', array($this, 'acf_setParcelPrintOnPost'), 20 );
+
     add_filter('acf/load_field/name=parcel_printer', array($this, 'acf_setParcelPrinter'), 20 );
     add_filter('acf/load_field/name=parcel_type', array($this, 'acf_setCarrierProducts'), 10 );
     add_filter('acf/load_field/name=parcel_package_type', array($this, 'acf_setParcelTypes'), 10 );
@@ -271,7 +274,7 @@ class Cargonizer{
                 $product['product_id'],
                 $product['name'],
                 $product['qty'],
-                ( ($product['is_subscription']) ? 'yes' : 'no' ),
+                ( ( isset($product['is_subscription']) && $product['is_subscription'] ) ? 'yes' : 'no' ),
                 $status. ' <a href="'.get_edit_post_link( $Consignment->Subscriptions->ID ).'" target="_blank">'.$post_status.'</a>'
             );
             // _log($log);
@@ -566,6 +569,17 @@ class Cargonizer{
       if (  $choices = $this->getTransportAgreementChoices() ){
         $field['choices'] = $choices;
       }
+    }
+
+    return $field;
+  }
+
+
+  function acf_setParcelPrintOnPost( $field ){
+    // _log('acf_setParcelPrintOnPost');
+    // _log($field);
+    if ( get_option('cargonizer-print-on-export' ) ){
+      $field['default_value'] = true;
     }
 
     return $field;

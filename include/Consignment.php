@@ -22,6 +22,7 @@ class Consignment{
   public $OrderId;
   public $OrderProducts;
   public $Printer;
+  public $PrintOnExport;
   public $RecurringInterval;
   public $Subscriptions;
   public $Meta;
@@ -63,6 +64,7 @@ class Consignment{
 
     $this->History          = $this->getHistory();
     $this->Printer          = $this->getPrinter();
+    $this->PrintOnExport    = $this->getPrintOnExport();
 
     $this->NextShippingDate  = $this->getNextShippingDate();
     $this->LastShippingDate  = $this->getLastShippingDate();
@@ -129,11 +131,14 @@ class Consignment{
   }
 
 
-  function getItems(){
-    return acf_getField('consignment_items', $this->ID);
+  function getPrintOnExport(){
+    return gi($this->Meta, 'consignment_print_on_export');
   }
 
 
+  function getItems(){
+    return acf_getField('consignment_items', $this->ID);
+  }
 
 
   function getRecurringInterval(){
@@ -227,6 +232,7 @@ class Consignment{
       update_post_meta( $post_id, $meta_order_key, $Parcel->ID );
       update_post_meta( $post_id, 'consignment_is_recurring', $recurring );
       update_post_meta( $post_id, 'parcel_printer', $Parcel->Printer );
+      update_post_meta( $post_id, 'consignment_print_on_export', $Parcel->PrintOnExport );
 
       // user id
       update_post_meta( $post_id, 'customer_id', gi($Parcel->Meta, '_customer_user' ) );
@@ -493,7 +499,7 @@ class Consignment{
       array(
         'transport_agreement' => $this->CarrierId,
         'estimate' => "true",
-        'print' => ( get_option('cargonizer-print-on-export' ) == 'on' ) ? 'true' : 'false'
+        'print' => ( $this->PrintOnExport ) ? 'true' : 'false'
         );
 
     $export['consignments']['consignment']['values'] = array(
@@ -587,12 +593,9 @@ class Consignment{
           // 'type'        => 'package',
           'amount'      => gi( $item, 'parcel_amount' ),
           'weight'      => $parcel_weight,
-          // 'length'      => gi( $item, 'parcel_length' ),
-          // 'width'       => gi( $item, 'parcel_width' ),
-          // 'height'      => gi( $item, 'parcel_height' ),
-          'length'      => 0,
-          'width'       => 0,
-          'height'      => 0,
+          'length'      => gi( $item, 'parcel_length' ),
+          'width'       => gi( $item, 'parcel_width' ),
+          'height'      => gi( $item, 'parcel_height' ),
           'description' => gi($item, 'parcel_description' ),
         );
 

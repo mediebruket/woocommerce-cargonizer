@@ -168,6 +168,22 @@ acf_add_local_field_group(array (
       'readonly' => 0,
     ),
     array (
+      'key' => 'field_595396145dbde',
+      'label' => 'Print on export',
+      'name' => 'consignment_print_on_export',
+      'type' => 'true_false',
+      'instructions' => '',
+      'required' => 0,
+      'conditional_logic' => 0,
+      'wrapper' => array (
+        'width' => '',
+        'class' => '',
+        'id' => '',
+      ),
+      'message' => '',
+      'default_value' => true,
+    ),
+    array (
       'key' => 'field_593e706d3f51f',
       'label' => 'Carrier',
       'name' => 'consignment_carrier_id',

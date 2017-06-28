@@ -36,6 +36,7 @@ class Parcel{
         $this->ShippingDate   = $this->getShippingDate();
         $this->IsCargonized   = $this->isCargonized();
         $this->Printer        = $this->getPrinter();
+        $this->PrintOnExport  = $this->getPrintOnExport();
         $this->ParcelType     = $this->getParcelType();
         $this->ParcelServices = $this->getParcelServices();
         $this->ParcelMessage  = $this->getParcelMessage();
@@ -82,7 +83,11 @@ class Parcel{
 
   function getPrinter(){
     return gi($this->Meta, 'parcel_printer');
-    //_log($this->Printer);
+  }
+
+
+  function getPrintOnExport(){
+    return gi($this->Meta, 'parcel_print_on_post');
   }
 
 

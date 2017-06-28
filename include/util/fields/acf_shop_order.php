@@ -59,6 +59,18 @@ acf_add_local_field_group(
           'readonly' => 1,
         ),
         array(
+          'key' => 'field_593e33287a323',
+          'label' => 'Print on export',
+          'name' => 'parcel_print_on_post',
+          'type' => 'true_false',
+          'instructions' => 'Prints the consignment automatically',
+          'required' => 0,
+          'conditional_logic' => 0,
+          'wrapper' => array('width' => '','class' => '','id' => '', ),
+          'message' => '',
+          'default_value' => 0,
+        ),
+        array(
           'key' => 'field_56cd64c524656',
           'label' => 'Carrier',
           'name' => 'transport_agreement',

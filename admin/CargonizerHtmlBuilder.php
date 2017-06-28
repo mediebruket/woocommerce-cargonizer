@@ -69,12 +69,10 @@ class CargonizerHtmlBuilder{
           // _log( $option['options'] );
           foreach ( $option['options'] as $key => $o) {
             if ( isset($o['types']) && is_array($o['types']) && !empty($o['types']) ){
-              foreach ($o['types'] as $type_key => $type) {
-
+              foreach ($o['types'] as $type_key => $type){
                 $id = uniqid();
                 $checked  = null;
                 $type_value = $o['identifier']."|".$type_key;
-
 
                 if ( $type_value == $option['value'] ){
                   $checked = ' checked="checked" ';
@@ -103,9 +101,8 @@ class CargonizerHtmlBuilder{
           <?php
           _log( $option['value'] );
           foreach ( $option['options'] as $o_id => $o_name) {
-
             $id = uniqid();
-            $checked = $type_value = null;
+            $checked = null;
 
             if ( is_numeric( array_search($o_id, $option['value'])  ) ){
               $checked = ' checked="checked" ';
@@ -116,8 +113,6 @@ class CargonizerHtmlBuilder{
               <input type="checkbox" id="%s" name="%s[]" value="%s" %s /><label for="%s">%s</label></div>',
               $id, $option['name'], $o_id, $checked, $id, $o_name
               );
-
-
           }
           ?>
         </div>

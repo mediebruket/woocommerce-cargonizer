@@ -254,11 +254,7 @@ class CargonizerAdmin{
           $carrier_product = CargonizerOptions::getDefaultCarrierProduct();
         }
 
-
         printf( '<script>var parcel_carrier_product="%s"</script>', $carrier_product );
-
-
-
         printf( '<script>var parcel_carrier_product_services=%s</script>', json_encode($Parcel->ParcelServices) );
         printf( '<script>var parcel_is_cargonized=%s</script>', (( $Parcel->IsCargonized ) ? 'true' : 'false') ) ;
       }
@@ -505,8 +501,6 @@ class CargonizerAdmin{
       echo '<div class="alignleft actions"><a href="#" id="ajax-create-consignments" class="button">'.CargonizerIcons::consignment().' '. __('Create new consignment', 'wc-cargonizer'). '</a></div>';
     }
   }
-
-
 
 
 
