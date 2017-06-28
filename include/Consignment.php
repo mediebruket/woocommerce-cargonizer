@@ -1,6 +1,6 @@
 <?php
 add_action( 'init', array('Consignment', '_registerPostType'), 10 );
-add_action( 'init', array('Consignment', '_updateNextShippingDates'), 20 ); // OBS check next shipping date first
+// add_action( 'init', array('Consignment', '_updateNextShippingDates'), 20 ); // OBS check next shipping date first
 add_action( 'pre_get_posts', array('Consignment', '_orderConsignmentsByShippingDate'), 20 );
 add_filter( 'woocommerce_package_rates' , array('Consignment', '_setShippingCosts'), 10, 2 );
 
@@ -162,7 +162,7 @@ class Consignment{
     $carrier_id = gi($this->Meta, 'consignment_carrier_id');
 
     if ( !$carrier_id  ){
-      $carrier_id = get_option('cargonizer-delivery-company-id' );
+      $carrier_id = get_option('cargonizer-carrier-id' );
     }
 
 
@@ -176,7 +176,7 @@ class Consignment{
     // _log('$consignment_product');
     // _log($consignment_product);
     if ( !$consignment_product ){
-      $consignment_product = get_option('cargonizer-delivery-services' );
+      $consignment_product = get_option('cargonizer-carrier-products');
 
       if ( isset($consignment_product[0]) ){
         $consignment_product = $consignment_product[0];
@@ -578,7 +578,7 @@ class Consignment{
 
       $parcel_weight = null;
       if ( $pw = gi( $item, 'parcel_weight' ) ){
-        $parcel_weight = $pw;
+        $parcel_weight =  str_replace(',', '.', $pw);
       }
 
       $item_attributes =
@@ -587,9 +587,12 @@ class Consignment{
           // 'type'        => 'package',
           'amount'      => gi( $item, 'parcel_amount' ),
           'weight'      => $parcel_weight,
-          'length'      => gi( $item, 'parcel_length' ),
-          'width'       => gi( $item, 'parcel_width' ),
-          'height'      => gi( $item, 'parcel_height' ),
+          // 'length'      => gi( $item, 'parcel_length' ),
+          // 'width'       => gi( $item, 'parcel_width' ),
+          // 'height'      => gi( $item, 'parcel_height' ),
+          'length'      => 0,
+          'width'       => 0,
+          'height'      => 0,
           'description' => gi($item, 'parcel_description' ),
         );
 
@@ -598,7 +601,7 @@ class Consignment{
         $item_attributes['volume'] = $volume;
       }
       else{
-        $item_attributes['volume'] = $item_attributes['length']*$item_attributes['width']*$item_attributes['height'];
+        $item_attributes['volume'] = $item_attributes['length']*$item_attributes['width']*$item_attributes['height']/1000;
       }
 
 
@@ -629,7 +632,7 @@ class Consignment{
     $export['consignments']['references']['consignor'] = $this->OrderId;
     $export['consignments']['references']['consignee'] = $this->CustomerId;
 
-    // _log($export);
+    _log($export);
     return $export;
   }
 

@@ -30,7 +30,7 @@ class Cargonizer{
     add_filter('acf/load_field/name=create_consignment', array($this, 'acf_checkConsignmentStatus'), 10 );
 
     add_filter('acf/load_field/name=parcel_services', array($this, 'acf_setProductServices') );
-    
+
     add_filter('acf/load_field/name=message_consignee', array($this, 'acf_setDefaultMessageToConsignee') );
 
     add_filter('acf/load_field/name=parcel_height', array($this, 'acf_setDefaultHeight') );
@@ -151,7 +151,7 @@ class Cargonizer{
       $Consignment = new Consignment( $post_id );
       $CargonizeXml = new CargonizeXml( $Consignment->prepareExport() );
       $CargonizerApi = new CargonizerApi();
-      $result = true;
+      $result = null;
       // _log('post consignment');
 
       $result = $CargonizerApi->postConsignment($CargonizeXml->Xml);
@@ -198,11 +198,9 @@ class Cargonizer{
 
 
   function resetConsignment(){
-    if ( _is($_GET, 'wcc_action') == 'reset_consignment' ){
-
-      $order_id = _is($_GET, 'post');
+    if ( isset($_GET['wcc_action']) && $_GET['wcc_action'] == 'reset_consignment' ){
+      $order_id = $_GET['post'];
       if ( is_numeric($order_id) ){
-
         $Parcel = new Parcel($order_id);
         $Parcel->reset();
         $Parcel->addNote( 'reset' );
@@ -216,8 +214,7 @@ class Cargonizer{
   }
 
 
-
-   function setMailContentType(){
+  function setMailContentType(){
     return 'text/html';
   }
 
@@ -349,7 +346,7 @@ class Cargonizer{
       $post_id = ( isset($_GET['post']) && is_numeric($_GET['post']) ) ? $_GET['post'] : null;
       $field['default_value'] = str_replace('@order_id@', $post_id, $value);
     }
-    
+
     return $field;
   }
 
@@ -397,7 +394,7 @@ class Cargonizer{
     if ( $post_id = $this->isOrder($object=false) ){
       $CargonizerSettings = new CargonizerOptions();
       $ta = $CargonizerSettings->get('SelectedTransportAgreement');
-      $ts = $CargonizerSettings->get('TransportServices');
+      $ts = $CargonizerSettings->get('TransportProduct');
 
       if ( is_array($ta) && isset($ta['products']) && is_array($ta['products']) ){
         // _log($ta_settings);
@@ -408,9 +405,15 @@ class Cargonizer{
             foreach ($p['types'] as $ti => $type) {
               $index = $p['identifier']."|".$ti;
 
-              if ( is_numeric(array_search($index, $ts)) ){
+              if ( is_array($ts) ){
+                if ( is_numeric(array_search($index, $ts)) ){
+                  $choices[$index] = $p['name']." (".$type.")";
+                }
+              }
+              elseif ( $index == $ts ){
                 $choices[$index] = $p['name']." (".$type.")";
               }
+
             }
           }
           else{
@@ -444,7 +447,7 @@ class Cargonizer{
     if ( $post_id = $this->isOrder($object=false) ){
       $CargonizerSettings = new CargonizerOptions();
       $ta = $CargonizerSettings->get('SelectedTransportAgreement');
-      $ts = $CargonizerSettings->get('TransportServices');
+      $ts = $CargonizerSettings->get('TransportProduct');
 
       if ( is_array($ta) && isset($ta['products']) && is_array($ta['products']) ){
         // _log($ta_settings);
@@ -453,9 +456,16 @@ class Cargonizer{
           if ( isset($p['types']) && is_array($p['types']) ){
             foreach ($p['types'] as $ti => $type) {
               $index = $p['identifier']."|".$ti;
-              if ( is_numeric(array_search($index, $ts)) ){
+
+              if ( is_array($ts) ){
+                if ( is_numeric(array_search($index, $ts)) ){
+                  $choices[$ti] = $p['name']." (".$type.")";
+                }
+              }
+              else if ( $index == $ts ){
                 $choices[$ti] = $p['name']." (".$type.")";
               }
+
             }
           }
           else{
@@ -482,7 +492,7 @@ class Cargonizer{
     if ( $post_id = $this->isOrder($object=false) ){
       $CargonizerSettings = new CargonizerOptions();
       $ta = $CargonizerSettings->get('SelectedTransportAgreement');
-      $ts = $CargonizerSettings->get('TransportServices');
+      $ts = $CargonizerSettings->get('TransportProduct');
 
       if ( is_array($ta) && isset($ta['products']) && is_array($ta['products']) ){
 

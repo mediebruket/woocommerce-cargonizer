@@ -57,7 +57,7 @@ class CargonizerHtmlBuilder{
       <?php endif; ?>
 
 
-      <?php if( $option['type'] == 'multiple_checkbox'): ?>
+      <?php if( $option['type'] == 'multiple_checkbox_2'): ?>
         <div >
           <?php self::buildLabel( $option['label'], $option['name'], 'mb-admin-label inline' ); ?>
 
@@ -75,7 +75,8 @@ class CargonizerHtmlBuilder{
                 $checked  = null;
                 $type_value = $o['identifier']."|".$type_key;
 
-                if ( is_numeric(array_search($type_value, $option['value'])) ){
+
+                if ( $type_value == $option['value'] ){
                   $checked = ' checked="checked" ';
                 }
 
@@ -85,6 +86,38 @@ class CargonizerHtmlBuilder{
                   );
               }
             }
+          }
+          ?>
+        </div>
+      <?php endif; ?>
+
+
+      <?php if( $option['type'] == 'multiple_checkbox'): ?>
+        <div >
+          <?php self::buildLabel( $option['label'], $option['name'], 'mb-admin-label inline' ); ?>
+
+          <?php if ( isset($option['desc'])): ?>
+            <div><span class="mb-field-desc"><?php echo $option['desc']; ?></span></div>
+          <?php endif; ?>
+
+          <?php
+          _log( $option['value'] );
+          foreach ( $option['options'] as $o_id => $o_name) {
+
+            $id = uniqid();
+            $checked = $type_value = null;
+
+            if ( is_numeric( array_search($o_id, $option['value'])  ) ){
+              $checked = ' checked="checked" ';
+            }
+
+            printf(
+              '<div class="mb-option-row">
+              <input type="checkbox" id="%s" name="%s[]" value="%s" %s /><label for="%s">%s</label></div>',
+              $id, $option['name'], $o_id, $checked, $id, $o_name
+              );
+
+
           }
           ?>
         </div>

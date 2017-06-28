@@ -168,11 +168,11 @@ function getCarrierProducts( carrier_id ){
 
 
 function getProductServices( product_field_id, services_field_id ){
-  _log('getProductServices');
+  // _log('getProductServices');
   var product_services = null;
   var product_id = jQuery('#acf-field_'+product_field_id).val();
 
-  _log(product_id);
+  // _log(product_id);
   if ( typeof product_id !== 'undefined' && product_id != 0 ){
     var identifier = null;
     // _log(product_id);
@@ -183,7 +183,7 @@ function getProductServices( product_field_id, services_field_id ){
       identifier = pid_tmp[0];
     }
 
-    _log( 'identifier '+ identifier );
+    // _log( 'identifier '+ identifier );
     TransportProduct = null;
 
     if ( identifier ){

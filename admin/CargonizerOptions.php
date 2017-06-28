@@ -4,6 +4,7 @@ class CargonizerOptions{
   protected $TransportAgreements;
   protected $SelectedTransportAgreement;
   protected $TransportCompanyId;
+  protected $TransportProduct;
   protected $TransportServices;
   protected $DefaultPrinter;
   protected $RecurringConsignmentWarningTime;
@@ -11,11 +12,13 @@ class CargonizerOptions{
 
   function __construct(){
     $this->TransportCompanyId         = $this->getTransportCompanyId();
+    $this->TransportProduct           = $this->getTransportProduct();
     $this->TransportServices          = $this->getTransportServices();
     $this->DefaultPrinter             = $this->getDefaultPrinter();
     $this->PrintOnExport              = $this->getPrintOnExport();
     $this->TransportAgreements        = $this->getTransportAgreements();
     $this->SelectedTransportAgreement = $this->getSelectedTransportAgreement();
+    $this->TransportAgreementServices = $this->getSelectedTransportAgreementServices();
     $this->RecurringConsignmentWarningTime = $this->getRecurringConsignmentWarningTime();
   }
 
@@ -78,7 +81,7 @@ class CargonizerOptions{
   }
 
   function getTransportCompanyId(){
-    return get_option('cargonizer-delivery-company-id');
+    return get_option('cargonizer-carrier-id');
   }
 
 
@@ -87,13 +90,41 @@ class CargonizerOptions{
   }
 
 
+  public static function getDefaultCarrierProduct(){
+    $carrier_products = get_option( 'cargonizer-carrier-products' );
+    $product_identifier = null;
+    if ( is_string($carrier_products) ){
+      $product_identifier = $carrier_products;
+    }
+    elseif ( is_array($carrier_products) && isset($carrier_products[0]) && $carrier_products[0] ){
+      $product_identifier = $carrier_products[0];
+    }
+
+    return $product_identifier;
+  }
+
+
   function getPrintOnExport(){
     return get_option('cargonizer-print-on-export');
   }
 
 
+  function getTransportProduct(){
+    $carrier_product = maybe_unserialize( get_option('cargonizer-carrier-products') );
+    if ( is_string($carrier_product) ){
+      return $carrier_product;
+    }
+    else if( is_array($carrier_product) && isset($carrier_product[0]) ){
+      return $carrier_product[0];
+    }
+    else{
+      return null;
+    }
+  }
+
+
   function getTransportServices(){
-    return maybe_unserialize( get_option('cargonizer-delivery-services') );
+    return maybe_unserialize( get_option('cargonizer-delivery-carrier-product-services') );
   }
 
 
@@ -109,7 +140,32 @@ class CargonizerOptions{
       }
     }
 
+    // _log($selected_transport_agreement);
     return $selected_transport_agreement;
+  }
+
+
+  function getSelectedTransportAgreementServices(){
+    $services = array();
+    if ( $this->TransportProduct ){
+      $tp = explode('|', $this->TransportProduct );
+      if ( $this->SelectedTransportAgreement && is_array($this->SelectedTransportAgreement) && isset($this->SelectedTransportAgreement['products']) ){
+        foreach ($this->SelectedTransportAgreement['products'] as $key => $product) {
+          if ( $product['identifier'] == $tp[0] ){
+            if ( is_array($product['services']) ){
+              foreach ($product['services'] as $name => $s){
+                $services[ $s['identifier']] = $s['name'];
+              }
+            }
+            break;
+          }
+        }
+      }
+    }
+
+    // _log($services);
+
+    return $services;
   }
 
 
@@ -339,7 +395,6 @@ class CargonizerOptions{
           'value'   => $this->DefaultPrinter,
           'options' => self::getPrinterList(),
         ),
-
         array(
           'name'    => 'cargonizer-print-on-export',
           'label'   => __('Print on export'),
@@ -349,21 +404,28 @@ class CargonizerOptions{
           'option'   => 'on',
         ),
         array(
-          'name'    => 'cargonizer-delivery-company-id',
+          'name'    => 'cargonizer-carrier-id',
           'label'   => __('Default delivery company'),
           'desc'    => __('Api settings required to load delivery companies'),
           'type'    => 'select',
           'value'   => $this->TransportCompanyId,
           'options' => $this->getCompanyList(),
         ),
-
         array(
-          'name'    => 'cargonizer-delivery-services',
-          'label'   => __('Products'),
+          'name'    => 'cargonizer-carrier-products',
+          'label'   => __('Default product'),
           'desc'    => __('If empty, select delivery company and update'),
-          'type'    => 'multiple_checkbox',
-          'value'   => $this->TransportServices,
+          'type'    => 'multiple_checkbox_2',
+          'value'   => $this->TransportProduct,
           'options' => ( $this->SelectedTransportAgreement ) ? $this->SelectedTransportAgreement['products'] : array(),
+        ),
+        array(
+          'name'    => 'cargonizer-delivery-carrier-product-services',
+          'label'   => __('Default services'),
+          // 'desc' => __('Api settings required to load delivery companies'),
+          'type'    => 'multiple_checkbox',
+          'value'   =>  $this->TransportServices,
+          'options'   => $this->TransportAgreementServices
         ),
       );
 
@@ -397,7 +459,7 @@ class CargonizerOptions{
         'name' => 'cargonizer-parcel-message-consignee',
         'label' => __('Message consignee'),
         'desc' => 'placeholders: @order_id@',
-        'type' => 'textarea',
+        'type' => 'text',
         'value' => get_option('cargonizer-parcel-message-consignee'),
       ),
       array(

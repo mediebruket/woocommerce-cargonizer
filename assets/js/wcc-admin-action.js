@@ -122,7 +122,7 @@ function updateProductServices(){
 
 function updateProductTypes(){
   _log('updateProductTypes');
-  _log(TransportProduct);
+  // _log(TransportProduct);
   if ( TransportProduct && typeof TransportProduct.types !== 'undefined' ){
     var options = makeOption( 'select parcel type', '' );
     for ( type_index in TransportProduct.types ){

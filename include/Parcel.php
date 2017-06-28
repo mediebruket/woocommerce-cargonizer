@@ -39,7 +39,7 @@ class Parcel{
         $this->ParcelType     = $this->getParcelType();
         $this->ParcelServices = $this->getParcelServices();
         $this->ParcelMessage  = $this->getParcelMessage();
-        
+
 
         // recurring
         $this->IsRecurring                  = $this->getIsRecurring();
@@ -85,7 +85,7 @@ class Parcel{
     //_log($this->Printer);
   }
 
-  
+
   function getRecurringStartDate(){
     return gi($this->Meta, 'parcel_start_date');
   }
@@ -192,8 +192,18 @@ class Parcel{
 
 
   function getParcelServices(){
-    return maybe_unserialize( gi($this->Meta, 'parcel_services') );
-    //_log($this->Printer);
+    $services = array();
+
+    if ( isset($this->Meta['parcel_services']) ){
+      _log('has');
+      $services = $this->Meta['parcel_services'];
+    }
+    else {
+      _log('none');
+      $services = get_option('cargonizer-delivery-carrier-product-services');
+    }
+
+    return maybe_unserialize( $services );
   }
 
 

@@ -92,8 +92,8 @@ class CargonizerAdmin{
       $this->showUpdateMessage ( __( 'General settings updated', 'wc-cargonizer' ) );
     }
     else if ( isset($_GET['delete']) && $_GET['delete'] == '1' ){
-      delete_option( 'cargonizer-delivery-company-id' );
-      delete_option( 'cargonizer-delivery-services' );
+      delete_option( 'cargonizer-carrier-id' );
+      delete_option( 'cargonizer-carrier-products' );
       delete_option( 'cargonizer-default-printer' );
       delete_transient( 'wcc_printer_list' );
       delete_transient( 'transport_agreements' );
@@ -243,8 +243,22 @@ class CargonizerAdmin{
         // _log($Parcel->ParcelServices);
         // _log($Parcel->IsCargonized);
         printf( '<script>var Parcel=%s;</script>', json_encode($Parcel) );
-        printf( '<script>var parcel_carrier_id=%s;</script>', json_encode($Parcel->TransportAgreementId) );
-        printf( '<script>var parcel_carrier_product="%s"</script>', $Parcel->ParcelType );
+
+        // carrier id
+        $carrier_id =  ( $Parcel->TransportAgreementId ) ? $Parcel->TransportAgreementId : get_option( 'cargonizer-carrier-id' );
+        printf( '<script>var parcel_carrier_id=%s;</script>', json_encode($carrier_id) );
+
+        // carrier product
+        $carrier_product =$Parcel->ParcelType;
+        if ( !$carrier_product ){
+          $carrier_product = CargonizerOptions::getDefaultCarrierProduct();
+        }
+
+
+        printf( '<script>var parcel_carrier_product="%s"</script>', $carrier_product );
+
+
+
         printf( '<script>var parcel_carrier_product_services=%s</script>', json_encode($Parcel->ParcelServices) );
         printf( '<script>var parcel_is_cargonized=%s</script>', (( $Parcel->IsCargonized ) ? 'true' : 'false') ) ;
       }
