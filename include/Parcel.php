@@ -195,11 +195,9 @@ class Parcel{
     $services = array();
 
     if ( isset($this->Meta['parcel_services']) ){
-      _log('has');
       $services = $this->Meta['parcel_services'];
     }
     else {
-      _log('none');
       $services = get_option('cargonizer-delivery-carrier-product-services');
     }
 

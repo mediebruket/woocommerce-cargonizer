@@ -39,6 +39,8 @@ class Cargonizer{
     add_filter('acf/load_field/name=parcel_length', array($this, 'acf_setDefaultLength') );
     add_filter('acf/load_field/name=parcel_recurring_consignment_length', array($this, 'acf_setDefaultLength') );
 
+    add_filter('acf/load_field/name=parcel_weight', array($this, 'acf_setDefaultWeight') );
+
     add_filter('acf/load_field/name=parcel_width', array($this, 'acf_setDefaultWidth') );
     add_filter('acf/load_field/name=parcel_recurring_consignment_width', array($this, 'acf_setDefaultWidth') );
 
@@ -363,6 +365,33 @@ class Cargonizer{
     if ( $value = get_option('cargonizer-parcel-length' ) ){
       $field['default_value'] = $value;
     }
+    return $field;
+  }
+
+
+  function acf_setDefaultWeight($field){
+    $weight = 0;
+
+    if ( isset($_GET['post']) && is_numeric($_GET['post']) ){
+      $Order = new WC_Order($_GET['post']);
+      $order_items = $Order->get_items();
+      if ( is_array($order_items)) {
+        foreach( $order_items as $item ) {
+          if ( $item['product_id'] > 0 ) {
+            $_product = $Order->get_product_from_item( $item );
+            if ( !$_product->is_virtual() ) {
+              $weight += $_product->get_weight() * $item['qty'];
+            }
+          }
+        }
+      }
+
+      if ( $weight ){
+        $field['default_value'] = $weight;
+      }
+    }
+
+
     return $field;
   }
 
