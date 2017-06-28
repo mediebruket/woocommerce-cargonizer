@@ -92,7 +92,7 @@ class CargonizerHtmlBuilder{
 
       <?php if( $option['type'] == 'textarea'): ?>
       <?php self::buildLabel( $option['label'], $option['name'], 'mb-admin-label' ); ?>
-        <textarea name="<?php echo $option['name']; ?>" id="<?php echo $option['name']; ?>" class="wcc-textarea"><?php echo $option['value']; ?></textarea>
+        <textarea name="<?php echo $option['name']; ?>" id="<?php echo $option['name']; ?>" class="wcc-textarea" rows="4" cols="50"><?php echo $option['value']; ?></textarea>
       <?php endif; ?>
 
       <?php if( $option['type'] == 'select'): ?>

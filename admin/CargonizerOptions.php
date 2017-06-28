@@ -394,6 +394,13 @@ class CargonizerOptions{
         'value' => get_option('cargonizer-parcel-width'),
       ),
       array(
+        'name' => 'cargonizer-parcel-message-consignee',
+        'label' => __('Message consignee'),
+        'desc' => 'placeholders: @order_id@',
+        'type' => 'textarea',
+        'value' => get_option('cargonizer-parcel-message-consignee'),
+      ),
+      array(
         'name'    => 'cargonizer-recurring-consignments-warning-time',
         'label'   => __('Recurring consignments warning time'),
         'desc' => __('Default 1 day'),

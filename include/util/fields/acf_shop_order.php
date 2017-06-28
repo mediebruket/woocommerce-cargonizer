@@ -121,7 +121,7 @@ acf_add_local_field_group(
           'required' => 0,
           'conditional_logic' => 0,
           'wrapper' => array('width' => '','class' => '','id' => '',),
-          'default_value' => '',
+          'default_value' => null,
           'placeholder' => '',
           'maxlength' => '',
           'rows' => '',

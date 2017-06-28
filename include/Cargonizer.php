@@ -30,6 +30,8 @@ class Cargonizer{
     add_filter('acf/load_field/name=create_consignment', array($this, 'acf_checkConsignmentStatus'), 10 );
 
     add_filter('acf/load_field/name=parcel_services', array($this, 'acf_setProductServices') );
+    
+    add_filter('acf/load_field/name=message_consignee', array($this, 'acf_setDefaultMessageToConsignee') );
 
     add_filter('acf/load_field/name=parcel_height', array($this, 'acf_setDefaultHeight') );
     add_filter('acf/load_field/name=parcel_recurring_consignment_height', array($this, 'acf_setDefaultHeight') );
@@ -337,6 +339,17 @@ class Cargonizer{
       $field['message'] = str_replace('@acf_consignment_history@', $html, $field['message'] );
     }
 
+    return $field;
+  }
+
+
+  function acf_setDefaultMessageToConsignee( $field ){
+    if ( $value = get_option('cargonizer-parcel-message-consignee' ) ){
+      $field['default_value'] = $value;
+      $post_id = ( isset($_GET['post']) && is_numeric($_GET['post']) ) ? $_GET['post'] : null;
+      $field['default_value'] = str_replace('@order_id@', $post_id, $value);
+    }
+    
     return $field;
   }
 

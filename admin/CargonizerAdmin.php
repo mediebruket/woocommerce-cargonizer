@@ -110,7 +110,7 @@ class CargonizerAdmin{
       $this->showUpdateMessage ( __( 'Parcel settings updated', 'wc-cargonizer' ) );
     }
 
-    $this->showToolBox( __('Default package size', 'wc-cargonizer'), $this->Options->getOptions('Parcel') );
+    $this->showToolBox( __('Package defaults', 'wc-cargonizer'), $this->Options->getOptions('Parcel') );
   }
 
 
