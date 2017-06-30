@@ -79,7 +79,7 @@ class CargonizerHtmlBuilder{
                 }
 
                 printf(
-                  '<div class="mb-option-row"><input type="checkbox" id="%s" name="%s[]" value="%s" %s /><label for="%s">%s</label></div>',
+                  '<div class="mb-option-row"><input type="checkbox" id="%s" name="%s[]" class="wcc-carrier-products" value="%s" %s /><label for="%s">%s</label></div>',
                   $id, $option['name'], $type_value, $checked, $id, $o['name']." (".$type.")"
                   );
               }

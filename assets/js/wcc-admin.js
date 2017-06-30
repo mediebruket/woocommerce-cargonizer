@@ -17,16 +17,33 @@ jQuery(document).ready(function(){
   initPrintBtn();
   initOrderConsignment();
   initRecurringConsignment();
+  initWccCarrierProducts();
 });
+
+
+function initWccCarrierProducts(){
+  jQuery('.wcc-carrier-products').click(
+    function(){
+      if ( jQuery(this).attr('checked') ){
+        jQuery('.wcc-carrier-products').attr('checked', false);
+        jQuery(this).attr('checked', true);
+      }
+    }
+  );
+}
+
 
 
 function initRecurringConsignment(){
   if ( jQuery('.post-type-shop_order').length ){
-    jQuery('#acf-field_'+acf_copy_from_parcel).attr('checked', false); // uncheck copy from parcel
-    initCopyFromParcels();
-    updateRecurringConsignmentCarrierProducts( getRecurringCarrierId(), false );
-    updateRecurringConsignmentProductServices( false );
-    updateRecurringConsignmentProductTypes();
+    carrier_id = getRecurringCarrierId();
+    if ( typeof carrier_id !== 'undefined' ){
+      jQuery('#acf-field_'+acf_copy_from_parcel).attr('checked', false); // uncheck copy from parcel
+      initCopyFromParcels();
+      updateRecurringConsignmentCarrierProducts( carrier_id, false );
+      updateRecurringConsignmentProductServices( false );
+      updateRecurringConsignmentProductTypes();
+    }
   }
 
   jQuery('#acf-field_'+acf_recurring_carrier_id).change(function(){
@@ -162,8 +179,8 @@ function getCarrierProducts( carrier_id ){
     };
   }
 
-  return options;
 
+  return options;
 }
 
 
