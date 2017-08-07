@@ -44,7 +44,7 @@ function getConsignmentCarrierId(){
 
 
 function updateConsignmentCarrierProducts(){
-  _log('updateConsignmentCarrierProducts');
+  //_log('updateConsignmentCarrierProducts');
 
   carrier_id = Consignment.CarrierId;
   // _log(carrier_id);
@@ -73,12 +73,13 @@ function updateConsignmentCarrierProducts(){
 
 
 function updateConsignmentProductServices(){
+  _log('updateConsignmentProductServices');
   product_services = getProductServices( acf_consignment_product, acf_consignment_product_services );
   // _log(product_services);
   if ( product_services ){
     jQuery('.acf-field.acf-field-'+acf_consignment_product_services+' .acf-checkbox-list').html( product_services );
 
-    if ( typeof Consignment.CarrierProductServices !== 'undefined' 
+    if ( typeof Consignment.CarrierProductServices !== 'undefined'
           && Consignment.CarrierProductServices != null
             && Consignment.CarrierProductServices.length ){
             jQuery.each( Consignment.CarrierProductServices, function(index, service ){
@@ -103,7 +104,7 @@ function updateConsignmentItems(){
   jQuery('.acf-field.acf-field-'+acf_id+' select').html(options);
 
   // select current
-  if ( typeof Consignment.Items === 'object' 
+  if ( typeof Consignment.Items === 'object'
         && Consignment.Items != null
           && Consignment.Items.length ){
         updateItemTypes( Consignment.Items, acf_id );

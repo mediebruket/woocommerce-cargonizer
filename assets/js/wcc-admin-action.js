@@ -114,9 +114,8 @@ function updateCarrierProducts( carrier_id ){
 function updateProductServices(){
   // _log('updateProductServices');
   // _log (TransportAgreement );
-  if ( product_services = getProductServices( acf_parcel_type, acf_parcel_services) ){
-    jQuery('.acf-field.acf-field-'+acf_parcel_services+' .acf-checkbox-list').html( product_services );
-  }
+  product_services = getProductServices( acf_parcel_type, acf_parcel_services);
+  jQuery('.acf-field.acf-field-'+acf_parcel_services+' .acf-checkbox-list').html( product_services );
 }
 
 

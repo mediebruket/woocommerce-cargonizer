@@ -185,7 +185,7 @@ function getCarrierProducts( carrier_id ){
 
 
 function getProductServices( product_field_id, services_field_id ){
-  // _log('getProductServices');
+  //_log('getProductServices: '+ product_field_id);
   var product_services = null;
   var product_id = jQuery('#acf-field_'+product_field_id).val();
 
@@ -200,15 +200,13 @@ function getProductServices( product_field_id, services_field_id ){
       identifier = pid_tmp[0];
     }
 
-    // _log( 'identifier '+ identifier );
+    _log( 'identifier '+ identifier );
     TransportProduct = null;
 
     if ( identifier ){
       for (var i = 0; i < TransportAgreement.products.length; i++) {
         var product = TransportAgreement.products[i];
 
-        // _log('product');
-        // _log(product.identifier);
         if ( product.identifier == identifier ){
           TransportProduct = product;
         }
@@ -216,20 +214,21 @@ function getProductServices( product_field_id, services_field_id ){
     }
 
 
-    _log('TransportProduct');
-    _log(TransportProduct);
+    // _log('TransportProduct');
+    // _log(TransportProduct);
     product_services = '';
     if ( typeof TransportProduct.services !== 'undefined' ){
-      // _log( 'Services: '+TransportProduct.services.length);
+      //_log( 'Services: '+TransportProduct.services.length);
       for (var i = 0; i < TransportProduct.services.length ; i++) {
         // _log ( TransportProduct.services[i] );
-        var Service =  TransportProduct.services[i];
+        var Service = TransportProduct.services[i];
         // _log('Service');
         // _log(Service);
         product_services += makeCheckbox( services_field_id, Service.name,  Service.identifier );
       };
     }
   }
+
 
   return product_services;
 }

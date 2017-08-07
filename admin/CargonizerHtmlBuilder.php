@@ -99,21 +99,34 @@ class CargonizerHtmlBuilder{
           <?php endif; ?>
 
           <?php
-          _log( $option['value'] );
-          foreach ( $option['options'] as $o_id => $o_name) {
-            $id = uniqid();
-            $checked = null;
 
-            if ( is_numeric( array_search($o_id, $option['value'])  ) ){
-              $checked = ' checked="checked" ';
+          if ( !empty($option['options']) ){
+            foreach ( $option['options'] as $o_id => $o_name) {
+              $id = uniqid();
+              $checked = null;
+
+              if ( is_numeric( array_search($o_id, $option['value'])  ) ){
+                $checked = ' checked="checked" ';
+              }
+
+              printf(
+                '<div class="mb-option-row">
+                <input type="checkbox" id="%s" name="%s[]" value="%s" %s /><label for="%s">%s</label></div>',
+                $id, $option['name'], $o_id, $checked, $id, $o_name
+                );
             }
-
-            printf(
-              '<div class="mb-option-row">
-              <input type="checkbox" id="%s" name="%s[]" value="%s" %s /><label for="%s">%s</label></div>',
-              $id, $option['name'], $o_id, $checked, $id, $o_name
-              );
           }
+          else{
+             self::buildInput(
+              array(
+                'type'  => 'hidden',
+                'name'  => gi($option, 'name'),
+                'id'    => gi($option, 'name'),
+                'value' => ''
+              )
+            );
+          }
+
           ?>
         </div>
       <?php endif; ?>

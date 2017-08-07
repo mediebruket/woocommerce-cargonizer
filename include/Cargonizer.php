@@ -382,7 +382,7 @@ class Cargonizer{
         foreach( $order_items as $item ) {
           if ( $item['product_id'] > 0 ) {
             $_product = $Order->get_product_from_item( $item );
-            if ( !$_product->is_virtual() ) {
+            if ( $_product && is_object($_product) && method_exists($_product, 'is_virtual') && !$_product->is_virtual() ) {
               $weight += $_product->get_weight() * $item['qty'];
             }
           }
