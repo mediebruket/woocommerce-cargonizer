@@ -135,7 +135,7 @@ class CargonizerAdmin{
 
     <div class="wcc-instruction">
       <h4><?php _e('Placeholders', 'wc-cargonizer'); ?></h4>
-      <?php echo implode('<br/>', Parcel::getPlaceholders() ) ?>
+      <?php echo implode('<br/>', ShopOrder::getPlaceholders() ) ?>
     </div>
     <?php
   }
@@ -205,16 +205,20 @@ class CargonizerAdmin{
       echo '<link rel="stylesheet" href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" integrity="sha384-dNpIIXE8U05kAbPhy3G1cz+yZmTzA6CY8Vg/u2L9xRnHjJiAK76m2BIEaSEV+/aU" crossorigin="anonymous">';
       // echo '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" >';
 
-      wp_register_script( 'wcc-admin', $path. '/js/wcc-admin.js', false, '1.0.0' );
-      wp_register_script( 'wcc-admin-ajax', $path. '/js/wcc-admin-ajax.js', false, '1.0.0' );
-      wp_register_script( 'wcc-admin-consignment', $path. '/js/wcc-admin-consignment.js', false, '1.0.1' );
-      wp_register_script( 'wcc-admin-action', $path. '/js/wcc-admin-action.js', false, '1.0.1' );
-      wp_register_script( 'wcc-admin-html', $path. '/js/wcc-admin-html.js', false, '1.0.0' );
-      wp_enqueue_script( 'wcc-admin-ajax' );
-      wp_enqueue_script( 'wcc-admin-html' );
-      wp_enqueue_script( 'wcc-admin-action' );
-      wp_enqueue_script( 'wcc-admin-consignment' );
+      wp_register_script( 'wcc-admin', $path. 'js/wcc-admin.js', false, '1.0.0' );
       wp_enqueue_script( 'wcc-admin' );
+
+      wp_register_script( 'wcc-admin-ajax', $path. 'js/wcc-admin-ajax.js', false, '1.0.0' );
+      wp_enqueue_script( 'wcc-admin-ajax' );
+
+      wp_register_script( 'wcc-admin-consignment', $path. 'js/wcc-admin-consignment.js', false, '1.0.1' );
+      wp_enqueue_script( 'wcc-admin-consignment' );
+
+      wp_register_script( 'wcc-admin-action', $path. 'js/wcc-admin-action.js', false, '1.0.1' );
+      wp_enqueue_script( 'wcc-admin-action' );
+
+      wp_register_script( 'wcc-admin-html', $path. 'js/wcc-admin-html.js', false, '1.0.0' );
+      wp_enqueue_script( 'wcc-admin-html' );
 
     }
   }
@@ -237,32 +241,14 @@ class CargonizerAdmin{
       $post = get_post($carrier_id);
 
       if ( $post->post_type == 'shop_order' ){
-        $Parcel = new Parcel($_GET['post']);
-        // _log($Parcel->TransportAgreementId);
-        // _log($Parcel->ParcelType);
-        // _log($Parcel->ParcelServices);
-        // _log($Parcel->IsCargonized);
-        printf( '<script>var Parcel=%s;</script>', json_encode($Parcel) );
-
-        // carrier id
-        $carrier_id =  ( $Parcel->TransportAgreementId ) ? $Parcel->TransportAgreementId : get_option( 'cargonizer-carrier-id' );
-        printf( '<script>var parcel_carrier_id=%s;</script>', json_encode($carrier_id) );
-
-        // carrier product
-        $carrier_product =$Parcel->ParcelType;
-        if ( !$carrier_product ){
-          $carrier_product = CargonizerOptions::getDefaultCarrierProduct();
-        }
-
-        printf( '<script>var parcel_carrier_product="%s"</script>', $carrier_product );
-        printf( '<script>var parcel_carrier_product_services=%s</script>', json_encode($Parcel->ParcelServices) );
-        printf( '<script>var parcel_is_cargonized=%s</script>', (( $Parcel->IsCargonized ) ? 'true' : 'false') ) ;
+        $Order = new ShopOrder($_GET['post']);
+        $Order->TransportAgreementId = ( $Order->TransportAgreementId ) ? $Order->TransportAgreementId : get_option( 'cargonizer-carrier-id' );
+        $Order->ParcelType = ( $Order->ParcelType ) ? $Order->ParcelType : CargonizerOptions::getDefaultCarrierProduct();
+        printf( '<script>var ShopOrder=%s;</script>', json_encode($Order) );
       }
       else if ( $post->post_type = 'consignment' ){
         Consignment::getJsonObject( $_GET['post'], $echo = true );
       }
-
-
     }
     elseif ( gi($_REQUEST, 'post_type') == 'consignment' ) {
       Consignment::getJsonObject( null, $echo = true );

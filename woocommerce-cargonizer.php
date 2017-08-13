@@ -1,8 +1,8 @@
 <?php
-/*
+/*woo
 Plugin Name: Woocomerce Cargonizer
 Description:
-Version: 0.1.1
+Version: 0.1.4
 Author: Mediebruket AS
 Author URI: http://mediebruket.no
 */

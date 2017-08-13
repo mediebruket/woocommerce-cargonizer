@@ -59,6 +59,18 @@ acf_add_local_field_group(
           'readonly' => 1,
         ),
         array(
+          'key' => 'field_593e33287a325',
+          'label' => 'Export to carrier',
+          'name' => 'parcel_auto_transfer',
+          'type' => 'true_false',
+          'instructions' => 'Saves the consignment as "sent"',
+          'required' => 0,
+          'conditional_logic' => 0,
+          'wrapper' => array('width' => '','class' => '','id' => '', ),
+          'message' => '',
+          'default_value' => 0,
+        ),
+        array(
           'key' => 'field_593e33287a323',
           'label' => 'Print on export',
           'name' => 'parcel_print_on_post',

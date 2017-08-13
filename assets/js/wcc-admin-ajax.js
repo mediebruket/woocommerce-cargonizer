@@ -1,5 +1,6 @@
 jQuery(document).ready(
   function(){
+    initPrintBtn();
     initAjaxCreateConsignment(); // single consignment
     initAjaxPrintLatestConsignment(); // print the latest consignment one more time
     initAjaxCreateConsignments(); // multiple consignments

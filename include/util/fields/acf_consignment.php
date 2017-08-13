@@ -29,11 +29,7 @@ acf_add_local_field_group(array (
       'instructions' => '',
       'required' => 0,
       'conditional_logic' => 0,
-      'wrapper' => array (
-        'width' => '',
-        'class' => '',
-        'id' => '',
-      ),
+      'wrapper' => array('width' => '','class' => '','id' => '',),
       'message' => '',
       'default_value' => 0,
     ),
@@ -150,15 +146,9 @@ acf_add_local_field_group(array (
       'instructions' => '',
       'required' => 0,
       'conditional_logic' => 0,
-      'wrapper' => array (
-        'width' => '',
-        'class' => '',
-        'id' => '',
-      ),
-      'choices' => array (
-        1026 => 'Logistra 1409 - RFID',
-      ),
-      'default_value' => '1026',
+      'wrapper' => array('width' => '', 'class' => '', 'id' => '',),
+      'choices' => array(),
+      'default_value' => '',
       'allow_null' => 0,
       'multiple' => 0,
       'ui' => 0,
@@ -167,21 +157,28 @@ acf_add_local_field_group(array (
       'disabled' => 0,
       'readonly' => 0,
     ),
-    array (
+    array(
       'key' => 'field_595396145dbde',
       'label' => 'Print on export',
       'name' => 'consignment_print_on_export',
       'type' => 'true_false',
-      'instructions' => '',
       'required' => 0,
       'conditional_logic' => 0,
-      'wrapper' => array (
-        'width' => '',
-        'class' => '',
-        'id' => '',
-      ),
+      'wrapper' => array('width' => '','class' => '', 'id' => '' ),
       'message' => '',
-      'default_value' => true,
+      'default_value' => false,
+    ),
+    array(
+      'key' => 'field_595396145dbef',
+      'label' => 'Export to carrier',
+      'name' => 'consignment_auto_transfer',
+      'type' => 'true_false',
+      'instructions' => 'Saves the consignment as "sent"',
+      'required' => 0,
+      'conditional_logic' => 0,
+      'wrapper' => array('width' => '','class' => '', 'id' => '' ),
+      'message' => '',
+      'default_value' => false,
     ),
     array (
       'key' => 'field_593e706d3f51f',
@@ -191,15 +188,9 @@ acf_add_local_field_group(array (
       'instructions' => '',
       'required' => 0,
       'conditional_logic' => 0,
-      'wrapper' => array (
-        'width' => '',
-        'class' => '',
-        'id' => '',
-      ),
-      'choices' => array (
-      ),
-      'default_value' => array (
-      ),
+      'wrapper' => array('width' => '', 'class' => '', 'id' => '', ),
+      'choices' => array(),
+      'default_value' => array(),
       'allow_null' => 0,
       'multiple' => 0,
       'ui' => 0,
@@ -216,15 +207,9 @@ acf_add_local_field_group(array (
       'instructions' => '',
       'required' => 0,
       'conditional_logic' => 0,
-      'wrapper' => array (
-        'width' => '',
-        'class' => '',
-        'id' => '',
-      ),
-      'choices' => array (
-      ),
-      'default_value' => array (
-      ),
+      'wrapper' => array('width' => '', 'class' => '', 'id' => '',),
+      'choices' => array(),
+      'default_value' => array(),
       'allow_null' => 0,
       'multiple' => 0,
       'ui' => 0,
@@ -233,7 +218,7 @@ acf_add_local_field_group(array (
       'disabled' => 0,
       'readonly' => 0,
     ),
-    array (
+    array(
       'key' => 'field_593e71193f521',
       'label' => 'Product services',
       'name' => 'consignment_services',
@@ -241,19 +226,13 @@ acf_add_local_field_group(array (
       'instructions' => '',
       'required' => 0,
       'conditional_logic' => 0,
-      'wrapper' => array (
-        'width' => '',
-        'class' => '',
-        'id' => '',
-      ),
-      'choices' => array (
-      ),
-      'default_value' => array (
-      ),
+      'wrapper' => array('width' => '','class' => '','id' => '',),
+      'choices' => array(),
+      'default_value' => array(),
       'layout' => 'vertical',
       'toggle' => 0,
     ),
-    array (
+    array(
       'key' => 'field_593e7267efc19',
       'label' => 'Message',
       'name' => 'consignment_message',
@@ -261,11 +240,7 @@ acf_add_local_field_group(array (
       'instructions' => '',
       'required' => 0,
       'conditional_logic' => 0,
-      'wrapper' => array (
-        'width' => '',
-        'class' => '',
-        'id' => '',
-      ),
+      'wrapper' => array('width' => '','class' => '','id' => '',),
       'default_value' => '',
       'placeholder' => '',
       'maxlength' => '',
