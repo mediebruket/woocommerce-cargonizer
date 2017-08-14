@@ -174,7 +174,7 @@ class CargonizerOptions{
     $transport_agreements = get_transient('transport_agreements');
 
     if ( !$transport_agreements or $force_update ){
-      _log('update transient');
+      // _log('update transient');
       $Api = new CargonizerApi(true);
       if ( $ta = $this->sanitizeTransportAgreements( $Api->TransportAgreements['transport-agreements']['transport-agreement'] ) ){
          $this->saveTransportAgreements( $ta );
@@ -281,7 +281,6 @@ class CargonizerOptions{
   }
 
 
-
   function getCompanyList(){
     $companies = array();
     $this->getTransportAgreements();
@@ -346,7 +345,6 @@ class CargonizerOptions{
 
 
   /* api options */
-
   function loadApiOptions(){
     return array(
       array(
@@ -531,7 +529,6 @@ class CargonizerOptions{
         'type' => 'text',
         'value' => get_option('cargonizer-return-address-postcode'),
       ),
-
 
       array(
         'name' => 'cargonizer-return-address-city',

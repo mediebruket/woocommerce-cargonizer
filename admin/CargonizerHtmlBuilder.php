@@ -11,10 +11,27 @@ class CargonizerHtmlBuilder{
     printf('<input %s/>', $attributes );
   }
 
+  public static function buildNavigation( $items ){
+    return '<ul class="nav nav-tabs" role="tablist">'.$items.'</ul>';
+  }
+
+
+  public static function buildNavItem( $text, $tab, $active = null ){
+    return sprintf('<li class="nav-item"><a class="nav-link %s" href="%s" role="tab" data-toggle="tab" aria-controls="%s">%s</a></li>', (($active) ? 'active': ''),  '#'.$tab, $tab, $text );
+  }
+
+
+  public static function buildTab( $id, $content, $class=null ){
+    $aria = ' aria-labelledby="'.$id.'-tab" ';
+
+    return sprintf('<div class="tab-pane wcc-tab fade %s" id="%s" role="tabpanel" %s>%s</div>', $class, $id, $aria, $content );
+  }
+
 
   public static function buildLabel( $text, $for=null, $css = 'mb-admin-label inline' ){
     printf('<label class="%s" for="%s">%s</label>', $css, $for, $text );
   }
+
 
   public static function buildDesc( $text, $css = 'mb-field-desc' ){
     printf( '<div><span class="%s"></span>%s</div>', $css, $text );
@@ -153,4 +170,4 @@ class CargonizerHtmlBuilder{
     <?php
   }
 
-}
+} // end of class

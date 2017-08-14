@@ -33,6 +33,15 @@ class CargonizerCommonController{
     return $field;
   }
 
+  public static function getRecurringConsignmentInterval(){
+    $intervals = array();
+
+    for( $i=1; $i<=30; $i++ ){
+      $intervals[$i] = sprintf( __('every %sth', 'wc-cargonizer'), $i );
+    }
+    return $intervals;
+  }
+
 
   function acf_setParcelPrintOnPost( $field ){
     // _log('acf_setParcelPrintOnPost');
@@ -120,7 +129,7 @@ class CargonizerCommonController{
     return $field;
   }
 
-  
+
   function acf_setDefaultHeight($field){
     if ( $value = get_option('cargonizer-parcel-height' ) ){
       $field['default_value'] = $value;
