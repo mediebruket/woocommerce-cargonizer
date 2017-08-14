@@ -8,6 +8,8 @@ class ConsignmentController extends CargonizerCommonController{
   function __construct( ){
     parent::__construct();
 
+    add_action( 'save_post', array($this, 'preventRevision'), 10, 1 );
+
     add_filter('acf/load_field/name=consignment_carrier_id', array($this, 'acf_setTransportAgreements'), 30 );
   
     add_filter('acf/load_field/key=field_5940c85af6b7d', array($this, 'acf_filterHistory'), 40, 1 );
@@ -76,7 +78,15 @@ class ConsignmentController extends CargonizerCommonController{
   }
 
 
+  function preventRevision($post_id){    
+    $post = get_post($post_id);
 
+    if ( wp_is_post_revision( $post_id ) or !$post->post_title ){
+      return;  
+    }
+  }
+
+  
   function acf_filterCustomerId( $field ){
     global $post_id;
 

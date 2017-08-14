@@ -51,7 +51,7 @@ class ShopOrderController extends CargonizerCommonController{
       return false;
     }
 
-    if ( $Order = $this->isOrder(true) ){
+    if ( $Order = $this->isOrder( $return_object=true ) ){
       //_log($Order);
       $consignment_post_id = null;
       $is_future = ($Order->hasFutureShippingDate()) ? true : false;
