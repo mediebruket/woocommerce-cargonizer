@@ -22,24 +22,27 @@ class AdminShop extends AdminShopOptions{
 
 
   function getCarrierProducts(){
-    _log('AdminShop::getCarrierProducts');
-    // _log($field);
     $products = array();
 
     $ta = $this->CargonizerOptions->get('SelectedTransportAgreement');
     $ts = $this->CargonizerOptions->get('TransportProduct');
 
     if ( is_array($ta) && isset($ta['products']) && is_array($ta['products']) ){
-      foreach ($ta['products'] as $key => $p) {
+      $has_selected = false;
+      foreach( $ta['products'] as $key => $p ) {
         $p['selected'] = false;
         if ( is_string($ts) && $p['name'] == $ts ){
-          $p['selected'] = true;
-        }  
+          $p['selected'] = $has_selected = true;
+        }
 
-        $products[] = $p;
+      $products[] = $p;
+      }
+
+      if ( !$has_selected ){
+        $products[0]['selected'] = true;
       }
     }
-  
+
 
     return $products;
   }
@@ -61,18 +64,34 @@ class AdminShop extends AdminShopOptions{
     }
 
 
-    
+
 
     $data['products'] = $this->getCarrierProducts();
+
+    $data['product_types'] =
+      array(
+        array(
+          'value' => 'x',
+          'name' => '123',
+        ),
+        array(
+          'value' => 'y',
+          'name' => '567',
+        ),
+      );
+    $data['parcel_carrier_product'] = null;
+
+    _log($data);
     // todo
     // data.products // get carrier products
     // product text, selected, services, value
 
+
     $html .= '<script>var data = '.json_encode($data).'</script>';
 
-   /* $html .= "<script> data = { 
+   /* $html .= "<script> data = {
     products: [
-    { 
+    {
       text: 'Bananas',
       selected: false
     },
@@ -86,7 +105,7 @@ class AdminShop extends AdminShopOptions{
       selected: false
     }
     ],
-  }; 
+  };
 
  </script>";*/
 

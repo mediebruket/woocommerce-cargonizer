@@ -118,9 +118,18 @@ class AdminShopOptions{
         'desc'    => __('If empty, setup api settings', 'wc-cargonizer'),
         'type'    => 'vue',
         'container' => 'select',
-        'attr'    => 'id="@name@" name="@name@"',
+        'attr'    => 'id="@name@" name="@name@" v-model="@name@" @change="updateProductTypes"',
         'value'   => '',
-        'options' => '<option v-for="product in products" :selected="product.selected==true">{{ product.name }}</option>'
+        'options' => '<option v-for="product in products" :value="product.identifier" :selected="product.selected==true" >{{ product.name }}</option>'
+      ),
+      array(
+        'name'    => 'parcel_carrier_product_type',
+        'label'   => __('Product type', 'wc-cargonizer'),
+        'type'    => 'vue',
+        'container' => 'select',
+        'attr'    => 'id="@name@" name="@name@" ',
+        'value'   => '',
+        'options' => '<option v-for="pt in product_types" :selected="pt.selected==true">{{ pt.name }}</option>'
       ),
       array(
         'name' => 'parcel_message_consignee',
