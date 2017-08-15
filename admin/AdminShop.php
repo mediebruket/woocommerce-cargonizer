@@ -1,0 +1,118 @@
+<?php
+
+class AdminShop extends AdminShopOptions{
+
+  function __construct(){
+    parent::__construct();
+    add_action( 'add_meta_boxes', array($this, 'registerOrderMetaBox') );
+    $this->CargonizerOptions = new CargonizerOptions();
+  }
+
+  function registerOrderMetaBox() {
+    add_meta_box(
+      'rm-meta-box-id',
+      esc_html__( 'Logistra Cargonizer', 'wc-cargonizer' ),
+      array( $this, 'makeOrderMetaBox' ),
+      'shop_order',
+      'advanced',
+      'high'
+    );
+  }
+
+
+
+  function getCarrierProducts(){
+    _log('AdminShop::getCarrierProducts');
+    // _log($field);
+    $options = array();
+
+    $ta = $this->CargonizerOptions->get('SelectedTransportAgreement');
+    $ts = $this->CargonizerOptions->get('TransportProduct');
+
+    if ( is_array($ta) && isset($ta['products']) && is_array($ta['products']) ){
+      _log($ta['products']);
+      foreach ($ta['products'] as $key => $p) {
+        
+        $product = array('text' => null, 'value' => null, 'selected'=> false );
+
+        if ( isset($p['types']) && is_array($p['types']) ){
+
+          foreach ($p['types'] as $ti => $type) {
+            $product['text'] = $p['name']." (".$type.")";
+            $index = $p['identifier']."|".$ti;
+            $product['value'] = $index;
+
+            if ( is_string($ts) && $index == $ts ){
+              $product['selected'] = true;
+            }
+          }
+        }
+        else{
+          $product['text'] = $p['name'];
+        }
+
+        $options[] = $product;
+      }
+    }
+  
+
+
+    return $options;
+  }
+
+
+
+  function makeOrderMetaBox( $meta_id ) {
+    $html = $navigation = null;
+    if ( $nav_items = $this->getNavItems() ){
+      $i = 0;
+      foreach ($nav_items as $tab => $text) {
+        $navigation .= CargonizerHtmlBuilder::buildNavItem($text, $tab, $active=(($i==0) ? true: false) );
+        $i++;
+      }
+
+      if ( $navigation ){
+        $html .= CargonizerHtmlBuilder::buildNavigation( $navigation );
+      }
+    }
+
+    $products = $this->getCarrierProducts();
+    _log($products);
+    // todo
+    // data.products // get carrier products
+    // product text, selected, services, value
+
+    $html .= "<script> data = 
+  { 
+    products: [
+    { 
+      text: 'Bananas',
+      selected: false
+    },
+    {
+      text:  'Apples',
+      selected: true
+    }
+    ,
+    {
+      text:  'Ananas',
+      selected: false
+    }
+    ],
+  }; 
+
+ </script>";
+
+    $html .='<div class="tab-content" id="admin_shop">'.
+              CargonizerHtmlBuilder::buildTab( $id="parcel", $this->getOptions('Parcel'), $class='show active' ).
+                CargonizerHtmlBuilder::buildTab( $id="confirmation", $this->getOptions('Confirmation') , null).
+                  CargonizerHtmlBuilder::buildTab( $id="recurring", $this->getOptions('Recurring'), null ).
+                    '</div>';
+
+    echo $html;
+  }
+
+
+} // end of class
+
+new AdminShop();

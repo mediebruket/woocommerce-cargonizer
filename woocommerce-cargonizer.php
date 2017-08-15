@@ -9,57 +9,34 @@ Author URI: http://mediebruket.no
 
 global $plugin_file;
 $plugin_file = __FILE__;
-include('conf/conf.php');
-include('include/api/CargonizerApi.php');
-include('admin/index.php');
-include('include/index.php');
+$plugin_path = plugin_dir_path( __FILE__ );  
+
+require_once( $plugin_path . 'conf/conf.php');
+
+require_once( $plugin_path . 'include/util/utils.php');
+require_once( $plugin_path . 'include/util/acf.php');
+require_once( $plugin_path . 'include/util/XmlConverter.php');
+
+require_once( $plugin_path . 'include/api/CargonizerApi.php');
+
+require_once( $plugin_path . 'admin/CargonizerIcons.php');
+require_once( $plugin_path . 'admin/CargonizerOptions.php');
+require_once( $plugin_path . 'admin/CargonizerAdmin.php');
+require_once( $plugin_path . 'admin/AdminShopOptions.php');
+require_once( $plugin_path . 'admin/AdminShop.php');
+
+require_once( $plugin_path . 'admin/CargonizerHtmlBuilder.php');
+require_once( $plugin_path . 'admin/CargonizerAjax.php');
+ 
+if( !class_exists('acf') ) {
+  require_once( $plugin_path . 'include/vendor/advanced-custom-fields-pro/acf.php');
+}
 
 
+require_once( $plugin_path . 'include/ShopOrder.php');
+require_once( $plugin_path . 'include/CargonizeXml.php');
+require_once( $plugin_path . 'include/controllers/CargonizerCommonController.php');
+require_once( $plugin_path . 'include/controllers/ShopOrderController.php');
+require_once( $plugin_path . 'include/controllers/ConsignmentController.php');
 
-class AdminShop extends AdminShopOptions{
-
-  function __construct(){
-    parent::__construct();
-    add_action( 'add_meta_boxes', array($this, 'registerOrderMetaBox') );
-    $this->CargonizerOptions = new CargonizerOptions();
-  }
-
-  function registerOrderMetaBox() {
-    add_meta_box(
-      'rm-meta-box-id',
-      esc_html__( 'Logistra Cargonizer', 'wc-cargonizer' ),
-      array( $this, 'makeOrderMetaBox' ),
-      'shop_order',
-      'advanced',
-      'high'
-    );
-  }
-
-
-  function makeOrderMetaBox( $meta_id ) {
-    $html = $navigation = null;
-    if ( $nav_items = $this->getNavItems() ){
-      $i = 0;
-      foreach ($nav_items as $tab => $text) {
-        $navigation .= CargonizerHtmlBuilder::buildNavItem($text, $tab, $active=(($i==0) ? true: false) );
-        $i++;
-      }
-
-      if ( $navigation ){
-        $html .= CargonizerHtmlBuilder::buildNavigation( $navigation );
-      }
-    }
-
-    $html .='<div class="tab-content">'.
-              CargonizerHtmlBuilder::buildTab( $id="parcel", $this->getOptions('Parcel'), $class='show active' ).
-                CargonizerHtmlBuilder::buildTab( $id="confirmation", $this->getOptions('Confirmation') , null).
-                  CargonizerHtmlBuilder::buildTab( $id="recurring", $this->getOptions('Recurring'), null ).
-                    '</div>';
-
-    echo $html;
-  }
-
-
-} // end of class
-
-new AdminShop();
+require_once( $plugin_path . 'include/Consignment.php');

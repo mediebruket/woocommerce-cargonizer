@@ -113,6 +113,16 @@ class AdminShopOptions{
         'options' => $this->CargonizerOptions->getCompanyList(),
       ),
       array(
+        'name'    => 'parcel_carrier_product',
+        'label'   => __('Carrier product', 'wc-cargonizer'),
+        'desc'    => __('If empty, setup api settings', 'wc-cargonizer'),
+        'type'    => 'vue',
+        'container' => 'select',
+        'attr'    => 'id="@name@" name="@name@"',
+        'value'   => '',
+        'options' => '<option v-for="product in products" :selected="product.selected==true">{{ product.text }}</option>'
+      ),
+      array(
         'name' => 'parcel_message_consignee',
         'label' => __('Message', 'wc-cargonizer'),
         'type' => 'textarea',
@@ -186,6 +196,7 @@ class AdminShopOptions{
         'desc'  => __('Copies carrier, type, services and message from the main parcel', 'wc-cargonizer'),
         'type'  => 'checkbox',
         'value' => '',
+        'option'=> 'on'
       ),
       array(
         'name'  => 'recurring_consignment_interval',

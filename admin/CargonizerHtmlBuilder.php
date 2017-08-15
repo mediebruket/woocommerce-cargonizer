@@ -166,6 +166,12 @@ class CargonizerHtmlBuilder{
         </select>
       <?php endif; ?>
 
+
+      <?php if( $option['type'] == 'vue'): ?>
+        <?php self::buildLabel( $option['label'], $option['name'], 'mb-admin-label' ); ?>
+        <?php printf('<%s %s>%s</%s>', $option['container'], str_replace('@name@', $option['name'], $option['attr']), $option['options'], $option['container'] ); ?>
+      <?php endif; ?>
+
     </div>
     <?php
   }

@@ -203,7 +203,6 @@ class CargonizerAdmin{
       echo '<link rel="stylesheet" href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" integrity="sha384-dNpIIXE8U05kAbPhy3G1cz+yZmTzA6CY8Vg/u2L9xRnHjJiAK76m2BIEaSEV+/aU" crossorigin="anonymous">';
       echo '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" >';
 
-
       wp_register_script( 'wcc-admin', $path. 'js/wcc-admin.js', false, '1.0.0' );
       wp_enqueue_script( 'wcc-admin' );
 
@@ -218,6 +217,12 @@ class CargonizerAdmin{
 
       wp_register_script( 'wcc-admin-html', $path. 'js/wcc-admin-html.js', false, '1.0.0' );
       wp_enqueue_script( 'wcc-admin-html' );
+
+      wp_register_script( 'wcc-vue', $path. 'js/vue.js', false, '2.0.0' );
+      wp_enqueue_script( 'wcc-vue' );
+
+      wp_register_script( 'wcc-admin-order', $path. 'js/wcc-admin-order.js', false, '2.0.0' );
+      wp_enqueue_script( 'wcc-admin-order' );
 
       wp_register_script( 'popper-js', 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js', false, '1.11.0' );
       wp_enqueue_script( 'popper-js' );
