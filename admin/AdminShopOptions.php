@@ -120,7 +120,7 @@ class AdminShopOptions{
         'container' => 'select',
         'attr'    => 'id="@name@" name="@name@"',
         'value'   => '',
-        'options' => '<option v-for="product in products" :selected="product.selected==true">{{ product.text }}</option>'
+        'options' => '<option v-for="product in products" :selected="product.selected==true">{{ product.name }}</option>'
       ),
       array(
         'name' => 'parcel_message_consignee',

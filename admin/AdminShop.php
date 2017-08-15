@@ -24,40 +24,24 @@ class AdminShop extends AdminShopOptions{
   function getCarrierProducts(){
     _log('AdminShop::getCarrierProducts');
     // _log($field);
-    $options = array();
+    $products = array();
 
     $ta = $this->CargonizerOptions->get('SelectedTransportAgreement');
     $ts = $this->CargonizerOptions->get('TransportProduct');
 
     if ( is_array($ta) && isset($ta['products']) && is_array($ta['products']) ){
-      _log($ta['products']);
       foreach ($ta['products'] as $key => $p) {
-        
-        $product = array('text' => null, 'value' => null, 'selected'=> false );
+        $p['selected'] = false;
+        if ( is_string($ts) && $p['name'] == $ts ){
+          $p['selected'] = true;
+        }  
 
-        if ( isset($p['types']) && is_array($p['types']) ){
-
-          foreach ($p['types'] as $ti => $type) {
-            $product['text'] = $p['name']." (".$type.")";
-            $index = $p['identifier']."|".$ti;
-            $product['value'] = $index;
-
-            if ( is_string($ts) && $index == $ts ){
-              $product['selected'] = true;
-            }
-          }
-        }
-        else{
-          $product['text'] = $p['name'];
-        }
-
-        $options[] = $product;
+        $products[] = $p;
       }
     }
   
 
-
-    return $options;
+    return $products;
   }
 
 
@@ -76,14 +60,17 @@ class AdminShop extends AdminShopOptions{
       }
     }
 
-    $products = $this->getCarrierProducts();
-    _log($products);
+
+    
+
+    $data['products'] = $this->getCarrierProducts();
     // todo
     // data.products // get carrier products
     // product text, selected, services, value
 
-    $html .= "<script> data = 
-  { 
+    $html .= '<script>var data = '.json_encode($data).'</script>';
+
+   /* $html .= "<script> data = { 
     products: [
     { 
       text: 'Bananas',
@@ -101,7 +88,7 @@ class AdminShop extends AdminShopOptions{
     ],
   }; 
 
- </script>";
+ </script>";*/
 
     $html .='<div class="tab-content" id="admin_shop">'.
               CargonizerHtmlBuilder::buildTab( $id="parcel", $this->getOptions('Parcel'), $class='show active' ).
