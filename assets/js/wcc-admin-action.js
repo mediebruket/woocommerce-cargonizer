@@ -23,7 +23,7 @@ function updateRecurringConsignmentMessage(){
 
 
 function updateRecurringConsignmentProductServices( copy ){
-  //_log('updateRecurringConsignmentProductServices');
+  _log('updateRecurringConsignmentProductServices');
   product_services = getProductServices( acf_recurring_consignment_type, acf_recurring_consignment_services );
 
   // _log('product_services');
@@ -43,8 +43,8 @@ function updateRecurringConsignmentProductServices( copy ){
       }
     }
     else{
-      if ( typeof ShopOrder !== 'undefined' && typeof ShopOrder.RecurringConsignmentServices !== 'undefined' && ShopOrder.RecurringConsignmentServices && ShopOrder.RecurringConsignmentServices.length ){
-        jQuery.each( ShopOrder.RecurringConsignmentServices, function(index, service ){
+      if ( typeof Parcel !== 'undefined' && typeof Parcel.RecurringConsignmentServices !== 'undefined' && Parcel.RecurringConsignmentServices && Parcel.RecurringConsignmentServices.length ){
+        jQuery.each( Parcel.RecurringConsignmentServices, function(index, service ){
           // _log(service);
           jQuery('.acf-field.acf-field-'+acf_recurring_consignment_services+' .acf-checkbox-list input[value='+service+']').attr('checked', true );
         });
@@ -72,13 +72,13 @@ function updateRecurringConsignmentCarrierProducts( carrier_id, copy ){
     }
     else{
       // _log('set saved value');
-      // _log(ShopOrder.RecurringConsignmentType);
-      if ( typeof ShopOrder !== 'undefined' && typeof ShopOrder.RecurringConsignmentType !== 'undefined' ){
+      // _log(Parcel.RecurringConsignmentType);
+      if ( typeof Parcel !== 'undefined' && typeof Parcel.RecurringConsignmentType !== 'undefined' ){
         var options = jQuery('#acf-field_'+acf_recurring_consignment_type+' option');
         if ( typeof options == 'object' && options.length ){
           // _log(options);
           jQuery.each( options, function(index, option){
-            if ( option.value == ShopOrder.RecurringConsignmentType ){
+            if ( option.value == Parcel.RecurringConsignmentType ){
               var pattern = '#acf-field_'+acf_recurring_consignment_type+' option:nth-child('+(option.index+1) +')';
               // _log( pattern );
               jQuery( pattern ).attr('selected', true);
@@ -112,13 +112,15 @@ function updateCarrierProducts( carrier_id ){
 
 
 function updateProductServices(){
+  // _log('updateProductServices');
+  // _log (TransportAgreement );
   product_services = getProductServices( acf_parcel_type, acf_parcel_services);
   jQuery('.acf-field.acf-field-'+acf_parcel_services+' .acf-checkbox-list').html( product_services );
 }
 
 
 function updateProductTypes(){
-  //_log('updateProductTypes');
+  _log('updateProductTypes');
   // _log(TransportProduct);
   if ( TransportProduct && typeof TransportProduct.types !== 'undefined' ){
     var options = makeOption( 'select parcel type', '' );
@@ -131,16 +133,16 @@ function updateProductTypes(){
     jQuery('.acf-field.acf-field-'+acf_consignment_items+' select').html(options);
 
     // set select attribute
-    if ( typeof ShopOrder !== 'undefined' && typeof ShopOrder.Items === 'object' && ShopOrder.Items && ShopOrder.Items.length ){
-      updateItemTypes( ShopOrder.Items, acf_consignment_items );
+    if ( typeof Parcel !== 'undefined' && typeof Parcel.Items === 'object' && Parcel.Items && Parcel.Items.length ){
+      updateItemTypes( Parcel.Items, acf_consignment_items );
     }
   }
 }
 
 
 function updateRecurringConsignmentProductTypes(){
-  //_log('updateRecurringConsignmentProductTypes');
-  //_log(TransportProduct);
+  _log('updateRecurringConsignmentProductTypes');
+  _log(TransportProduct);
   if ( TransportProduct && typeof TransportProduct.types !== 'undefined' ){
     var options = makeOption( 'select parcel type', '' );
     for ( type_index in TransportProduct.types ){
@@ -149,8 +151,8 @@ function updateRecurringConsignmentProductTypes(){
     }
     jQuery('.acf-field.acf-field-'+acf_recurring_consignment_items+' select').html(options);
 
-    if ( typeof ShopOrder !== 'undefined' && typeof ShopOrder.RecurringConsignmentItems !== 'undefined' && ShopOrder.RecurringConsignmentItems && ShopOrder.RecurringConsignmentItems.length ){
-      updateItemTypes( ShopOrder.RecurringConsignmentItems, acf_recurring_consignment_items );
+    if ( typeof Parcel !== 'undefined' && typeof Parcel.RecurringConsignmentItems !== 'undefined' && Parcel.RecurringConsignmentItems && Parcel.RecurringConsignmentItems.length ){
+      updateItemTypes( Parcel.RecurringConsignmentItems, acf_recurring_consignment_items );
     }
   }
 }

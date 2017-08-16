@@ -23,7 +23,6 @@ class Consignment{
   public $OrderProducts;
   public $Printer;
   public $PrintOnExport;
-  public $ExportToCarrier;
   public $RecurringInterval;
   public $Subscriptions;
   public $Meta;
@@ -52,7 +51,6 @@ class Consignment{
 
   function init(){
     $this->Meta             = $this->getPostMeta();
-
     $this->Items            = $this->getItems();
     $this->IsRecurring      = $this->isRecurring();
     $this->CustomerId       = $this->getCustomerId();
@@ -67,7 +65,6 @@ class Consignment{
     $this->History          = $this->getHistory();
     $this->Printer          = $this->getPrinter();
     $this->PrintOnExport    = $this->getPrintOnExport();
-    $this->AutoTransfer     = $this->getAutoTransfer();
 
     $this->NextShippingDate  = $this->getNextShippingDate();
     $this->LastShippingDate  = $this->getLastShippingDate();
@@ -139,12 +136,6 @@ class Consignment{
   }
 
 
-  function getAutoTransfer(){
-    //_log( get_post_meta( $this->ID, 'consignment_auto_transfer', true ) );
-    return gi($this->Meta, 'consignment_auto_transfer');
-  }
-
-
   function getItems(){
     return acf_getField('consignment_items', $this->ID);
   }
@@ -208,19 +199,19 @@ class Consignment{
   }
 
 
-  public static function createOrUpdate( $Order, $recurring=false ){
-    _log('Consignment::createOrUpdate('.$Order->ID.')');
+  public static function createOrUpdate( $Parcel, $recurring=false ){
+    _log('Consignment::createOrUpdate('.$Parcel->ID.')');
     $post_id = null;
-    //_log($Order);
+    //_log($Parcel);
     $args = array(
       'post_author' => get_current_user_id(),
-      'post_title' =>  sprintf( 'Order #%s %s', $Order->ID, ( ($recurring) ? '| recurring ' : null) ),
+      'post_title' =>  sprintf( 'Order #%s %s', $Parcel->ID, ( ($recurring) ? '| recurring ' : null) ),
       'post_status' => 'publish',
       'post_type' => 'consignment',
       'post_parent' => 0,
     );
 
-    if ( $cid = self::getConsignmentIdByOrderId( $Order->ID, $recurring ) ){
+    if ( $cid = self::getConsignmentIdByOrderId( $Parcel->ID, $recurring ) ){
       _log('update existing consignment: '.$cid);
       $args['ID'] = $cid;
     }
@@ -231,112 +222,111 @@ class Consignment{
     if ( $post_id = wp_insert_post( $args ) ){
       _log('consignment: '.$post_id);
 
-      // _log('Order');
-      // _log($Order);
+      // _log('Parcel');
+      // _log($Parcel);
 
       $meta_order_key = 'consignment_order_id';
       if ( $recurring ){
         $meta_order_key = 'recurring_consignment_order_id';
       }
-      update_post_meta( $post_id, $meta_order_key, $Order->ID );
+      update_post_meta( $post_id, $meta_order_key, $Parcel->ID );
       update_post_meta( $post_id, 'consignment_is_recurring', $recurring );
-      update_post_meta( $post_id, 'parcel_printer', $Order->Printer );
-      update_post_meta( $post_id, 'consignment_print_on_export', $Order->PrintOnExport );
-      update_post_meta( $post_id, 'consignment_auto_transfer', $Order->AutoTransfer );
+      update_post_meta( $post_id, 'parcel_printer', $Parcel->Printer );
+      update_post_meta( $post_id, 'consignment_print_on_export', $Parcel->PrintOnExport );
 
       // user id
-      update_post_meta( $post_id, 'customer_id', gi($Order->Meta, '_customer_user' ) );
+      update_post_meta( $post_id, 'customer_id', gi($Parcel->Meta, '_customer_user' ) );
 
       // products
-      update_post_meta( $post_id, 'consignment_order_products', $Order->Products );
+      update_post_meta( $post_id, 'consignment_order_products', $Parcel->Products );
 
 
       if ( $recurring ){
-        update_post_meta( $post_id, 'recurring_consignment_interval', $Order->RecurringInterval );
-        update_post_meta( $post_id, 'consignment_carrier_id', $Order->RecurringCarrierId );
-        update_post_meta( $post_id, 'consignment_start_date', $Order->RecurringStartDate );
-        update_post_meta( $post_id, 'consignment_product', $Order->RecurringConsignmentType );
-        update_post_meta( $post_id, 'consignment_services', $Order->RecurringConsignmentServices );
-        update_post_meta( $post_id, 'consignment_message', $Order->RecurringConsignmentMessage );
-        acf_updateField('consignment_items', $Order->RecurringConsignmentItems, $post_id);
+        update_post_meta( $post_id, 'recurring_consignment_interval', $Parcel->RecurringInterval );
+        update_post_meta( $post_id, 'consignment_carrier_id', $Parcel->RecurringCarrierId );
+        update_post_meta( $post_id, 'consignment_start_date', $Parcel->RecurringStartDate );
+        update_post_meta( $post_id, 'consignment_product', $Parcel->RecurringConsignmentType );
+        update_post_meta( $post_id, 'consignment_services', $Parcel->RecurringConsignmentServices );
+        update_post_meta( $post_id, 'consignment_message', $Parcel->RecurringConsignmentMessage );
+        acf_updateField('consignment_items', $Parcel->RecurringConsignmentItems, $post_id);
       }
       else{
         _log('single consignment');
-        acf_updateField('consignment_items', $Order->Items, $post_id);
-        update_post_meta( $post_id, 'consignment_carrier_id', $Order->TransportAgreementId );
-        update_post_meta( $post_id, 'consignment_product', $Order->ParcelType );
-        update_post_meta( $post_id, 'consignment_services', $Order->ParcelServices );
-        update_post_meta( $post_id, 'consignment_message', $Order->ParcelMessage );
-        update_post_meta( $post_id, 'consignment_next_shipping_date', $Order->ShippingDate );
+        acf_updateField('consignment_items', $Parcel->Items, $post_id);
+        update_post_meta( $post_id, 'consignment_carrier_id', $Parcel->TransportAgreementId );
+        update_post_meta( $post_id, 'consignment_product', $Parcel->ParcelType );
+        update_post_meta( $post_id, 'consignment_services', $Parcel->ParcelServices );
+        update_post_meta( $post_id, 'consignment_message', $Parcel->ParcelMessage );
+        update_post_meta( $post_id, 'consignment_next_shipping_date', $Parcel->ShippingDate );
       }
 
       // copy meta values
-      update_post_meta( $post_id, '_billing_first_name',  gi( $Order->Meta, '_billing_first_name' ) );
-      update_post_meta( $post_id, '_billing_last_name',   gi( $Order->Meta, '_billing_last_name' ) );
-      update_post_meta( $post_id, '_billing_country',     gi( $Order->Meta, '_billing_country' ) );
-      update_post_meta( $post_id, '_billing_postcode',    gi( $Order->Meta, '_billing_postcode' ) );
-      update_post_meta( $post_id, '_billing_city',        gi( $Order->Meta, '_billing_city' ) );
-      update_post_meta( $post_id, '_billing_address_1',   gi( $Order->Meta, '_billing_address_1' ) );
-      update_post_meta( $post_id, '_billing_address_2',   gi( $Order->Meta, '_billing_address_2' ) );
+      update_post_meta( $post_id, '_billing_first_name',  gi( $Parcel->Meta, '_billing_first_name' ) );
+      update_post_meta( $post_id, '_billing_last_name',   gi( $Parcel->Meta, '_billing_last_name' ) );
+      update_post_meta( $post_id, '_billing_country',     gi( $Parcel->Meta, '_billing_country' ) );
+      update_post_meta( $post_id, '_billing_postcode',    gi( $Parcel->Meta, '_billing_postcode' ) );
+      update_post_meta( $post_id, '_billing_city',        gi( $Parcel->Meta, '_billing_city' ) );
+      update_post_meta( $post_id, '_billing_address_1',   gi( $Parcel->Meta, '_billing_address_1' ) );
+      update_post_meta( $post_id, '_billing_address_2',   gi( $Parcel->Meta, '_billing_address_2' ) );
 
 
       // firstname
-      $sfn = gi( $Order->Meta, '_shipping_first_name' );
+      $sfn = gi( $Parcel->Meta, '_shipping_first_name' );
       if ( !$sfn ){
-        $sfn =  gi( $Order->Meta, '_billing_first_name' );
+        $sfn =  gi( $Parcel->Meta, '_billing_first_name' );
       }
       update_post_meta( $post_id, '_shipping_first_name', $sfn );
 
       // lastname
-      $sln = gi( $Order->Meta, '_shipping_last_name' );
+      $sln = gi( $Parcel->Meta, '_shipping_last_name' );
       if ( !$sln ){
-        $sln = gi( $Order->Meta, '_billing_last_name' );
+        $sln = gi( $Parcel->Meta, '_billing_last_name' );
       }
       update_post_meta( $post_id, '_shipping_last_name', $sln );
 
       // country
-      $sc = gi( $Order->Meta, '_shipping_country' );
+      $sc = gi( $Parcel->Meta, '_shipping_country' );
       if ( !$sc ){
-        $sc = gi( $Order->Meta, '_billing_city' ) ;
+        $sc = gi( $Parcel->Meta, '_billing_city' ) ;
       }
       update_post_meta( $post_id, '_shipping_country', $sc );
 
       // postcode
-      $spc = gi( $Order->Meta, '_shipping_postcode' );
+      $spc = gi( $Parcel->Meta, '_shipping_postcode' );
       if ( !$spc  ){
-        $spc = gi( $Order->Meta, '_billing_postcode' );
+        $spc = gi( $Parcel->Meta, '_billing_postcode' );
       }
       update_post_meta( $post_id, '_shipping_postcode', $spc );
 
       // city
-      $sc = gi( $Order->Meta, '_shipping_city' );
+      $sc = gi( $Parcel->Meta, '_shipping_city' );
       if ( !$sc ){
-        $sc = gi( $Order->Meta, '_billing_city' );
+        $sc = gi( $Parcel->Meta, '_billing_city' );
       }
       update_post_meta( $post_id, '_shipping_city', $sc );
 
 
       // address 1
-      $sa1 = gi( $Order->Meta, '_shipping_address_1' );
+      $sa1 = gi( $Parcel->Meta, '_shipping_address_1' );
       if ( !$sa1 ){
-        $sa1 = gi( $Order->Meta, '_billing_address_1' );
+        $sa1 = gi( $Parcel->Meta, '_billing_address_1' );
       }
       update_post_meta( $post_id, '_shipping_address_1', $sa1 );
 
       // address 2
-      $sa2 = gi( $Order->Meta, '_shipping_address_2' );
+      $sa2 = gi( $Parcel->Meta, '_shipping_address_2' );
       if ( !$sa2 ){
-        $sa2 =  gi( $Order->Meta, '_billing_address_2' );
+        $sa2 =  gi( $Parcel->Meta, '_billing_address_2' );
       }
       update_post_meta( $post_id, '_shipping_address_2', $sa2 );
 
 
-      $address = $Order->WC_Order->get_address();
+      $address = $Parcel->WC_Order->get_address();
       update_post_meta( $post_id, 'email', gi( $address, 'email' ) );
       update_post_meta( $post_id, 'phone', gi( $address, 'phone' ) );
 
       if ( !isset($args['ID']) ){
-        self::addNote($Order->ID, $post_id);
+        self::addNote($Parcel->ID, $post_id);
       }
     }
 
@@ -524,11 +514,7 @@ class Consignment{
         )
     );
 
-
-      
-    $export['consignments']['consignment']['transfer'] = ( $this->AutoTransfer ) ? 'true' : 'false';
-        
-
+    $export['consignments']['consignment']['transfer'] = ( get_option('cargonizer-auto-transfer' ) == 'on' ) ? 'true' : 'false';
     // $export['consignments']['consignment']['booking_request'] = 'false';
     $export['consignments']['consignment']['product'] = $this->CarrierProductId;
 

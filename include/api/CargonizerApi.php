@@ -141,7 +141,7 @@ class CargonizerApi{
 
 
   function rest( $resource, $headers=array(), $method='GET', $xml=null, $debug=false, $force_response = false ){
-    // _log('Cargonizer::rest()');
+    _log('Cargonizer::rest()');
 
     $default_headers =
       array(

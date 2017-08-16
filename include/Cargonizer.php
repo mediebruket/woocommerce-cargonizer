@@ -1,30 +1,154 @@
 <?php
 
-class ConsignmentController extends CargonizerCommonController{
+class Cargonizer{
   protected $Order;
   protected $WC_Order;
   protected $Settings;
 
   function __construct( ){
-    parent::__construct();
+    $this->Settings = new CargonizerOptions();
 
-    add_action( 'save_post', array($this, 'preventRevision'), 10, 1 );
+    add_action( 'save_post', array($this, 'saveConsignment'), 10, 1 );
+    add_action( 'init',  array($this, 'resetConsignment') , 10, 2 );
 
+    // add_filter('wc_shipment_tracking_get_providers', array($this, 'setCustomProvider') ); ???
+
+    add_filter('acf/load_field/name=parcel_recurring_carrier_id', array($this, 'acf_setTransportAgreements'), 20 );
     add_filter('acf/load_field/name=consignment_carrier_id', array($this, 'acf_setTransportAgreements'), 30 );
-  
+    add_filter('acf/load_field/name=transport_agreement', array($this, 'acf_setTransportAgreements'), 40 );
+
     add_filter('acf/load_field/key=field_5940c85af6b7d', array($this, 'acf_filterHistory'), 40, 1 );
     add_filter('acf/load_field/key=field_59477f6eddf36', array($this, 'acf_filterOrderProducts'), 40, 1 );
     add_filter('acf/load_field/key=field_59477faf14b71', array($this, 'acf_filterCustomerId'), 40, 1 );
-    add_filter('acf/load_field/name=consignment_auto_transfer', array($this, 'acf_setParcelAutoTransfer'), 20 );
-    
-    // CargonizerCommonController
-    add_filter('acf/load_field/name=recurring_consignment_interval', array($this, 'acf_setRecurringConsignmentInterval'), 40 ); 
+
+    add_filter('acf/load_field/name=parcel-recurring-consignment-interval', array($this, 'acf_setRecurringConsignmentInterval'), 40 );
+    add_filter('acf/load_field/name=recurring_consignment_interval', array($this, 'acf_setRecurringConsignmentInterval'), 40 );
+
+    add_filter('acf/load_field/name=parcel_print_on_post', array($this, 'acf_setParcelPrintOnPost'), 20 );
     add_filter('acf/load_field/name=consignment_print_on_export', array($this, 'acf_setParcelPrintOnPost'), 20 );
+
+    add_filter('acf/load_field/name=parcel_printer', array($this, 'acf_setParcelPrinter'), 20 );
+    add_filter('acf/load_field/name=parcel_type', array($this, 'acf_setCarrierProducts'), 10 );
+    add_filter('acf/load_field/name=parcel_package_type', array($this, 'acf_setParcelTypes'), 10 );
+    add_filter('acf/load_field/name=create_consignment', array($this, 'acf_checkConsignmentStatus'), 10 );
+
+    add_filter('acf/load_field/name=parcel_services', array($this, 'acf_setProductServices') );
+
+    add_filter('acf/load_field/name=message_consignee', array($this, 'acf_setDefaultMessageToConsignee') );
+
+    add_filter('acf/load_field/name=parcel_height', array($this, 'acf_setDefaultHeight') );
+    add_filter('acf/load_field/name=parcel_recurring_consignment_height', array($this, 'acf_setDefaultHeight') );
+
+    add_filter('acf/load_field/name=parcel_length', array($this, 'acf_setDefaultLength') );
+    add_filter('acf/load_field/name=parcel_recurring_consignment_length', array($this, 'acf_setDefaultLength') );
+
+    add_filter('acf/load_field/name=parcel_weight', array($this, 'acf_setDefaultWeight') );
+
+    add_filter('acf/load_field/name=parcel_width', array($this, 'acf_setDefaultWidth') );
+    add_filter('acf/load_field/name=parcel_recurring_consignment_width', array($this, 'acf_setDefaultWidth') );
+
+    add_filter( 'wp_mail_content_type', array($this, 'setMailContentType') );
   }
 
 
-  public static function createConsignment( $post_id  ){
-    _log('ConsignmentController:: ('.$post_id.')');
+  function getTransportAgreementChoices(){
+
+    $choices = array();
+    $agreements = $this->Settings->get('TransportAgreements');
+    if ( is_array($agreements) ){
+      foreach ($agreements as $key => $a) {
+        $choices[$a['id']] = $a['title'];
+      }
+    }
+
+    return $choices;
+  }
+
+
+  function saveConsignment( $post_id ){
+    if ( !isset($_REQUEST['post_ID']) or $_REQUEST['post_ID'] != $post_id ){
+      return false;
+    }
+
+    if ( $Parcel = $this->isOrder(true) ){
+      //_log($Parcel);
+
+      $consignment_post_id = null;
+      $is_future = ($Parcel->hasFutureShippingDate()) ? true : false;
+
+      if ( $is_future ){
+        $consignment_post_id = Consignment::createOrUpdate( $Parcel, $recurring=false );
+      }
+
+      if ( $Parcel->isReady($force=false) && !$is_future ){
+        _log('Parcel is ready');
+        if ( $cid = Consignment::createOrUpdate( $Parcel, $recurring=false ) ){
+          _log('consignment created/updated: '.$cid);
+          _log('create consignment now');
+          $result = self::_createConsignment($cid);
+        }
+      }
+      else{
+        _log('not ready or has future shipping date');
+      }
+
+      if ( $Parcel->IsRecurring ){
+        _log('create recurring');
+        Consignment::createOrUpdate( $Parcel, $recurring=true );
+      }
+    }
+  }
+
+
+
+
+
+  function isOrder($object=true ){
+    global $post;
+
+    if ( isset($post->post_type) && $post->post_type == 'shop_order' ){
+      if ( $object ){
+        return new Parcel($post->ID);
+      }
+      else{
+        return $post->ID;
+      }
+
+    }
+    else{
+      return null;
+    }
+  }
+
+
+  function isConsignment($object=true ){
+    global $post;
+
+    if ( isset($post->post_type) && $post->post_type == 'consignment' ){
+      if ( $object ){
+        return new Consignment($post->ID);
+      }
+      else{
+        return $post->ID;
+      }
+
+    }
+    else{
+      return null;
+    }
+  }
+
+
+  function setCustomProvider($args){
+    $args['Norway']['Cargonizer'] = 'tracking_url';
+    ksort($args);
+
+    return $args;
+  }
+
+
+  public static function _createConsignment( $post_id  ){
+    _log('Cargonizer::_createConsignment('.$post_id.')');
 
     $response = false;
     if ( is_numeric($post_id) ){
@@ -78,15 +202,28 @@ class ConsignmentController extends CargonizerCommonController{
   }
 
 
-  function preventRevision($post_id){    
-    $post = get_post($post_id);
+  function resetConsignment(){
+    if ( isset($_GET['wcc_action']) && $_GET['wcc_action'] == 'reset_consignment' ){
+      $order_id = $_GET['post'];
+      if ( is_numeric($order_id) ){
+        $Parcel = new Parcel($order_id);
+        $Parcel->reset();
+        $Parcel->addNote( 'reset' );
 
-    if ( wp_is_post_revision( $post_id ) or !$post->post_title ){
-      return;  
+        if ( $location = get_edit_post_link($order_id) ){
+          wp_redirect( str_replace('&amp;', '&', $location) );
+          die();
+        }
+      }
     }
   }
 
-  
+
+  function setMailContentType(){
+    return 'text/html';
+  }
+
+
   function acf_filterCustomerId( $field ){
     global $post_id;
 
@@ -168,11 +305,9 @@ class ConsignmentController extends CargonizerCommonController{
 
 
   function acf_filterHistory($field){
-    //_log('acf_filterHistory');
     global $post_id;
 
-    $html = null;
-    if ( $post_id ){
+    if ( $post_id  ){
       $Consignment = new Consignment($post_id);
 
       $rows = null;
@@ -203,15 +338,76 @@ class ConsignmentController extends CargonizerCommonController{
         );
       $html = '<table class="table table-striped">'.$head.$rows.'</table>';
 
+      $field['message'] = str_replace('@acf_consignment_history@', $html, $field['message'] );
     }
-    
-    $field['message'] = str_replace('@acf_consignment_history@', $html, $field['message'] );
 
     return $field;
   }
 
 
+  function acf_setDefaultMessageToConsignee( $field ){
+    if ( $value = get_option('cargonizer-parcel-message-consignee' ) ){
+      $field['default_value'] = $value;
+      $post_id = ( isset($_GET['post']) && is_numeric($_GET['post']) ) ? $_GET['post'] : null;
+      $field['default_value'] = str_replace('@order_id@', $post_id, $value);
+    }
 
+    return $field;
+  }
+
+
+  function acf_setDefaultHeight($field){
+    if ( $value = get_option('cargonizer-parcel-height' ) ){
+      $field['default_value'] = $value;
+    }
+    return $field;
+  }
+
+
+  function acf_setDefaultLength($field){
+    if ( $value = get_option('cargonizer-parcel-length' ) ){
+      $field['default_value'] = $value;
+    }
+    return $field;
+  }
+
+
+  function acf_setDefaultWeight($field){
+    $weight = null;
+
+    if ( isset($_GET['post']) && is_numeric($_GET['post']) ){
+      $post = get_post($_GET['post']);
+
+      if ( $post->post_type == 'shop_order'){
+        $Order = new WC_Order($_GET['post']);
+
+        $order_items = $Order->get_items();
+        if ( is_array($order_items)) {
+          foreach( $order_items as $item ) {
+            if ( $item['product_id'] > 0 ) {
+              $_product = $Order->get_product_from_item( $item );
+              if ( $_product && is_object($_product) && method_exists($_product, 'is_virtual') && !$_product->is_virtual() ) {
+                $weight += $_product->get_weight() * $item['qty'];
+              }
+            }
+          }
+        }
+
+        $field['default_value'] = $weight;
+      }
+    }
+
+
+    return $field;
+  }
+
+
+  function acf_setDefaultWidth($field){
+    if ( $value = get_option('cargonizer-parcel-width' ) ){
+      $field['default_value'] = $value;
+    }
+    return $field;
+  }
 
 
   function acf_checkConsignmentStatus($field){
@@ -270,6 +466,13 @@ class ConsignmentController extends CargonizerCommonController{
     return $field;
   }
 
+
+  function acf_setRecurringConsignmentInterval( $field ){
+    for( $i=1; $i<=30; $i++ ){
+      $field['choices'][$i] = sprintf( __('every %sth', 'wc-cargonizer'), $i );
+    }
+    return $field;
+  }
 
 
   function acf_setParcelTypes($field){
@@ -350,7 +553,22 @@ class ConsignmentController extends CargonizerCommonController{
 
 
   function acf_setTransportAgreements($field){
-    if ( $Consignment = $this->isConsignment() ){
+    // _log('Cargonizer::acf_setTransportAgreements');
+    // _log($field);
+    if ( $Parcel = $this->isOrder() ){
+
+      if (  $choices = $this->getTransportAgreementChoices() ){
+        $field['choices'] = $choices;
+      }
+
+      if( is_numeric($Parcel->TransportAgreementId) && $Parcel->TransportAgreementId ){
+        $field['default_value'] = $Parcel->TransportAgreementId ;
+      }
+      elseif ( $ta = $this->Settings->get('SelectedTransportAgreement' ) ){
+        $field['default_value'] = $ta['id'];
+      }
+    }
+    else if ( $Consignment = $this->isConsignment() ){
       if (  $choices = $this->getTransportAgreementChoices() ){
         $field['choices'] = $choices;
       }
@@ -359,6 +577,16 @@ class ConsignmentController extends CargonizerCommonController{
     return $field;
   }
 
+
+  function acf_setParcelPrintOnPost( $field ){
+    // _log('acf_setParcelPrintOnPost');
+    // _log($field);
+    if ( get_option('cargonizer-print-on-export' ) ){
+      $field['default_value'] = true;
+    }
+
+    return $field;
+  }
 
 
   function acf_setParcelPrinter($field){
@@ -379,6 +607,7 @@ class ConsignmentController extends CargonizerCommonController{
     return $field;
   }
 
+
 } // end of class
 
-new ConsignmentController();
+$Cargonizer = new Cargonizer();

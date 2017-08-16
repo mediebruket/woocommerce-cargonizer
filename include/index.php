@@ -8,9 +8,10 @@ include('util/utils.php');
 include('util/acf.php');
 include('util/XmlConverter.php');
 
-include('ShopOrder.php');
+include('Parcel.php');
 include('CargonizeXml.php');
-include('controllers/CargonizerCommonController.php');
-include('controllers/ShopOrderController.php');
-include('controllers/ConsignmentController.php');
+include('Cargonizer.php');
+include('CargonizerIcons.php');
+include('CargonizerUpdater.php');
 include('Consignment.php');
+include('CargonizerAjax.php');

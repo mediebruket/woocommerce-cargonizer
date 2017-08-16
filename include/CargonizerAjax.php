@@ -14,26 +14,26 @@ class CargonizerAjax{
 
     $response = '1';
     if ( isset($_POST['order_id']) && is_numeric($_POST['order_id']) ){
-      $Order = new ShopOrder( $_POST['order_id'] );
+      $Parcel = new Parcel( $_POST['order_id'] );
 
-      _log('ConsignmentId: '.$Order->ConsignmentId);
-      _log('Printer: '. $Order->Printer);
+      _log('ConsignmentId: '.$Parcel->ConsignmentId);
+      _log('Printer: '. $Parcel->Printer);
 
-      if ( !$Order->ConsignmentId ){
+      if ( !$Parcel->ConsignmentId ){
         $response = 'Missing consignment id';
       }
 
-      if ( !$Order->Printer ){
+      if ( !$Parcel->Printer ){
         $response = 'Missing printer_abort(printer_handle)';
       }
 
-      if ( $Order->ConsignmentId && $Order->Printer ){
+      if ( $Parcel->ConsignmentId && $Parcel->Printer ){
         $Api = new CargonizerApi();
-        if ( $Api->postLabel( $Order->ConsignmentId, $Order->Printer ) == 'Printing' ){
-          $printer = $Order->Printer;
+        if ( $Api->postLabel( $Parcel->ConsignmentId, $Parcel->Printer ) == 'Printing' ){
+          $printer = $Parcel->Printer;
           if ( $ta = get_transient( 'wcc_printer_list' ) ){
-            if ( isset( $ta[$Order->Printer] ) ){
-              $printer = $ta[$Order->Printer]. " (".$Order->Printer.")";
+            if ( isset( $ta[$Parcel->Printer] ) ){
+              $printer = $ta[$Parcel->Printer]. " (".$Parcel->Printer.")";
             }
           }
           $response = 'Label was printed on printer '.$printer;

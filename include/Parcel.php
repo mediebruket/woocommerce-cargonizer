@@ -1,7 +1,6 @@
 <?php
 
-class ShopOrder{
-  public $AutoTransfer;
+class Parcel{
   public $ConsignmentId;
   public $ID;
   public $Id;
@@ -10,7 +9,6 @@ class ShopOrder{
   public $Printer;
   public $ParcelType;
   public $ParcelMessage;
-  public $ParcelServices;
   public $ShippingDate;
   public $TrackingProvider;
   public $TransportAgreements;
@@ -39,7 +37,6 @@ class ShopOrder{
         $this->IsCargonized   = $this->isCargonized();
         $this->Printer        = $this->getPrinter();
         $this->PrintOnExport  = $this->getPrintOnExport();
-        $this->AutoTransfer   = $this->getAutoTransfer();
         $this->ParcelType     = $this->getParcelType();
         $this->ParcelServices = $this->getParcelServices();
         $this->ParcelMessage  = $this->getParcelMessage();
@@ -91,10 +88,6 @@ class ShopOrder{
 
   function getPrintOnExport(){
     return gi($this->Meta, 'parcel_print_on_post');
-  }
-
-  function getAutoTransfer(){
-    return gi($this->Meta, 'parcel_auto_transfer');
   }
 
 
@@ -208,9 +201,6 @@ class ShopOrder{
 
     if ( isset($this->Meta['parcel_services']) ){
       $services = $this->Meta['parcel_services'];
-      if ( is_array($services) && isset($services[0]) && is_string($services[0]) ){
-        $services = $services[0];
-      }
     }
     else {
       $services = get_option('cargonizer-delivery-carrier-product-services');

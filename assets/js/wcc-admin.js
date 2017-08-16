@@ -14,6 +14,7 @@ var TransportAgreement = null;
 var TransportProduct = null;
 
 jQuery(document).ready(function(){
+  initPrintBtn();
   initOrderConsignment();
   initRecurringConsignment();
   initWccCarrierProducts();
@@ -30,6 +31,7 @@ function initWccCarrierProducts(){
     }
   );
 }
+
 
 
 function initRecurringConsignment(){
@@ -75,8 +77,10 @@ function initCopyFromParcels(){
 }
 
 
-function initOrderConsignment(){
 
+
+
+function initOrderConsignment(){
   // changed carrier
   jQuery('#acf-field_'+acf_carrier_id).change(function(){
     var carrier_id = getCarrierId();
@@ -94,31 +98,27 @@ function initOrderConsignment(){
 
 
   // if carrier exists
- if ( jQuery('#acf-field_'+acf_carrier_id).length && typeof ShopOrder !== 'undefined' ){
+  if ( jQuery('#acf-field_'+acf_carrier_id).length ){
     var carrier_id = jQuery('#acf-field_'+acf_carrier_id).val();
 
-    
     if ( carrier_id ){
       updateCarrierProducts( carrier_id );
 
-      if ( typeof ShopOrder.ParcelType !== 'undefined' && ShopOrder.ParcelType.length ){
-        var query = '#acf-field_'+acf_parcel_type+' option[value="'+ShopOrder.ParcelType+'"]';
+      if ( typeof parcel_carrier_product !== 'undefined' && parcel_carrier_product.length ){
+        var query = '#acf-field_'+acf_parcel_type+' option[value="'+parcel_carrier_product+'"]';
         jQuery(query).attr('selected', true);
       }
 
       updateProductServices();
-      
-      if ( typeof ShopOrder.ParcelServices !== 'undefined' && ShopOrder.ParcelServices != null && ShopOrder.ParcelServices.length ){ 
-        for (var i = 0; i < ShopOrder.ParcelServices.length; i++) {
-          jQuery('input[value="'+ShopOrder.ParcelServices[i]+'"]').attr('checked', true);
+      if ( typeof parcel_carrier_product_services !== 'undefined' &&  parcel_carrier_product_services != null && parcel_carrier_product_services.length ){
+        for (var i = 0; i < parcel_carrier_product_services.length; i++) {
+          // _log( parcel_carrier_product_services[i] );
+          jQuery('input[value="'+parcel_carrier_product_services[i]+'"]').attr('checked', true);
         };
       }
-          
+      updateProductTypes();
     }
-  
-    //updateProductTypes();
-     
-  } 
+  }
 
   checkIfCargonized();
 }
@@ -126,8 +126,7 @@ function initOrderConsignment(){
 
 
 function checkIfCargonized(){
-
-  if (typeof ShopOrder !== 'undefined' &&  ShopOrder.IsCargonized == true ){
+  if (typeof parcel_is_cargonized !== 'undefined' &&  parcel_is_cargonized == true ){
     // select
     jQuery('#acf-field_56cd64c524655, #acf-field_56cd64c524656, #acf-field_56cec446a4498').attr('disabled', true);
     // checkbox
@@ -201,7 +200,7 @@ function getProductServices( product_field_id, services_field_id ){
       identifier = pid_tmp[0];
     }
 
-    //_log( 'identifier '+ identifier );
+    _log( 'identifier '+ identifier );
     TransportProduct = null;
 
     if ( identifier ){
