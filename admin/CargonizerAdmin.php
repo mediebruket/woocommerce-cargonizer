@@ -203,20 +203,20 @@ class CargonizerAdmin{
       echo '<link rel="stylesheet" href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" integrity="sha384-dNpIIXE8U05kAbPhy3G1cz+yZmTzA6CY8Vg/u2L9xRnHjJiAK76m2BIEaSEV+/aU" crossorigin="anonymous">';
       echo '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" >';
 
-      wp_register_script( 'wcc-admin', $path. 'js/wcc-admin.js', false, '1.0.0' );
-      wp_enqueue_script( 'wcc-admin' );
+      // wp_register_script( 'wcc-admin', $path. 'js/wcc-admin.js', false, '1.0.0' );
+      // wp_enqueue_script( 'wcc-admin' );
 
-      wp_register_script( 'wcc-admin-ajax', $path. 'js/wcc-admin-ajax.js', false, '1.0.0' );
-      wp_enqueue_script( 'wcc-admin-ajax' );
+      // wp_register_script( 'wcc-admin-ajax', $path. 'js/wcc-admin-ajax.js', false, '1.0.0' );
+      // wp_enqueue_script( 'wcc-admin-ajax' );
 
-      wp_register_script( 'wcc-admin-consignment', $path. 'js/wcc-admin-consignment.js', false, '1.0.1' );
-      wp_enqueue_script( 'wcc-admin-consignment' );
+      // wp_register_script( 'wcc-admin-consignment', $path. 'js/wcc-admin-consignment.js', false, '1.0.1' );
+      // wp_enqueue_script( 'wcc-admin-consignment' );
 
-      wp_register_script( 'wcc-admin-action', $path. 'js/wcc-admin-action.js', false, '1.0.1' );
-      wp_enqueue_script( 'wcc-admin-action' );
+      // wp_register_script( 'wcc-admin-action', $path. 'js/wcc-admin-action.js', false, '1.0.1' );
+      // wp_enqueue_script( 'wcc-admin-action' );
 
-      wp_register_script( 'wcc-admin-html', $path. 'js/wcc-admin-html.js', false, '1.0.0' );
-      wp_enqueue_script( 'wcc-admin-html' );
+      // wp_register_script( 'wcc-admin-html', $path. 'js/wcc-admin-html.js', false, '1.0.0' );
+      // wp_enqueue_script( 'wcc-admin-html' );
 
       wp_register_script( 'wcc-vue', $path. 'js/vue.js', false, '2.0.0' );
       wp_enqueue_script( 'wcc-vue' );

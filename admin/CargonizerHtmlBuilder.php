@@ -63,6 +63,29 @@ class CargonizerHtmlBuilder{
         ?>
       <?php endif; ?>
 
+
+      <?php
+      if( $option['type'] == 'date'):
+
+       self::buildLabel( $option['label'], $option['name'], 'mb-admin-label inline' );
+
+        if (isset($option['desc']) && trim($option['desc']) ){
+          self::buildDesc( $option['desc'] );
+        }
+
+        self::buildInput(
+            array(
+              'type'  => gi($option, 'type'),
+              'name'  => gi($option, 'name'),
+              'id'    => gi($option, 'name'),
+              'value' => gi($option, 'value'),
+              'class'   => ' hasDatepicker datepicker '. gi($option, 'css'),
+              'size'  => 50,
+            )
+          )
+        ?>
+      <?php endif; ?>
+
        <?php if( $option['type'] == 'checkbox'): ?>
        <?php self::buildLabel( $option['label'], $option['name'], 'mb-admin-label inline' ); ?>
         <?php
@@ -158,7 +181,7 @@ class CargonizerHtmlBuilder{
         <?php if ( isset($option['desc']) ): ?>
           <div><span class="mb-field-desc"><?php echo $option['desc']; ?></span></div>
         <?php endif; ?>
-        <select name="<?php echo $option['name'] ?>" id="<?php echo $option['name'] ?>">
+        <select name="<?php echo $option['name'] ?>" id="<?php echo $option['name'] ?>" <?php echo (isset($option['attr']) ? $option['attr']: null); ?> >
             <?php foreach ($option['options'] as $value => $title) {
               printf('<option value="%s" %s>%s</option>',  $value, selected( $value, $option['value'], $echo=false ), $title );
             }
@@ -167,9 +190,15 @@ class CargonizerHtmlBuilder{
       <?php endif; ?>
 
 
-      <?php if( $option['type'] == 'vue'): ?>
+      <?php if( $option['type'] == 'vue_select'): ?>
         <?php self::buildLabel( $option['label'], $option['name'], 'mb-admin-label' ); ?>
         <?php printf('<%s %s>%s</%s>', $option['container'], str_replace('@name@', $option['name'], $option['attr']), $option['options'], $option['container'] ); ?>
+      <?php endif; ?>
+
+
+      <?php if( $option['type'] == 'vue_checkboxes'): ?>
+        <?php self::buildLabel( $option['label'], $option['name'], 'mb-admin-label' ); ?>
+        <?php printf('<%s>%s</%s>', $option['container'], str_replace('@name@', $option['name'], $option['options']), $option['container'] ); ?>
       <?php endif; ?>
 
     </div>

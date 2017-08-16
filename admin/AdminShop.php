@@ -68,23 +68,14 @@ class AdminShop extends AdminShopOptions{
 
     $data['products'] = $this->getCarrierProducts();
 
-    $data['product_types'] =
-      array(
-        array(
-          'value' => 'x',
-          'name' => '123',
-        ),
-        array(
-          'value' => 'y',
-          'name' => '567',
-        ),
-      );
-    $data['parcel_carrier_product'] = null;
 
-    _log($data);
+    $data['product_services'] = $data['product_types'] = array();
+    $data['parcel_carrier_product'] = 'bring_servicepakke';
+
+    $data['carrier_id'] = 1055;
+    $data['carriers'] = $this->CargonizerOptions->getCompanyList();
+    // _log($data);
     // todo
-    // data.products // get carrier products
-    // product text, selected, services, value
 
 
     $html .= '<script>var data = '.json_encode($data).'</script>';

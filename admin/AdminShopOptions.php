@@ -73,13 +73,13 @@ class AdminShopOptions{
   function loadParcelOptions(){
 
     return array(
-      array(
-        'name'    => 'parcel_is_recurring',
-        'label'   => __('Recurring consignment', 'wc-cargonizer'),
-        'type'    => 'checkbox',
-        'value'   => false,
-        'option'  => 'on'
-      ),
+      // array(
+      //   'name'    => 'parcel_is_recurring',
+      //   'label'   => __('Recurring consignment', 'wc-cargonizer'),
+      //   'type'    => 'checkbox',
+      //   'value'   => false,
+      //   'option'  => 'on'
+      // ),
       array(
         'name'    => 'parcel_printer',
         'label'   => __('Printer', 'wc-cargonizer'),
@@ -110,26 +110,39 @@ class AdminShopOptions{
         'desc'    => __('If empty, setup api settings', 'wc-cargonizer'),
         'type'    => 'select',
         'value'   => null,
+        'attr'   => ' @change="updateProducts" v-model="carrier_id" ',
         'options' => $this->CargonizerOptions->getCompanyList(),
       ),
       array(
         'name'    => 'parcel_carrier_product',
         'label'   => __('Carrier product', 'wc-cargonizer'),
         'desc'    => __('If empty, setup api settings', 'wc-cargonizer'),
-        'type'    => 'vue',
+        'type'    => 'vue_select',
         'container' => 'select',
-        'attr'    => 'id="@name@" name="@name@" v-model="@name@" @change="updateProductTypes"',
+        'attr'    => 'id="@name@" name="@name@" v-model="@name@" @change="updateProductTypes" ',
         'value'   => '',
-        'options' => '<option v-for="product in products" :value="product.identifier" :selected="product.selected==true" >{{ product.name }}</option>'
+        'options' => '<option v-for="product in products" :value="product.identifier" :selected="product.selected==true">{{ product.name }}</option>'
       ),
       array(
         'name'    => 'parcel_carrier_product_type',
         'label'   => __('Product type', 'wc-cargonizer'),
-        'type'    => 'vue',
+        'type'    => 'vue_select',
         'container' => 'select',
         'attr'    => 'id="@name@" name="@name@" ',
         'value'   => '',
         'options' => '<option v-for="pt in product_types" :selected="pt.selected==true">{{ pt.name }}</option>'
+      ),
+      array(
+        'name'    => 'parcel_carrier_product_services',
+        'label'   => __('Product services', 'wc-cargonizer'),
+        'type'    => 'vue_checkboxes',
+        'container' => 'ul',
+        //'attr'    => 'id="@name@" name="@name@" ',
+        'value'   => '',
+        'options' => '<li v-for="service in product_services">
+                      <input type="checkbox" class="form-check-input" nav_menu_description="@name@[]" :id="service.value" :value="service.value" :checked="service.checked==true">
+                      <label class="form-check-label" :for="service.value" >{{ service.name }}</label>
+                      </li>'
       ),
       array(
         'name' => 'parcel_message_consignee',
@@ -141,7 +154,7 @@ class AdminShopOptions{
         'name' => 'parcel_shipping_date',
         'label' => __('Shipping date', 'wc-cargonizer'),
         'desc' => __('Leave empty if the consignment is to be created today'),
-        'type' => 'text',
+        'type' => 'date',
         'value' => '',
       ),
       array(
