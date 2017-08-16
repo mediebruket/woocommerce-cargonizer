@@ -17,12 +17,14 @@ function shop_updateCarrierProduct(){
             jQuery.each(product.types, function(type_index, type_name){
               _log(type_index);
               _log(type_name);
+              _log(data.product_types);
 
-              this.product_types.push = { 'name' : type_name, 'value' : type_index };
+              // data.product_types.push = { 'name' : type_name, 'value' : type_index };
+              types.push( { 'name' : type_name, 'value' : type_index } );
+
             } );
 
-
-
+            data.product_types = types;
           }
         }
       }
