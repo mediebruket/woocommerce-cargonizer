@@ -1,25 +1,81 @@
 <?php
 
 class CargonizerOptions{
+  protected $DefaultPrinter;
+  protected $DefaultProductType;
+  protected $AvailableProducts;
   protected $TransportAgreements;
+  protected $RecurringConsignmentWarningTime;
   protected $SelectedTransportAgreement;
   protected $TransportCompanyId;
   protected $TransportProduct;
-  protected $TransportServices;
-  protected $DefaultPrinter;
-  protected $RecurringConsignmentWarningTime;
+  protected $TransportServices;  
 
 
   function __construct(){
+    $this->TransportAgreements        = $this->getTransportAgreements();
     $this->TransportCompanyId         = $this->getTransportCompanyId();
+    $this->CarrierId                  = $this->TransportCompanyId;
+
+    $this->SelectedTransportAgreement = $this->getSelectedTransportAgreement();
+
     $this->TransportProduct           = $this->getTransportProduct();
+    $this->DefaultCarrierProduct      = $this->TransportProduct;
+
+    $this->DefaultProductType      = $this->getDefaultProductType();
+    
+    $this->AvailableProducts          = $this->getAvailableProducts();
+    $this->ProductTypes               = $this->getTypesByProductIdentifier();
+    
     $this->TransportServices          = $this->getTransportServices();
     $this->DefaultPrinter             = $this->getDefaultPrinter();
     $this->PrintOnExport              = $this->getPrintOnExport();
-    $this->TransportAgreements        = $this->getTransportAgreements();
-    $this->SelectedTransportAgreement = $this->getSelectedTransportAgreement();
+    
+    
     $this->TransportAgreementServices = $this->getSelectedTransportAgreementServices();
     $this->RecurringConsignmentWarningTime = $this->getRecurringConsignmentWarningTime();
+  }
+
+
+  function getAvailableProducts(){
+    if ( $products = $this->getProductsByCarrierId( $this->CarrierId ) ){
+      return $this->productsToKeyValue($products);
+    }
+    else{
+      return array();
+    }
+  }
+
+
+
+  function productsToKeyValue( $products ){
+    $key_value = array();
+    if ( is_array($products) ){
+      foreach ($products as $key => $p) {
+        $id = $p['identifier'];
+        $name = $p['name'];
+        if ( $name && $id ){
+          $key_value[$id] = $name;
+        }
+         
+      }
+    }
+
+    return $key_value;
+  }
+
+
+  function getProductsByCarrierId( $carrier_id ){
+    $products = null;
+    foreach ( $this->TransportAgreements as $ta ){
+      if ( $ta['id'] == $carrier_id ){
+        if ( isset($ta['products']) && is_array($ta['products']) ){
+          $products = $ta['products'];
+        }
+      }
+    }
+    
+    return $products;
   }
 
 
@@ -85,6 +141,11 @@ class CargonizerOptions{
   }
 
 
+  function getDefaultProductType(){
+    return get_option('cargonizer-default-product-type');
+  }
+
+
   function getDefaultPrinter(){
     return get_option('cargonizer-default-printer');
   }
@@ -110,25 +171,17 @@ class CargonizerOptions{
 
 
   function getTransportProduct(){
-    $carrier_product = maybe_unserialize( get_option('cargonizer-carrier-products') );
-    if ( is_string($carrier_product) ){
-      return $carrier_product;
-    }
-    else if( is_array($carrier_product) && isset($carrier_product[0]) ){
-      return $carrier_product[0];
-    }
-    else{
-      return null;
-    }
+    return get_option('cargonizer-default-carrier-product');
   }
 
 
   function getTransportServices(){
-    return maybe_unserialize( get_option('cargonizer-delivery-carrier-product-services') );
+    return maybe_unserialize( get_option('cargonizer-default-product-services') );
   }
 
 
   function getSelectedTransportAgreement(){
+
     $selected_transport_agreement = null;
 
     if ( $this->TransportCompanyId && is_array($this->TransportAgreements) && !empty($this->TransportAgreements) ){
@@ -140,7 +193,6 @@ class CargonizerOptions{
       }
     }
 
-    // _log($selected_transport_agreement);
     return $selected_transport_agreement;
   }
 
@@ -166,6 +218,27 @@ class CargonizerOptions{
     // _log($services);
 
     return $services;
+  }
+
+
+  function getTypesByProductIdentifier( $identifier = null ){
+    $product_types = array();
+    if ( !$identifier ){
+      $identifier = $this->DefaultCarrierProduct;
+    }  
+
+    if ( $identifier ){
+      if ( $this->SelectedTransportAgreement && is_array($this->SelectedTransportAgreement) && isset($this->SelectedTransportAgreement['products']) ){
+        foreach ($this->SelectedTransportAgreement['products'] as $key => $product) {
+          if ( $product['identifier'] == $identifier ){
+            $product_types = $product['types'];
+            break;
+          }
+        }
+      }
+    }
+
+    return $product_types;
   }
 
 
@@ -410,16 +483,25 @@ class CargonizerOptions{
           'options' => $this->getCompanyList(),
         ),
         array(
-          'name'    => 'cargonizer-carrier-products',
+          'name'    => 'cargonizer-default-carrier-product',
           'label'   => __('Default product'),
           'desc'    => __('If empty, select delivery company and update'),
-          'type'    => 'multiple_checkbox_2',
-          'value'   => $this->TransportProduct,
-          'options' => ( $this->SelectedTransportAgreement ) ? $this->SelectedTransportAgreement['products'] : array(),
+          'type'    => 'select',
+          'value'   => $this->DefaultCarrierProduct,
+          'options' => $this->AvailableProducts
         ),
         array(
-          'name'    => 'cargonizer-delivery-carrier-product-services',
-          'label'   => __('Default services'),
+          'name'    => 'cargonizer-default-product-type',
+          'label'   => __('Default product type'),
+          'desc'    => __('If empty, select product and update'),
+          'type'    => 'multiple_checkbox',
+          'value'   => $this->DefaultProductType,
+          'options' => $this->ProductTypes
+        ),
+        array(
+          //'name'    => 'cargonizer-delivery-carrier-product-services',
+          'name'    => 'cargonizer-default-product-services',
+          'label'   => __('Default product services'),
           // 'desc' => __('Api settings required to load delivery companies'),
           'type'    => 'multiple_checkbox',
           'value'   =>  $this->TransportServices,
