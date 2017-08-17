@@ -128,9 +128,9 @@ class AdminShopOptions{
         'label'   => __('Product type', 'wc-cargonizer'),
         'type'    => 'vue_select',
         'container' => 'select',
-        'attr'    => 'id="@name@" name="@name@" ',
+        'attr'    => 'id="@name@" name="@name@" v-model="product_type" ',
         'value'   => '',
-        'options' => '<option v-for="pt in product_types" :selected="pt.selected==true">{{ pt.name }}</option>'
+        'options' => '<option v-for="pt in product_types" :value="pt.value" :selected="pt.selected==true">{{ pt.name }}</option>'
       ),
       array(
         'name'    => 'parcel_carrier_product_services',
@@ -140,7 +140,7 @@ class AdminShopOptions{
         //'attr'    => 'id="@name@" name="@name@" ',
         'value'   => '',
         'options' => '<li v-for="service in product_services">
-                      <input type="checkbox" class="form-check-input" nav_menu_description="@name@[]" :id="service.value" :value="service.value" :checked="service.checked==true">
+                      <input type="checkbox" class="form-check-input" name="parcel_carrier_product_services[]" nav_menu_description="@name@[]" v-model="active_product_services" :id="service.value" :value="service.value" :checked="service.checked==true">
                       <label class="form-check-label" :for="service.value" >{{ service.name }}</label>
                       </li>'
       ),
@@ -150,6 +150,24 @@ class AdminShopOptions{
         'type' => 'textarea',
         'value' => '',
       ),
+
+      array(
+        'name'  => 'parcel_packages',
+        'label' => __('Packages', 'wc-cargonizer'),
+        'type'  => 'repeater',
+        'value'   => '',
+        'options' => array(
+          array(
+            'name'  => 'package_count',
+            'label' => __('Count'),
+            'type'  => 'number',
+            'value' => '0',
+          )
+
+        )
+      ),
+
+
       array(
         'name' => 'parcel_shipping_date',
         'label' => __('Shipping date', 'wc-cargonizer'),
@@ -158,7 +176,7 @@ class AdminShopOptions{
         'value' => '',
       ),
       array(
-        'name'    => 'parcel_auto_transfer',
+        'name'    => 'parcel_create_consignment_now',
         'label'   => __('Create consignment now', 'wc-cargonizer'),
         'desc'    => __('To create a consignment on cargonizer.no:<br/>- Will only work if shipping date is empty<br/>- Enable this checkox if carrier is selected and the parcel(s) added.', 'wc-cargonizer'),
         'type'    => 'checkbox',

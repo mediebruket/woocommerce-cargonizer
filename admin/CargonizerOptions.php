@@ -1,6 +1,7 @@
 <?php
 
 class CargonizerOptions{
+  protected $CarrierId;
   protected $DefaultPrinter;
   protected $DefaultProductType;
   protected $AvailableProducts;
@@ -9,7 +10,7 @@ class CargonizerOptions{
   protected $SelectedTransportAgreement;
   protected $TransportCompanyId;
   protected $TransportProduct;
-  protected $TransportServices;  
+  protected $TransportServices;
 
 
   function __construct(){
@@ -22,16 +23,18 @@ class CargonizerOptions{
     $this->TransportProduct           = $this->getTransportProduct();
     $this->DefaultCarrierProduct      = $this->TransportProduct;
 
-    $this->DefaultProductType      = $this->getDefaultProductType();
-    
+    $this->DefaultProductType         = $this->getDefaultProductType();
+
     $this->AvailableProducts          = $this->getAvailableProducts();
     $this->ProductTypes               = $this->getTypesByProductIdentifier();
-    
+
     $this->TransportServices          = $this->getTransportServices();
+    $this->DefaultProductServices     = $this->TransportServices;
+
     $this->DefaultPrinter             = $this->getDefaultPrinter();
     $this->PrintOnExport              = $this->getPrintOnExport();
-    
-    
+
+
     $this->TransportAgreementServices = $this->getSelectedTransportAgreementServices();
     $this->RecurringConsignmentWarningTime = $this->getRecurringConsignmentWarningTime();
   }
@@ -57,7 +60,7 @@ class CargonizerOptions{
         if ( $name && $id ){
           $key_value[$id] = $name;
         }
-         
+
       }
     }
 
@@ -74,7 +77,7 @@ class CargonizerOptions{
         }
       }
     }
-    
+
     return $products;
   }
 
@@ -225,7 +228,7 @@ class CargonizerOptions{
     $product_types = array();
     if ( !$identifier ){
       $identifier = $this->DefaultCarrierProduct;
-    }  
+    }
 
     if ( $identifier ){
       if ( $this->SelectedTransportAgreement && is_array($this->SelectedTransportAgreement) && isset($this->SelectedTransportAgreement['products']) ){
@@ -494,7 +497,7 @@ class CargonizerOptions{
           'name'    => 'cargonizer-default-product-type',
           'label'   => __('Default product type'),
           'desc'    => __('If empty, select product and update'),
-          'type'    => 'multiple_checkbox',
+          'type'    => 'select',
           'value'   => $this->DefaultProductType,
           'options' => $this->ProductTypes
         ),

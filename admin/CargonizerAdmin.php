@@ -221,14 +221,20 @@ class CargonizerAdmin{
       wp_register_script( 'wcc-vue', $path. 'js/vue.js', false, '2.0.0' );
       wp_enqueue_script( 'wcc-vue' );
 
-      wp_register_script( 'wcc-admin-order', $path. 'js/wcc-admin-order.js', false, '2.0.0' );
-      wp_enqueue_script( 'wcc-admin-order' );
+      if ( _is($_GET, 'post') && _is($_GET, 'action') == 'edit' ){
+        wp_register_script( 'wcc-admin-order', $path. 'js/wcc-admin-order.js', false, '2.0.0' );
+        wp_enqueue_script( 'wcc-admin-order' );
+      }
+
 
       wp_register_script( 'popper-js', 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js', false, '1.11.0' );
       wp_enqueue_script( 'popper-js' );
 
       wp_register_script( 'boostrap-js', 'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js', false, '4.0.0b' );
       wp_enqueue_script( 'boostrap-js' );
+
+      wp_register_script( 'tableedit-js', $path.'/js/jquery.tabledit.min.js', false, '1.0.0' );
+      wp_enqueue_script( 'tableedit-js' );
 
     }
   }

@@ -8,18 +8,19 @@ class ShopOrderController extends CargonizerCommonController{
   function __construct( ){
     parent::__construct();
 
-    add_action( 'save_post', array($this, 'saveConsignment'), 10, 1 );
+    add_action( 'save_post', array($this, 'saveConsignmentSettgings'), 10, 1 );
+    // add_action( 'save_post', array($this, 'saveConsignment'), 20, 1 );
     add_action( 'init',  array($this, 'resetConsignment') , 10, 2 );
 
-    // transport agreements ... 
-    // ... default parcel 
+    // transport agreements ...
+    // ... default parcel
     add_filter('acf/load_field/name=parcel_recurring_carrier_id', array($this, 'acf_setTransportAgreements'), 20 );
     // ... and recurring parcel
     add_filter('acf/load_field/name=transport_agreement', array($this, 'acf_setTransportAgreements'), 40 );
 
     add_filter('acf/load_field/name=parcel_auto_transfer', array($this, 'acf_setParcelAutoTransfer'), 20 );
 
-  
+
     add_filter('acf/load_field/name=parcel_type', array($this, 'acf_setCarrierProducts'), 10 );
     add_filter('acf/load_field/name=parcel_package_type', array($this, 'acf_setParcelTypes'), 10 );
     add_filter('acf/load_field/name=create_consignment', array($this, 'acf_checkConsignmentStatus'), 10 );
@@ -45,6 +46,26 @@ class ShopOrderController extends CargonizerCommonController{
     add_filter('acf/load_field/name=parcel_print_on_post', array($this, 'acf_setParcelPrintOnPost'), 20 );
   }
 
+
+  function saveConsignmentSettgings( $post_id ){
+    _log('saveConsignmentSettgings');
+    _log($_REQUEST);
+    if ( _is($_REQUEST, 'post_ID') == $post_id ){
+      $AdminShopOptions = new AdminShopOptions();
+      $options = $AdminShopOptions->loadParcelOptions();
+
+      foreach ( $options as $key => $o ) {
+        $index = $o['name'];
+        _log('save '.$index);
+        $meta_value = ( isset($_POST[$index]) ) ? $_POST[$index] : null;
+        if ( update_post_meta( $post_id, $index, maybe_serialize($meta_value) ) ){
+          _log('success ');
+        }
+
+      }
+
+    }
+  }
 
   function saveConsignment( $post_id ){
     if ( !isset($_REQUEST['post_ID']) or $_REQUEST['post_ID'] != $post_id ){
@@ -96,7 +117,7 @@ class ShopOrderController extends CargonizerCommonController{
     }
   }
 
-  
+
   function acf_setDefaultMessageToConsignee( $field ){
     $placeholders = array('order_id' => null );
     $default_value = null;
@@ -262,13 +283,13 @@ class ShopOrderController extends CargonizerCommonController{
         $field['default_value'] = $ta['id'];
       }
     }
-    
+
 
     return $field;
   }
 
 
- 
+
 
 } // end of class
 

@@ -42,7 +42,7 @@ class CargonizerHtmlBuilder{
     <div class="mb-field-row">
 
       <?php
-      if( $option['type'] == 'text'):
+      if( $option['type'] == 'text' or $option['type'] == 'number'):
 
        self::buildLabel( $option['label'], $option['name'], 'mb-admin-label inline' );
 
@@ -130,8 +130,50 @@ class CargonizerHtmlBuilder{
       <?php endif; ?>
 
 
+      <?php if( $option['type'] == 'repeater'): ?>
+
+       <table class="table table-striped table-bordered" id="parcel_repeater">
+          <thead>
+            <tr>
+              <th>Count</th>
+              <th>Parcel type</th>
+              <th>Description</th>
+              <th>Weight (cm)</th>
+              <th>Height (cm)</th>
+              <th>Length (cm)</th>
+              <th>Width (cm)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>2</td>
+              <td>Package</td>
+              <td>lorem ipsum 1</td>
+              <td>0,4</td>
+              <td>40</td>
+              <td>50</td>
+              <td>60</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Package</td>
+              <td>lorem ipsum 2</td>
+              <td>0,4</td>
+              <td>70</td>
+              <td>80</td>
+              <td>90</td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" id="add-package-row" class="btn btn-dark  "><?php _e('Add row'); ?></button>
+
+
+
+
+      <?php endif; ?>
+
       <?php if( $option['type'] == 'multiple_checkbox'): ?>
-        <div >
+        <div>
           <?php self::buildLabel( $option['label'], $option['name'], 'mb-admin-label inline' ); ?>
 
           <?php if ( isset($option['desc'])): ?>

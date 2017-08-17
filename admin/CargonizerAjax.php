@@ -4,8 +4,17 @@ class CargonizerAjax{
 
   function __construct(){
     add_action( 'wp_ajax_wcc_print_order', array( $this, '_printOrder' ) );
+    add_action( 'wp_ajaxedit', array( $this, '_addPackageRow' ) );
+    add_action( 'wp_ajax_nopriv_wcc_add_package_row', array( $this, '_addPackageRow' ) );
     add_action( 'wp_ajax_wcc_create_consignment', array( $this, '_createConsignment' ) );
     add_action( 'wp_ajax_wcc_print_latest_consignment', array( $this, '_printLatestConsignment' ) );
+  }
+
+
+  function _addPackageRow(){
+    _log('_addPackageRow');
+    echo 'lk121';
+    wp_die();
   }
 
 
