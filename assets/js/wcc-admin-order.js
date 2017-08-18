@@ -8,8 +8,7 @@ jQuery(document).ready(function(){
 function initTableEdit(){
   jQuery('#parcel_repeater').Tabledit(
   {
-    url: ajaxurl,
-
+    url: ajaxurl+"?post_id="+jQuery('#post_ID').val(),
 
     columns: {
         identifier: [0, 'id'],
@@ -17,8 +16,7 @@ function initTableEdit(){
           [1, 'parcel_amount'],
           [2, 'parcel_type'],
           [3, 'parcel_description'],
-          [4, 'parcel_description'],
-          [5, 'parcel_weight'],
+          [4, 'parcel_weight'],
           [5, 'parcel_height'],
           [6, 'parcel_length'],
           [7, 'parcel_width'],
@@ -32,13 +30,16 @@ function initTableRepeater(){
   jQuery('#add-package-row').click(function(e){
     e.preventDefault();
 
-    cc = jQuery("#parcel_repeater tr:first-child td").length;
+    cc = jQuery("#parcel_repeater tr:first-child th").length;
+    next_id = jQuery("#parcel_repeater tbody tr").length + 1; 
+    
     columns = '';
     for( i=0; i<cc; i++ ){
-      columns += '<td></td>';
+      value = (i==0) ? next_id : '';
+      columns += '<td>'+value+'</td>';
     }
 
-    jQuery("#parcel_repeater").append('<tr>'+columns+'</tr>');
+    jQuery("#parcel_repeater tbody").append('<tr>'+columns+'</tr>');
     initTableEdit();
     return false;
   });
@@ -116,6 +117,3 @@ function getCarrierById ( carrier_id ){
   }
 }
 
-function _log( object ){
-  console.log( object );
-}

@@ -1,12 +1,13 @@
 <?php
 
-class AdminShop extends AdminShopOptions{
-
+class AdminShopOrder extends AdminShopOptions{
+  
   function __construct(){
     parent::__construct();
+  
     add_action( 'add_meta_boxes', array($this, 'registerOrderMetaBox') );
-    $this->CargonizerOptions = new CargonizerOptions();
   }
+
 
   function registerOrderMetaBox() {
     add_meta_box(
@@ -18,7 +19,6 @@ class AdminShop extends AdminShopOptions{
       'high'
     );
   }
-
 
 
   function getCarrierProducts(){
@@ -48,6 +48,27 @@ class AdminShop extends AdminShopOptions{
   }
 
 
+  function getProductsByCarrierId( $carrier_id ){
+    $products = array();
+
+    $agreements = get_transient('transport_agreements');
+
+    if ( is_array($agreements) ){
+      foreach ($agreements as $key => $a) {
+        if ( $a['id'] == $carrier_id ){
+          if ( is_array($a) && isset($a['products']) && is_array($a['products']) ){
+            $products = $a['products'];
+            break;
+          }
+        }
+      }
+    }
+
+    //_log($products);
+    
+    return $products;
+  }
+
 
   function makeOrderMetaBox( $meta_id ) {
     $html = $navigation = null;
@@ -64,24 +85,38 @@ class AdminShop extends AdminShopOptions{
     }
 
 
+    // all carriers
+    $data['carriers'] = $this->CargonizerOptions->getCompanyList(); 
+    // active carrier
+
+    _log($this->ShopOrder);
+    $data['carrier_id'] =  ( $this->ShopOrder->CarrierId ) ?  $this->ShopOrder->CarrierId : $this->CargonizerOptions->get('CarrierId'); 
+    
+
+    // active product
+    $data['parcel_carrier_product'] = ( $this->ShopOrder->CarrierProduct ) ? $this->ShopOrder->CarrierProduct : $this->CargonizerOptions->get('DefaultCarrierProduct');
+    // all products
+    $data['products'] = $this->getProductsByCarrierId( $data['carrier_id'] ); 
 
 
-    $data['parcel_carrier_product'] = $this->CargonizerOptions->get('DefaultCarrierProduct'); // active product
-    $data['products'] = $this->getCarrierProducts(); // available products
+  
+    // all product types, handled by vue
+    $data['product_types'] = array(); 
+    // active product type
+    $data['product_type'] = ( $this->ShopOrder->ParcelType ) ? $this->ShopOrder->ParcelType : $this->CargonizerOptions->get('DefaultProductType');
 
-    $data['carrier_id'] = $this->CargonizerOptions->get('CarrierId'); // active carrier
-    $data['carriers'] = $this->CargonizerOptions->getCompanyList(); // availabe carriers
 
-    $data['product_types'] = array(); // available product types
-    $data['product_type'] = null; // active product type
-    if ( $default_product_type = $this->CargonizerOptions->get('DefaultProductType') ){
-      $data['product_type'] = $default_product_type;
+    // all product services, handled by vue
+    $data['product_services'] = array();   
+    // active product services
+    $data['active_product_services'] = array();
+    if ( $this->ShopOrder->ParcelServices ){
+      $data['active_product_services'] = $this->ShopOrder->ParcelServices;
     }
-
-    $data['product_services'] = array(); // availabel product services
-    if ( $default_product_services = $this->CargonizerOptions->get('DefaultProductServices') ){
+    else if ( $default_product_services = $this->CargonizerOptions->get('DefaultProductServices') ){
       $data['active_product_services'] = $default_product_services;
     }
+
 
     $html .= '<script>var data = '.json_encode($data).'</script>';
 
@@ -98,4 +133,10 @@ class AdminShop extends AdminShopOptions{
 
 } // end of class
 
-new AdminShop();
+
+add_action( 'init', 'init_admin_shop_order', 10 );
+function init_admin_shop_order(){  
+  if ( gi($_GET, 'post') && gi($_GET, 'action') == 'edit' ){
+    new AdminShopOrder();  
+  }
+}

@@ -22,8 +22,9 @@ require_once( $plugin_path . 'include/api/CargonizerApi.php');
 require_once( $plugin_path . 'admin/CargonizerIcons.php');
 require_once( $plugin_path . 'admin/CargonizerOptions.php');
 require_once( $plugin_path . 'admin/CargonizerAdmin.php');
-require_once( $plugin_path . 'admin/AdminShopOptions.php');
-require_once( $plugin_path . 'admin/AdminShop.php');
+require_once( $plugin_path . 'admin/AdminShopOrderOptions.php');
+require_once( $plugin_path . 'admin/AdminShopOrder.php');
+
 
 require_once( $plugin_path . 'admin/CargonizerHtmlBuilder.php');
 require_once( $plugin_path . 'admin/CargonizerAjax.php');

@@ -2,19 +2,42 @@
 
 class CargonizerAjax{
 
+
   function __construct(){
     add_action( 'wp_ajax_wcc_print_order', array( $this, '_printOrder' ) );
-    add_action( 'wp_ajaxedit', array( $this, '_addPackageRow' ) );
-    add_action( 'wp_ajax_nopriv_wcc_add_package_row', array( $this, '_addPackageRow' ) );
+    add_action( 'wp_ajax_edit', array( $this, '_addPackageRow' ) );
+    add_action( 'wp_ajax_nopriv_ajaxedit', array( $this, '_addPackageRow' ) );
+    add_action( 'wp_ajax_delete', array( $this, '_deletePackageRow' ) );
     add_action( 'wp_ajax_wcc_create_consignment', array( $this, '_createConsignment' ) );
     add_action( 'wp_ajax_wcc_print_latest_consignment', array( $this, '_printLatestConsignment' ) );
   }
 
 
   function _addPackageRow(){
-    _log('_addPackageRow');
-    echo 'lk121';
+    if ( $post_id = gi($_REQUEST, 'post_id') ){
+      unset($_REQUEST['action'] );
+      unset($_REQUEST['post_id'] );
+      $packages = get_post_meta( $post_id, 'parcel_packages', true );
+      $packages[ $_REQUEST['id'] ] = $_REQUEST;
+      update_post_meta( $post_id, 'parcel_packages', $packages );
+    }
     wp_die();
+  }
+
+
+  function _deletePackageRow(){    
+    $post_id = gi($_REQUEST, 'post_id');
+    $package_id = gi($_REQUEST, 'id');
+
+    if ( $post_id && $package_id ){
+      $packages = get_post_meta( $post_id, 'parcel_packages', true );
+      if ( isset($packages[$package_id]) ){
+        unset($packages[$package_id]);
+        $packages = array_values($packages);
+      }
+
+      update_post_meta( $post_id, 'parcel_packages', $packages );
+    }
   }
 
 
@@ -63,7 +86,8 @@ class CargonizerAjax{
 
     $response = array('status' => null, 'message' => null);
     if ( isset($_POST['order_id']) && is_numeric($_POST['order_id']) ){
-      $result = Cargonizer::_createConsignment( $_POST['order_id'] );
+      $result = ConsignmentController::createConsignment( $_POST['order_id'] );
+      
       // _log('result');
       // _log($result);
       if ( is_array($result) && isset($result['consignments']['consignment']['id']['$']) ){
@@ -140,6 +164,7 @@ class CargonizerAjax{
     echo json_encode($response);
     wp_die();
   }
-}
+
+} // end of class
 
 new CargonizerAjax();

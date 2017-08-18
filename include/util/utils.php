@@ -37,3 +37,10 @@ if(!function_exists('_log')){
     }
   }
 }
+
+
+if ( !function_exists('cleanDate') ){
+  function cleanDate( $date ){
+    return str_replace('-', null, $date );
+  }
+}

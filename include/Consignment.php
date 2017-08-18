@@ -39,13 +39,11 @@ class Consignment{
 
     $this->CarrierId        = $this->getCarrierId();
     $this->CarrierProduct   = $this->getCarrierProduct();
-    $this->CarrierProductServices   = $this->getCarrierProductServices();
+    $this->CarrierProductServices  = $this->getCarrierProductServices();
+    $this->CarrierProductType  = $this->getCarrierProductType();
 
-    if ( $this->CarrierProduct ){
-      $tmp = explode('|', $this->CarrierProduct );
-      $this->CarrierProductId    = ( isset($tmp[0]) ) ? $tmp[0] : null;
-      $this->CarrierProductType  =  ( isset($tmp[1]) ) ? $tmp[1] : null;
-    }
+      //$this->CarrierProductType  =  ( isset($tmp[1]) ) ? $tmp[1] : null;
+    
 
     // _log($this);
   }
@@ -146,7 +144,7 @@ class Consignment{
 
 
   function getItems(){
-    return acf_getField('consignment_items', $this->ID);
+    return maybe_unserialize( gi($this->Meta, 'consignment_packages') );
   }
 
 
@@ -204,7 +202,11 @@ class Consignment{
 
 
   function getCarrierProductServices(){
-    return acf_getField('consignment_services', $this->Id );
+    return maybe_unserialize( get_post_meta( $this->Id, 'consignment_services', true ) );
+  }
+
+  function getCarrierProductType(){
+    return get_post_meta( $this->Id, 'consignment_product_type', true );
   }
 
 
@@ -250,7 +252,6 @@ class Consignment{
       // products
       update_post_meta( $post_id, 'consignment_order_products', $Order->Products );
 
-
       if ( $recurring ){
         update_post_meta( $post_id, 'recurring_consignment_interval', $Order->RecurringInterval );
         update_post_meta( $post_id, 'consignment_carrier_id', $Order->RecurringCarrierId );
@@ -258,13 +259,12 @@ class Consignment{
         update_post_meta( $post_id, 'consignment_product', $Order->RecurringConsignmentType );
         update_post_meta( $post_id, 'consignment_services', $Order->RecurringConsignmentServices );
         update_post_meta( $post_id, 'consignment_message', $Order->RecurringConsignmentMessage );
-        acf_updateField('consignment_items', $Order->RecurringConsignmentItems, $post_id);
       }
       else{
-        _log('single consignment');
-        acf_updateField('consignment_items', $Order->Items, $post_id);
-        update_post_meta( $post_id, 'consignment_carrier_id', $Order->TransportAgreementId );
-        update_post_meta( $post_id, 'consignment_product', $Order->ParcelType );
+        update_post_meta( $post_id, 'consignment_packages', $Order->ParcelPackages );
+        update_post_meta( $post_id, 'consignment_carrier_id', $Order->CarrierId );
+        update_post_meta( $post_id, 'consignment_product', $Order->CarrierProduct );
+        update_post_meta( $post_id, 'consignment_product_type', $Order->ParcelType );
         update_post_meta( $post_id, 'consignment_services', $Order->ParcelServices );
         update_post_meta( $post_id, 'consignment_message', $Order->ParcelMessage );
         update_post_meta( $post_id, 'consignment_next_shipping_date', $Order->ShippingDate );
@@ -525,12 +525,11 @@ class Consignment{
     );
 
 
-      
     $export['consignments']['consignment']['transfer'] = ( $this->AutoTransfer ) ? 'true' : 'false';
         
 
     // $export['consignments']['consignment']['booking_request'] = 'false';
-    $export['consignments']['consignment']['product'] = $this->CarrierProductId;
+    $export['consignments']['consignment']['product'] = $this->CarrierProduct;
 
     //
     // ---------------- addresses ----------------
@@ -593,6 +592,7 @@ class Consignment{
     // <item type="PK" amount="1" weight="22" volume="122" description="Something else"/>
 
     $export['consignments']['consignment']['items'] = array(); // packages
+    
     foreach ($this->Items as $key => $item) {
       $array = array('item' => null );
 
@@ -603,7 +603,7 @@ class Consignment{
 
       $item_attributes =
         array(
-          'type'        => ( $parcel_type = gi( $item, 'parcel_package_type' ) ) ? $parcel_type : $this->CarrierProductType,
+          'type'        => $this->CarrierProductType,
           // 'type'        => 'package',
           'amount'      => gi( $item, 'parcel_amount' ),
           'weight'      => $parcel_weight,
@@ -1027,4 +1027,4 @@ class Consignment{
 
   }
 
-}
+} // end of class

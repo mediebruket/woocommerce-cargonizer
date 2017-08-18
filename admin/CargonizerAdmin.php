@@ -206,11 +206,14 @@ class CargonizerAdmin{
       // wp_register_script( 'wcc-admin', $path. 'js/wcc-admin.js', false, '1.0.0' );
       // wp_enqueue_script( 'wcc-admin' );
 
-      // wp_register_script( 'wcc-admin-ajax', $path. 'js/wcc-admin-ajax.js', false, '1.0.0' );
-      // wp_enqueue_script( 'wcc-admin-ajax' );
+      wp_register_script( 'wcc-util', $path. 'js/wcc-util.js', false, '1.0.0' );
+      wp_enqueue_script( 'wcc-util' );
 
-      // wp_register_script( 'wcc-admin-consignment', $path. 'js/wcc-admin-consignment.js', false, '1.0.1' );
-      // wp_enqueue_script( 'wcc-admin-consignment' );
+      wp_register_script( 'wcc-admin-ajax', $path. 'js/wcc-admin-ajax.js', false, '1.0.0' );
+      wp_enqueue_script( 'wcc-admin-ajax' );
+
+      //wp_register_script( 'wcc-admin-consignment', $path. 'js/wcc-admin-consignment.js', false, '1.0.1' );
+      //wp_enqueue_script( 'wcc-admin-consignment' );
 
       // wp_register_script( 'wcc-admin-action', $path. 'js/wcc-admin-action.js', false, '1.0.1' );
       // wp_enqueue_script( 'wcc-admin-action' );
@@ -221,11 +224,15 @@ class CargonizerAdmin{
       wp_register_script( 'wcc-vue', $path. 'js/vue.js', false, '2.0.0' );
       wp_enqueue_script( 'wcc-vue' );
 
-      if ( _is($_GET, 'post') && _is($_GET, 'action') == 'edit' ){
+      $screen = null;
+      if ( function_exists('get_current_screen') ){
+        $screen = get_current_screen();
+      }
+
+      if ( gi($_GET, 'post') && gi($_GET, 'action') == 'edit' && is_object($screen) && $screen->post_type == 'shop_order' ){
         wp_register_script( 'wcc-admin-order', $path. 'js/wcc-admin-order.js', false, '2.0.0' );
         wp_enqueue_script( 'wcc-admin-order' );
       }
-
 
       wp_register_script( 'popper-js', 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js', false, '1.11.0' );
       wp_enqueue_script( 'popper-js' );
@@ -306,8 +313,7 @@ class CargonizerAdmin{
 
 
   public static function showResetLink( $Order ){
-
-    if ( get_post_meta( $Order->id, 'is_cargonized', true ) ){
+    if ( is_object($Order) && get_post_meta( $Order->get_id(), 'is_cargonized', true ) ){
       if ( $edit_link = get_edit_post_link($Order->id) ){
         $delete_link = $edit_link.'&wcc_action=reset_consignment';
         $delete_text = __('Logistra Cargonizer: reset consignment', 'wc-cargonizer' );
@@ -446,7 +452,6 @@ class CargonizerAdmin{
 
 
   public static function addCargonizerActions( $post ){
-
     if ( is_object($post) && $post->post_type == 'consignment' ){
       $Consignment = new Consignment($post->ID);
       echo '<div class="wcc-meta-box-consignment">';
@@ -457,13 +462,13 @@ class CargonizerAdmin{
       }
       echo '</div>';
     }
-
   }
 
 
   public static function showAdminNotice(){
     printf('<div class="wcc-admin-message alert" id="wcc-admin-message"></div>');
   }
+
 
   public static function isInTime( $next_shipping_date, $check_date ){
     $warning_time = get_option( 'cargonizer-recurring-consignments-warning-time', '1' );

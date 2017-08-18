@@ -9,17 +9,6 @@ class ConsignmentController extends CargonizerCommonController{
     parent::__construct();
 
     add_action( 'save_post', array($this, 'preventRevision'), 10, 1 );
-
-    add_filter('acf/load_field/name=consignment_carrier_id', array($this, 'acf_setTransportAgreements'), 30 );
-  
-    add_filter('acf/load_field/key=field_5940c85af6b7d', array($this, 'acf_filterHistory'), 40, 1 );
-    add_filter('acf/load_field/key=field_59477f6eddf36', array($this, 'acf_filterOrderProducts'), 40, 1 );
-    add_filter('acf/load_field/key=field_59477faf14b71', array($this, 'acf_filterCustomerId'), 40, 1 );
-    add_filter('acf/load_field/name=consignment_auto_transfer', array($this, 'acf_setParcelAutoTransfer'), 20 );
-    
-    // CargonizerCommonController
-    add_filter('acf/load_field/name=recurring_consignment_interval', array($this, 'acf_setRecurringConsignmentInterval'), 40 ); 
-    add_filter('acf/load_field/name=consignment_print_on_export', array($this, 'acf_setParcelPrintOnPost'), 20 );
   }
 
 
@@ -33,7 +22,8 @@ class ConsignmentController extends CargonizerCommonController{
       $CargonizeXml = new CargonizeXml( $Consignment->prepareExport() );
       $CargonizerApi = new CargonizerApi();
       $result = null;
-      // _log('post consignment');
+      _log('post consignment');
+
 
       $result = $CargonizerApi->postConsignment($CargonizeXml->Xml);
 
@@ -55,7 +45,7 @@ class ConsignmentController extends CargonizerCommonController{
           // update order
           if ( $Consignment->OrderId ){
             _log('has order id');
-            $Parcel = new Parcel( $Consignment->OrderId );
+            $Parcel = new ShopOrder( $Consignment->OrderId );
             $Parcel->setCargonized();
             $Parcel->saveConsignmentDetails( $consignment = $result['consignments']['consignment'] );
             $Parcel->addNote();

@@ -2,6 +2,7 @@
 
 class ShopOrder{
   public $AutoTransfer;
+  public $CarrierId;
   public $ConsignmentId;
   public $ID;
   public $Id;
@@ -11,6 +12,7 @@ class ShopOrder{
   public $ParcelType;
   public $ParcelMessage;
   public $ParcelServices;
+  public $ParcelPackages;
   public $ShippingDate;
   public $TrackingProvider;
   public $TransportAgreements;
@@ -22,6 +24,7 @@ class ShopOrder{
 
 
   function __construct($post_id){
+    _log("ShopOrder::__construct");
 
     if ( is_numeric($post_id) ){
       // set woocommerce order object
@@ -36,13 +39,19 @@ class ShopOrder{
 
         $this->Meta           = $this->getPostMeta();
         $this->ShippingDate   = $this->getShippingDate();
+        $this->CarrierId      = $this->getCarrierId();
+        $this->CarrierProduct = $this->getCarrierProduct();
+        
+
         $this->IsCargonized   = $this->isCargonized();
         $this->Printer        = $this->getPrinter();
         $this->PrintOnExport  = $this->getPrintOnExport();
         $this->AutoTransfer   = $this->getAutoTransfer();
+        
         $this->ParcelType     = $this->getParcelType();
         $this->ParcelServices = $this->getParcelServices();
         $this->ParcelMessage  = $this->getParcelMessage();
+        $this->ParcelPackages = $this->getPackages();
 
 
         // recurring
@@ -79,10 +88,58 @@ class ShopOrder{
   } // construct
 
 
+
   function getPostMeta(){
     return get_post_custom( $this->ID );
   }
 
+
+  function getPackages(){
+    $packages = maybe_unserialize( gi($this->Meta, 'parcel_packages') ); 
+    //_log('$packages');
+    //_log($packages);
+    if ( !$packages or is_array($packages) and empty($packages) ){
+      $default = array(
+        'id' => 1,
+        'parcel_amount'       => 1,
+        'parcel_type'         => 'PK',
+        'parcel_description'  => '',
+        'parcel_weight'       =>  $this->getTotalWeight(),
+        'parcel_height'       => get_option('cargonizer-parcel-height'),
+        'parcel_length'       => get_option('cargonizer-parcel-length'),
+        'parcel_width'        => get_option('cargonizer-parcel-width')
+      );
+
+      $packages = array($default);
+    }
+
+    return $packages;
+  }
+
+
+  function getTotalWeight(){
+    $weight = null;
+    $order_items = $this->WC_Order->get_items();
+    
+    if ( is_array($order_items) ){
+      foreach( $order_items as $item ){
+        if ( $item['product_id'] > 0 ){
+          $_product = $this->WC_Order->get_product_from_item( $item );
+          if ( $_product && is_object($_product) && method_exists($_product, 'is_virtual') && !$_product->is_virtual() ) {
+            $weight += $_product->get_weight() * $item['qty'];
+          }
+        }
+      }
+    }
+
+    if (  $weight ){
+      $weight = number_format($weight, 2, '.', ' ');
+    }
+
+    return $weight;
+  }
+
+  
 
   function getPrinter(){
     return gi($this->Meta, 'parcel_printer');
@@ -91,6 +148,15 @@ class ShopOrder{
 
   function getPrintOnExport(){
     return gi($this->Meta, 'parcel_print_on_post');
+  }
+
+
+  function getCarrierId(){
+    return gi($this->Meta, 'parcel_carrier_id');
+  }
+
+  function getCarrierProduct(){
+    return gi($this->Meta, 'parcel_carrier_product');
   }
 
   function getAutoTransfer(){
@@ -121,7 +187,7 @@ class ShopOrder{
 
 
   function getParcelMessage(){
-    return gi($this->Meta, 'message_consignee' );
+    return gi($this->Meta, 'parcel_message_consignee' );
   }
 
 
@@ -188,7 +254,7 @@ class ShopOrder{
 
 
   function hasFutureShippingDate(){
-    if ( $this->ShippingDate > date('Ymd') ){
+    if ( cleanDate($this->ShippingDate) > date('Ymd') ){
       return true;
     }
     else{
@@ -198,7 +264,7 @@ class ShopOrder{
 
 
   function getParcelType(){
-    return gi($this->Meta, 'parcel_type');
+    return gi($this->Meta, 'parcel_carrier_product_type');
     //_log($this->Printer);
   }
 
@@ -206,17 +272,17 @@ class ShopOrder{
   function getParcelServices(){
     $services = array();
 
-    if ( isset($this->Meta['parcel_services']) ){
-      $services = $this->Meta['parcel_services'];
-      if ( is_array($services) && isset($services[0]) && is_string($services[0]) ){
+    if ( isset($this->Meta['parcel_carrier_product_services']) ){
+      $services = $this->Meta['parcel_carrier_product_services'];
+
+      if ( is_array($services) && isset($services[0]) &&  is_string($services[0]) ){
         $services = $services[0];
       }
     }
-    else {
-      $services = get_option('cargonizer-delivery-carrier-product-services');
+    else{
+      $services = null;
     }
-
-
+    
     return maybe_unserialize( $services );
   }
 

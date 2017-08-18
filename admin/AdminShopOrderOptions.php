@@ -2,9 +2,24 @@
 
 class AdminShopOptions{
   public $CargonizerOptions;
+  public $Id;
+  public $ParcelPackages;
+  public $ShopOrder;
 
   function __construct(){
-    $this->CargonizerOptions = new CargonizerOptions();
+    $this->Id = gi($_GET, 'post'); 
+    if ( !$this->Id ){
+      $this->Id = gi($_REQUEST, 'post_ID');
+    }
+  
+    if ( is_numeric($this->Id) ){
+      $post = get_post($this->Id);
+      if ( is_object($post) && $post->post_type == 'shop_order' ){
+        $this->CargonizerOptions = new CargonizerOptions();
+        $this->ShopOrder = new ShopOrder($this->Id);
+      }
+    //_log($this->ShopOrder);
+    }  
   }
 
 
@@ -21,6 +36,7 @@ class AdminShopOptions{
   function set($Attribute, $value){
     $this->$Attribute = $value;
   }
+
 
 
   // function updateOptions( $type ){
@@ -93,16 +109,16 @@ class AdminShopOptions{
         'label'   => __('Export to carrier', 'wc-cargonizer'),
         'desc'    => __('Saves the consignment as "sent"', 'wc-cargonizer'),
         'type'    => 'checkbox',
-        'value'   => false,
-        'option'  => 'on'
+        'value'   => $this->ShopOrder->AutoTransfer,
+        'option'  => '1'
       ),
       array(
         'name'    => 'parcel_print_on_post',
         'label'   => __('Print on export', 'wc-cargonizer'),
         'desc'    => __('Prints the consignment automatically', 'wc-cargonizer'),
         'type'    => 'checkbox',
-        'value'   => false,
-        'option'  => 'on'
+        'value'   => $this->ShopOrder->PrintOnExport,
+        'option'  => '1'
       ),
       array(
         'name'    => 'parcel_carrier_id',
@@ -148,23 +164,16 @@ class AdminShopOptions{
         'name' => 'parcel_message_consignee',
         'label' => __('Message', 'wc-cargonizer'),
         'type' => 'textarea',
-        'value' => '',
+        'value' => $this->ShopOrder->ParcelMessage,
       ),
 
       array(
         'name'  => 'parcel_packages',
         'label' => __('Packages', 'wc-cargonizer'),
-        'type'  => 'repeater',
-        'value'   => '',
-        'options' => array(
-          array(
-            'name'  => 'package_count',
-            'label' => __('Count'),
-            'type'  => 'number',
-            'value' => '0',
-          )
-
-        )
+        'type'  => 'table',
+        'value'   => $this->ShopOrder->ParcelPackages,
+        'options' => array('Id', 'Count', 'Parcel type', 'Description', 'Weight (kg)', 'Height (cm)', 'Length (cm)', 'Width (cm)'),
+        
       ),
 
 
@@ -173,7 +182,7 @@ class AdminShopOptions{
         'label' => __('Shipping date', 'wc-cargonizer'),
         'desc' => __('Leave empty if the consignment is to be created today'),
         'type' => 'date',
-        'value' => '',
+        'value' => $this->ShopOrder->ShippingDate,
       ),
       array(
         'name'    => 'parcel_create_consignment_now',
@@ -268,12 +277,6 @@ class AdminShopOptions{
 
     );
   }
-
-
-
-
-
-
 
 
 } // end of class

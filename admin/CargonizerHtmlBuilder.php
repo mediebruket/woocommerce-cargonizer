@@ -66,7 +66,6 @@ class CargonizerHtmlBuilder{
 
       <?php
       if( $option['type'] == 'date'):
-
        self::buildLabel( $option['label'], $option['name'], 'mb-admin-label inline' );
 
         if (isset($option['desc']) && trim($option['desc']) ){
@@ -130,47 +129,46 @@ class CargonizerHtmlBuilder{
       <?php endif; ?>
 
 
-      <?php if( $option['type'] == 'repeater'): ?>
-
+      <?php if( $option['type'] == 'table'): ?>
        <table class="table table-striped table-bordered" id="parcel_repeater">
+          <?php if ( isset($option['options']) && is_array($option['options']) ): ?> 
           <thead>
-            <tr>
-              <th>Count</th>
-              <th>Parcel type</th>
-              <th>Description</th>
-              <th>Weight (cm)</th>
-              <th>Height (cm)</th>
-              <th>Length (cm)</th>
-              <th>Width (cm)</th>
-            </tr>
+            <tr><?php foreach ($option['options'] as $key => $name) {
+                printf('<th>%s</th>', $name); 
+              }?></tr>
           </thead>
+          <?php endif; ?>
+
           <tbody>
-            <tr>
-              <td>2</td>
-              <td>Package</td>
-              <td>lorem ipsum 1</td>
-              <td>0,4</td>
-              <td>40</td>
-              <td>50</td>
-              <td>60</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Package</td>
-              <td>lorem ipsum 2</td>
-              <td>0,4</td>
-              <td>70</td>
-              <td>80</td>
-              <td>90</td>
-            </tr>
+          <?php if ( isset($option['value']) && is_array($option['value']) ): ?> 
+            <?php foreach ($option['value'] as $key => $package) {
+              printf('<tr>
+                <td class="id">%s</td>
+                <td class="package-amount">%s</td>
+                <td class="package-type">%s</td>
+                <td class="package-desc">%s</td>
+                <td class="package-weight">%s</td>
+                <td class="package-height">%s</td>
+                <td class="package-length">%s</td>
+                <td class="package-widt">%s</td>
+               </tr>',
+               $package['id'],
+               $package['parcel_amount'],
+               $package['parcel_type'],
+               $package['parcel_description'],
+               $package['parcel_weight'],
+               $package['parcel_height'],
+               $package['parcel_length'],
+               $package['parcel_width']
+               );
+            }
+            ?>
+          <?php endif; ?>
           </tbody>
         </table>
         <button type="button" id="add-package-row" class="btn btn-dark  "><?php _e('Add row'); ?></button>
-
-
-
-
       <?php endif; ?>
+
 
       <?php if( $option['type'] == 'multiple_checkbox'): ?>
         <div>
