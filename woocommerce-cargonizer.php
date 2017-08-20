@@ -24,6 +24,8 @@ require_once( $plugin_path . 'admin/CargonizerOptions.php');
 require_once( $plugin_path . 'admin/CargonizerAdmin.php');
 require_once( $plugin_path . 'admin/AdminShopOrderOptions.php');
 require_once( $plugin_path . 'admin/AdminShopOrder.php');
+require_once( $plugin_path . 'admin/AdminConsignmentOptions.php');
+require_once( $plugin_path . 'admin/AdminConsignment.php');
 
 
 require_once( $plugin_path . 'admin/CargonizerHtmlBuilder.php');

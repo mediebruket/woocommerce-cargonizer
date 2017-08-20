@@ -5,6 +5,7 @@ add_action( 'pre_get_posts', array('Consignment', '_orderConsignmentsByShippingD
 add_filter( 'woocommerce_package_rates' , array('Consignment', '_setShippingCosts'), 10, 2 );
 
 class Consignment{
+  public $AutoTransfer;
   public $ID;
   public $Id;
   public $CarrierId;
@@ -66,6 +67,7 @@ class Consignment{
     $this->Printer          = $this->getPrinter();
     $this->PrintOnExport    = $this->getPrintOnExport();
     $this->AutoTransfer     = $this->getAutoTransfer();
+    $this->Message          = $this->getConsigneeMessage();
 
     $this->NextShippingDate  = $this->getNextShippingDate();
     $this->LastShippingDate  = $this->getLastShippingDate();
@@ -109,6 +111,11 @@ class Consignment{
 
   function getCustomerId(){
     return gi($this->Meta, 'customer_id');
+  }
+
+  
+  function getConsigneeMessage(){
+    return gi($this->Meta, 'consignment_message');
   }
 
 
