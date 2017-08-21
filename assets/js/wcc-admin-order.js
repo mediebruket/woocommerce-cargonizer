@@ -104,10 +104,55 @@ function shop_updateCarrierProduct(){
           }
           data.product_services = services;
         }
-      }
+      },
+
+
+      updateRecurringProducts: function(){
+        agreement = getCarrierById( this.recurring_consignment_carrier_id );
+        data.recurring_consignment_products = agreement.products;
+        data.recurring_consignment_carrier_product = agreement.products[0].identifier;
+        this.updateRecurringProductTypes();
+      },
+
+
+      updateRecurringProductTypes: function(){
+        var identifier = this.recurring_consignment_carrier_product;
+
+        if ( product = getRecurringProductByIdentifier( identifier ) ){
+          // update product types
+          var types = new Array();
+          jQuery.each(product.types, function(type_index, type_name){
+            types.push( { 'name' : type_name, 'value' : type_index } );
+          } );
+
+          data.recurring_consignment_product_types = types;
+
+          // update product services
+          var services = new Array();
+
+          if ( typeof product.services === 'object' && product.services.length ){
+            jQuery.each(product.services, function(service_index, service){
+              services.push(
+                {
+                  'name' : service.name,
+                  'value' : service.identifier,
+                  'checked' : false,
+                }
+              );
+            });
+          }
+
+          _log('services');
+          _log(services);
+          data.recurring_consignment_product_services = services;
+        }
+      },
+
+
     },
     beforeMount(){
-      this.updateProductTypes()
+      this.updateProductTypes();
+      this.updateRecurringProductTypes();
     },
   });
 }
@@ -116,6 +161,18 @@ function shop_updateCarrierProduct(){
 function getProductByIdentifier( identifier ){
   product = null;
   jQuery.each(data.products , function(index, p){
+    if ( p.identifier == identifier ){
+      product = p;
+    }
+  });
+
+  return product;
+}
+
+
+function getRecurringProductByIdentifier( identifier ){
+  product = null;
+  jQuery.each(data.recurring_consignment_products , function(index, p){
     if ( p.identifier == identifier ){
       product = p;
     }

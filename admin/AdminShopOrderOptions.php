@@ -133,7 +133,13 @@ class AdminShopOptions{
         //'attr'    => 'id="@name@" name="@name@" ',
         'value'   => '',
         'options' => '<li v-for="service in product_services">
-                      <input type="checkbox" class="form-check-input" name="parcel_carrier_product_services[]" nav_menu_description="@name@[]" v-model="active_product_services" :id="service.value" :value="service.value" :checked="service.checked==true">
+                      <input type="checkbox" class="form-check-input" 
+                      name="parcel_carrier_product_services[]" 
+                      v-model="active_product_services" 
+                      :id="service.value" 
+                      :value="service.value" 
+                      :checked="service.checked==true"
+                      >
                       <label class="form-check-label" :for="service.value" >{{ service.name }}</label>
                       </li>'
       ),
@@ -143,18 +149,14 @@ class AdminShopOptions{
         'type' => 'textarea',
         'value' => $this->ShopOrder->ParcelMessage,
       ),
-
       array(
         'name'  => 'parcel_packages',
         'label' => __('Packages', 'wc-cargonizer'),
         'type'  => 'table',
         'value'   => $this->ShopOrder->ParcelPackages,
         'options' => array('Id', 'Count', 'Parcel type', 'Description', 'Weight (kg)', 'Height (cm)', 'Length (cm)', 'Width (cm)'),
-        'save_post' => false
-        
+        'save_post' => false        
       ),
-
-
       array(
         'name' => 'parcel_shipping_date',
         'label' => __('Shipping date', 'wc-cargonizer'),
@@ -217,13 +219,22 @@ class AdminShopOptions{
 
   function loadRecurringOptions(){
     return array(
-       array(
+      array(
+        'name'  => 'create_recurring_consignment',
+        'label' => __('Create recurring consignment', 'wc-cargonizer'),
+        'type'  => 'checkbox',
+        'value' => '',
+        'option'=> 'on',
+        'save_post' => false
+      ),
+      array(
         'name'  => 'copy_consignment',
         'label' => __('Copy from parcels', 'wc-cargonizer'),
         'desc'  => __('Copies carrier, type, services and message from the main parcel', 'wc-cargonizer'),
         'type'  => 'checkbox',
         'value' => '',
-        'option'=> 'on'
+        'option'=> 'on',
+        'save_post' => false
       ),
       array(
         'name'  => 'recurring_consignment_interval',
@@ -235,7 +246,7 @@ class AdminShopOptions{
       array(
         'name'  => 'recurring_consignment_start_date',
         'label' => __('Startdate', 'wc-cargonizer'),
-        'type'  => 'text',
+        'type'  => 'date',
         'value' => '',
       ),
 
@@ -244,13 +255,60 @@ class AdminShopOptions{
         'label' => __('Carrier', 'wc-cargonizer'),
         'type'  => 'select',
         'value'   => null,
+        'attr'   => ' @change="updateRecurringProducts" v-model="recurring_consignment_carrier_id" ',
         'options' => $this->CargonizerOptions->getCompanyList(),
       ),
-       array(
+
+      array(
+        'name'    => 'recurring_consignment_carrier_product',
+        'label'   => __('Carrier product', 'wc-cargonizer'),
+        'desc'    => __('If empty, setup api settings', 'wc-cargonizer'),
+        'type'    => 'vue_select',
+        'container' => 'select',
+        'attr'    => 'id="@name@" name="@name@" v-model="@name@" @change="updateRecurringProductTypes" ',
+        'value'   => '',
+        'options' => '<option v-for="product in recurring_consignment_products" :value="product.identifier" :selected="product.selected==true">{{ product.name }}</option>'
+      ),
+      array(
+        'name'    => 'recurring_consignment_product_type',
+        'label'   => __('Product type', 'wc-cargonizer'),
+        'type'    => 'vue_select',
+        'container' => 'select',
+        'attr'    => 'id="@name@" name="@name@" v-model="recurring_consignment_product_type" ',
+        'value'   => '',
+        'options' => '<option v-for="pt in recurring_consignment_product_types" :value="pt.value" :selected="pt.selected==true">{{ pt.name }}</option>'
+      ),
+      array(
+        'name'    => 'recurring_consignment_product_services',
+        'label'   => __('Product services', 'wc-cargonizer'),
+        'type'    => 'vue_checkboxes',
+        'container' => 'ul',
+        //'attr'    => 'id="@name@" name="@name@" ',
+        'value'   => '',
+        'options' => '<li v-for="service in recurring_consignment_product_services">
+                      <input type="checkbox" class="form-check-input" 
+                      name="recurring_consignment_product_services[]" 
+                      v-model="recurring_consignment_product_services" 
+                      :id="service.value" 
+                      :value="service.value" 
+                      :checked="service.checked==true"
+                      >
+                      <label class="form-check-label" :for="service.value" >{{ service.name }}</label>
+                      </li>'
+      ),
+      array(
         'name' => 'recurring_consignment_message_consignee',
         'label' => __('Message', 'wc-cargonizer'),
         'type' => 'textarea',
         'value' => '',
+      ),
+      array(
+        'name'  => 'recurring_consignment_items',
+        'label' => __('Packages', 'wc-cargonizer'),
+        'type'  => 'table',
+        'value'   => '',
+        'options' => array('Id', 'Count', 'Parcel type', 'Description', 'Weight (kg)', 'Height (cm)', 'Length (cm)', 'Width (cm)'),
+        'save_post' => false        
       ),
 
     );

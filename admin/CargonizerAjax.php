@@ -2,7 +2,6 @@
 
 class CargonizerAjax{
 
-
   function __construct(){
     add_action( 'wp_ajax_wcc_print_order', array( $this, '_printOrder' ) );
     add_action( 'wp_ajax_edit', array( $this, '_addPackageRow' ) );
@@ -22,13 +21,12 @@ class CargonizerAjax{
       $post = get_post( $post_id );
 
       if ( isset($_REQUEST['id']) && is_object($post) ){
-        _log($post->post_type);
+        // _log($post->post_type);
         $meta_key =  ( $post->post_type == 'consignment' ) ? 'consignment_packages' : 'parcel_packages';
-        
-        _log($meta_key);
+        //_log($meta_key);
         $packages = get_post_meta( $post_id, $meta_key, true );
         $packages[ $_REQUEST['id'] ] = $_REQUEST;
-        _log($packages);
+        //_log($packages);
         update_post_meta( $post_id, $meta_key, $packages );  
       }
     }

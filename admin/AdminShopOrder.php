@@ -96,6 +96,16 @@ class AdminShopOrder extends AdminShopOptions{
     }
 
 
+    // recurring consignment
+    $data['recurring_consignment_carrier_id'] = $this->CargonizerOptions->get('CarrierId');
+    $data['recurring_consignment_products'] = CargonizerCommonController::getProductsByCarrierId( $data['recurring_consignment_carrier_id'] ); 
+    $data['recurring_consignment_product_types'] = array(); 
+    
+    $data['recurring_consignment_carrier_product'] = $this->CargonizerOptions->get('DefaultCarrierProduct');
+    $data['recurring_consignment_product_type'] = $this->CargonizerOptions->get('DefaultProductType');
+    $data['recurring_consignment_product_services'] = $this->CargonizerOptions->get('DefaultProductServices'); 
+
+
     $html .= '<script>var data = '.json_encode($data).'</script>';
 
 
