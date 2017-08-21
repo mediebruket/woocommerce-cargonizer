@@ -129,8 +129,45 @@ class CargonizerHtmlBuilder{
       <?php endif; ?>
 
 
+      <?php if( $option['type'] == 'history'): ?>
+      <table class="table table-striped table-bordered" id="history">
+        <?php if ( isset($option['options']) && is_array($option['options']) ): ?> 
+          <thead>
+            <tr><?php foreach ($option['options'] as $key => $name) {
+                printf('<th>%s</th>', $name); 
+              }?></tr>
+          </thead>
+          
+          <tbody>
+            <?php if ( is_array($option['value']) ): ?>
+            <?php 
+              foreach ($option['value'] as $key => $h) {
+                 printf('<tr>
+                <td class="id">%s</td>
+                <td class="created-at">%s</td>
+                <td class="tracking-code">%s</td>
+                <td class="tracking-url"><a href="%s">Tracking url</a></td>
+                <td class="consignment-pdf"><a href="%s">PDF</a></td>
+               </tr>',
+               $h['consignment_id'],
+               $h['created_at'], //2017-08-18T11:42:56Z
+               $h['consignment_tracking_code'], // 40170712190101741122 
+               $h['consignment_tracking_url'], //sporing.bring.no/sporing.html?q=40170712190101741122&layout=standalone
+               $h['consignment_pdf'] // http://sandbox.cargonizer.no/consignments/label_pdf?consignment_ids%5B%5D=16233
+               );
+              }
+            ?>
+            <?php endif; ?>
+          </tbody>
+          <?php endif; ?>
+      </table>
+
+
+      <?php endif; ?>
+
+
       <?php if( $option['type'] == 'table'): ?>
-       <table class="table table-striped table-bordered" id="parcel_repeater">
+       <table class="table table-striped table-bordered " id="parcel_repeater">
           <?php if ( isset($option['options']) && is_array($option['options']) ): ?> 
           <thead>
             <tr><?php foreach ($option['options'] as $key => $name) {
@@ -150,7 +187,7 @@ class CargonizerHtmlBuilder{
                 <td class="package-weight">%s</td>
                 <td class="package-height">%s</td>
                 <td class="package-length">%s</td>
-                <td class="package-widt">%s</td>
+                <td class="package-width">%s</td>
                </tr>',
                $package['id'],
                $package['parcel_amount'],

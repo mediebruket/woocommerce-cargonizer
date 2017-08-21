@@ -22,8 +22,6 @@ class CargonizerCommonController{
 
     return $choices;
   }
-
-
    
 
   public static function getRecurringConsignmentInterval(){
@@ -34,9 +32,6 @@ class CargonizerCommonController{
     }
     return $intervals;
   }
-
-
-  
 
 
   function setMailContentType(){
@@ -87,22 +82,25 @@ class CargonizerCommonController{
   }
 
 
-  function acf_setParcelPrinter($field){
-    // _log('Cargonizer::acf_setParcelPrinter');
-    // _log($this->Settings);
-    if ( $printers = CargonizerOptions::getPrinterList() ){
-      $field['choices'] = array();
-      foreach ($printers as $printer_id => $printer_name) {
-        $field['choices'][$printer_id] = $printer_name;
+  public static function getProductsByCarrierId( $carrier_id ){
+    $products = array();
+
+    $agreements = get_transient('transport_agreements');
+
+    if ( is_array($agreements) ){
+      foreach ($agreements as $key => $a) {
+        if ( $a['id'] == $carrier_id ){
+          if ( is_array($a) && isset($a['products']) && is_array($a['products']) ){
+            $products = $a['products'];
+            break;
+          }
+        }
       }
     }
 
-    if ( $default_printer =  $this->Settings->get('DefaultPrinter' ) ) {
-      $field['default_value'] = $default_printer;
-    }
-
-
-    return $field;
+    //_log($products);
+    
+    return $products;
   }
 
 

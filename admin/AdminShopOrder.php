@@ -48,28 +48,6 @@ class AdminShopOrder extends AdminShopOptions{
   }
 
 
-  function getProductsByCarrierId( $carrier_id ){
-    $products = array();
-
-    $agreements = get_transient('transport_agreements');
-
-    if ( is_array($agreements) ){
-      foreach ($agreements as $key => $a) {
-        if ( $a['id'] == $carrier_id ){
-          if ( is_array($a) && isset($a['products']) && is_array($a['products']) ){
-            $products = $a['products'];
-            break;
-          }
-        }
-      }
-    }
-
-    //_log($products);
-    
-    return $products;
-  }
-
-
   function makeOrderMetaBox( $meta_id ) {
     $html = $navigation = null;
     if ( $nav_items = $this->getNavItems() ){
@@ -89,14 +67,14 @@ class AdminShopOrder extends AdminShopOptions{
     $data['carriers'] = $this->CargonizerOptions->getCompanyList(); 
     // active carrier
 
-    _log($this->ShopOrder);
+    //_log($this->ShopOrder);
     $data['carrier_id'] =  ( $this->ShopOrder->CarrierId ) ?  $this->ShopOrder->CarrierId : $this->CargonizerOptions->get('CarrierId'); 
     
 
     // active product
     $data['parcel_carrier_product'] = ( $this->ShopOrder->CarrierProduct ) ? $this->ShopOrder->CarrierProduct : $this->CargonizerOptions->get('DefaultCarrierProduct');
     // all products
-    $data['products'] = $this->getProductsByCarrierId( $data['carrier_id'] ); 
+    $data['products'] = CargonizerCommonController::getProductsByCarrierId( $data['carrier_id'] ); 
 
 
   
@@ -121,7 +99,7 @@ class AdminShopOrder extends AdminShopOptions{
     $html .= '<script>var data = '.json_encode($data).'</script>';
 
 
-    $html .='<div class="tab-content" id="admin_shop">'.
+    $html .='<div class="tab-content vue-consignment" id="admin_shop_order">'.
               CargonizerHtmlBuilder::buildTab( $id="parcel", $this->getOptions('Parcel'), $class='show active' ).
                 CargonizerHtmlBuilder::buildTab( $id="confirmation", $this->getOptions('Confirmation') , null).
                   CargonizerHtmlBuilder::buildTab( $id="recurring", $this->getOptions('Recurring'), null ).

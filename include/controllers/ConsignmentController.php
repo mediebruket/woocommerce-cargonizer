@@ -7,9 +7,48 @@ class ConsignmentController extends CargonizerCommonController{
 
   function __construct( ){
     parent::__construct();
-
-    add_action( 'save_post', array($this, 'preventRevision'), 10, 1 );
+    add_action( 'save_post', array($this, 'preventRevision'), 1, 1 );
+    add_action( 'save_post', array($this, 'save'), 10, 1 );
   }
+
+
+  function save( $post_id ){
+    _log('ConsignmentController::save()');
+    global $post_id;
+
+    if ( !isset($_REQUEST['post_ID']) or $_REQUEST['post_ID'] != $post_id ){
+      return false;
+    }
+
+    if ( $Consignment = $this->isConsignment( $return_object=true ) ){
+      $tabs = array('Parcel', 'Consignee');
+      //_log($_REQUEST);
+      $ConsignmentOptions = new AdminConsignmentOptions();
+
+      foreach ($tabs as $key => $tab) {
+        $method = 'load'.$tab.'Options';
+        $options = $ConsignmentOptions->$method();
+        
+        foreach ($options as $oi => $o) {
+           if ( !isset($o['save_post']) or (isset($o['save_post']) && $o['save_post']) ){
+            $index = $o['name'];
+            $meta_value = ( isset($_POST[$index]) ) ? $_POST[$index] : null;
+                                  
+            if ( $result = update_post_meta( $post_id, $index, $meta_value ) ){
+              _log('updated: '.$index);
+              _log($meta_value);
+              _log(' ');
+            }
+          }
+          // else{
+          //  _log('exception');
+          //  _log($o);
+          // }
+        }
+      }
+    }
+  }
+
 
 
   public static function createConsignment( $post_id  ){
@@ -76,24 +115,7 @@ class ConsignmentController extends CargonizerCommonController{
     }
   }
 
-  
-  function acf_filterCustomerId( $field ){
-    global $post_id;
-
-    $customer_id = null;
-    if ( $post_id  ){
-      $Consignment = new Consignment($post_id);
-      if ( $Consignment->CustomerId ){
-        $customer_id = $Consignment->CustomerId;
-      }
-    }
-
-    $field['message'] = str_replace('@acf_consignment_customer_id@', $customer_id, $field['message'] );
-
-    return $field;
-  }
-
-
+   
   function acf_filterOrderProducts( $field ){
     global $post_id;
 
@@ -156,218 +178,6 @@ class ConsignmentController extends CargonizerCommonController{
     return $field;
   }
 
-
-  function acf_filterHistory($field){
-    //_log('acf_filterHistory');
-    global $post_id;
-
-    $html = null;
-    if ( $post_id ){
-      $Consignment = new Consignment($post_id);
-
-      $rows = null;
-
-      if ( is_array($Consignment->History) ){
-        foreach ( $Consignment->History as $key => $log) {
-          // _log($log);
-          $rows .= sprintf(
-              '<tr><td>%s</td> <td>%s</td> <td>%s</td> <td><a href="%s" target="_blank">show</a></td> <td><a href="%s" target="_blank">download</a></td></tr>',
-              $log['created_at'],
-              $log['consignment_id'],
-              $log['consignment_tracking_code'],
-              strip_tags($log['consignment_tracking_url']),
-              strip_tags($log['consignment_pdf'])
-            );
-          // _log($log);
-        }
-      }
-
-      $head =  '<tr> <th>%s</th> <th>%s</th> <th>%s</th> <th>%s</th> <th>%s</th> </tr>';
-      $head = sprintf(
-          $head,
-          __('Created at', 'wc-cargonizer'),
-          __('Consignment id', 'wc-cargonizer'),
-          __('Tracking code', 'wc-cargonizer'),
-          __('Tracking url', 'wc-cargonizer'),
-          __('PDF', 'wc-cargonizer')
-        );
-      $html = '<table class="table table-striped">'.$head.$rows.'</table>';
-
-    }
-    
-    $field['message'] = str_replace('@acf_consignment_history@', $html, $field['message'] );
-
-    return $field;
-  }
-
-
-
-
-
-  function acf_checkConsignmentStatus($field){
-    if ( $post_id = $this->isOrder($object=false) ){
-      if ( $is_cargonized = get_post_meta( $post_id, 'is_cargonized', true ) ){
-        $field = null;
-      }
-    }
-
-    return $field;
-  }
-
-
-  function acf_setCarrierProducts($field){
-    // _log('Cargonizer::acf_setCarrierProducts');
-    // _log($field);
-    $choices = array();
-
-    if ( $post_id = $this->isOrder($object=false) ){
-      $CargonizerSettings = new CargonizerOptions();
-      $ta = $CargonizerSettings->get('SelectedTransportAgreement');
-      $ts = $CargonizerSettings->get('TransportProduct');
-
-      if ( is_array($ta) && isset($ta['products']) && is_array($ta['products']) ){
-        // _log($ta_settings);
-        // _log('settings');
-        foreach ($ta['products'] as $key => $p) {
-
-          if ( isset($p['types']) && is_array($p['types']) ){
-            foreach ($p['types'] as $ti => $type) {
-              $index = $p['identifier']."|".$ti;
-
-              if ( is_array($ts) ){
-                if ( is_numeric(array_search($index, $ts)) ){
-                  $choices[$index] = $p['name']." (".$type.")";
-                }
-              }
-              elseif ( $index == $ts ){
-                $choices[$index] = $p['name']." (".$type.")";
-              }
-
-            }
-          }
-          else{
-            $choices[$key] = $p['name'];
-          }
-        }
-      }
-    }
-
-    if ( $choices ){
-      $field['choices'] = array_merge($field['choices'], $choices);
-    }
-
-
-    return $field;
-  }
-
-
-
-  function acf_setParcelTypes($field){
-    // _log($field);
-    $choices = array();
-
-    if ( $post_id = $this->isOrder($object=false) ){
-      $CargonizerSettings = new CargonizerOptions();
-      $ta = $CargonizerSettings->get('SelectedTransportAgreement');
-      $ts = $CargonizerSettings->get('TransportProduct');
-
-      if ( is_array($ta) && isset($ta['products']) && is_array($ta['products']) ){
-        // _log($ta_settings);
-        // _log('settings');
-        foreach ($ta['products'] as $key => $p) {
-          if ( isset($p['types']) && is_array($p['types']) ){
-            foreach ($p['types'] as $ti => $type) {
-              $index = $p['identifier']."|".$ti;
-
-              if ( is_array($ts) ){
-                if ( is_numeric(array_search($index, $ts)) ){
-                  $choices[$ti] = $p['name']." (".$type.")";
-                }
-              }
-              else if ( $index == $ts ){
-                $choices[$ti] = $p['name']." (".$type.")";
-              }
-
-            }
-          }
-          else{
-            $choices[$key] = $p['name'];
-          }
-        }
-      }
-
-      if ( $choices ){
-        $field['choices'] = array_merge($field['choices'], $choices);
-      }
-    }
-
-
-    return $field;
-  }
-
-
-  function acf_setProductServices($field){
-    // _log('acf_setProductServices');
-    // _log($field);
-    $choices = array();
-
-    if ( $post_id = $this->isOrder($object=false) ){
-      $CargonizerSettings = new CargonizerOptions();
-      $ta = $CargonizerSettings->get('SelectedTransportAgreement');
-      $ts = $CargonizerSettings->get('TransportProduct');
-
-      if ( is_array($ta) && isset($ta['products']) && is_array($ta['products']) ){
-
-        // _log('settings');
-        foreach ( $ta['products'] as $key => $p) {
-          if ( $key == 0 ){
-            foreach ($p['services'] as $key => $s) {
-              $choices[$s['identifier']] = $s['name'];
-            }
-          }
-        }
-      }
-    }
-
-    if ( !empty($choices) ){
-      $field['choices'] = $choices;
-      $field['default_value'] = 'bring_e_varsle_for_utlevering';
-    }
-
-
-    return $field;
-  }
-
-
-  function acf_setTransportAgreements($field){
-    if ( $Consignment = $this->isConsignment() ){
-      if (  $choices = $this->getTransportAgreementChoices() ){
-        $field['choices'] = $choices;
-      }
-    }
-
-    return $field;
-  }
-
-
-
-  function acf_setParcelPrinter($field){
-    // _log('Cargonizer::acf_setParcelPrinter');
-    // _log($this->Settings);
-    if ( $printers = CargonizerOptions::getPrinterList() ){
-      $field['choices'] = array();
-      foreach ($printers as $printer_id => $printer_name) {
-        $field['choices'][$printer_id] = $printer_name;
-      }
-    }
-
-    if ( $default_printer =  $this->Settings->get('DefaultPrinter' ) ) {
-      $field['default_value'] = $default_printer;
-    }
-
-
-    return $field;
-  }
 
 } // end of class
 

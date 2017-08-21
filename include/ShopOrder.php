@@ -24,7 +24,7 @@ class ShopOrder{
 
 
   function __construct($post_id){
-    _log("ShopOrder::__construct");
+    //_log("ShopOrder::__construct");
 
     if ( is_numeric($post_id) ){
       // set woocommerce order object
@@ -187,7 +187,15 @@ class ShopOrder{
 
 
   function getParcelMessage(){
-    return gi($this->Meta, 'parcel_message_consignee' );
+    if (  isset($this->Meta['parcel_message_consignee'][0]) ){
+      return $this->Meta['parcel_message_consignee'][0];
+    }
+    else{
+      $default = get_option('cargonizer-parcel-message-consignee' );
+      $default = str_replace('@order_id@', $this->Id, $default);
+      return $default;
+    }
+    
   }
 
 

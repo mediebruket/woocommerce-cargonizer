@@ -13,21 +13,34 @@ class Consignment{
   public $CarrierProductId;
   public $CarrierProductType;
   public $CarrierProductService;
-  public $CustomerId;
+  
+  public $ExportToCarrier;
   public $History;
   public $IsRecurring;
   public $IsCargonized;
   public $Items;
   public $NextShippingDate;
   public $LastShippingDate;
+  public $Meta;
   public $OrderId;
   public $OrderProducts;
   public $Printer;
   public $PrintOnExport;
-  public $ExportToCarrier;
   public $RecurringInterval;
   public $Subscriptions;
-  public $Meta;
+
+  // consignee
+  public $CustomerId;
+  public $ShippingFirstName;
+  public $ShippingLastName;
+  public $ShippingAdress1;
+  public $ShippingAdress2;
+  public $ShippingPostCode;
+  public $ShippingCity;
+  public $ShippingCountry;
+  public $CustomerEmail;
+  public $CustomerPhone;
+  
 
   function __construct( $post_id ){
 
@@ -41,36 +54,46 @@ class Consignment{
     $this->CarrierId        = $this->getCarrierId();
     $this->CarrierProduct   = $this->getCarrierProduct();
     $this->CarrierProductServices  = $this->getCarrierProductServices();
-    $this->CarrierProductType  = $this->getCarrierProductType();
-
-      //$this->CarrierProductType  =  ( isset($tmp[1]) ) ? $tmp[1] : null;
-    
-
+    $this->CarrierProductType  = $this->getCarrierProductType(); 
     // _log($this);
   }
 
+
   function init(){
-    $this->Meta             = $this->getPostMeta();
+    $this->Meta                   = $this->getPostMeta();
 
-    $this->Items            = $this->getItems();
-    $this->IsRecurring      = $this->isRecurring();
-    $this->CustomerId       = $this->getCustomerId();
-    $this->OrderId          = $this->getOrderId();
-    $this->OrderProducts    = $this->getOrderProducts();
-    $this->SubscriptionProducts    = $this->getSubscriptionProducts();
-    $this->Subscriptions    = $this->getSubscriptionsByOrderId();
-    $this->ReceiverEmail    = $this->getReceiverEmail();
-    $this->ReceiverPhone    = $this->getReceiverPhone();
-    $this->RecurringInterval = $this->getRecurringInterval();
+    $this->Items                  = $this->getItems();
+    $this->IsRecurring            = $this->isRecurring();
 
-    $this->History          = $this->getHistory();
-    $this->Printer          = $this->getPrinter();
-    $this->PrintOnExport    = $this->getPrintOnExport();
-    $this->AutoTransfer     = $this->getAutoTransfer();
-    $this->Message          = $this->getConsigneeMessage();
+    $this->CustomerId             = $this->getCustomerId();
+    
+    $this->OrderId                = $this->getOrderId();
+    $this->OrderProducts          = $this->getOrderProducts();
+    $this->SubscriptionProducts   = $this->getSubscriptionProducts();
+    $this->Subscriptions          = $this->getSubscriptionsByOrderId();
+    $this->ReceiverEmail          = $this->getReceiverEmail();
+    $this->ReceiverPhone          = $this->getReceiverPhone();
+    $this->RecurringInterval      = $this->getRecurringInterval();
 
-    $this->NextShippingDate  = $this->getNextShippingDate();
-    $this->LastShippingDate  = $this->getLastShippingDate();
+    $this->History                = $this->getHistory();
+    $this->Printer                = $this->getPrinter();
+    $this->PrintOnExport          = $this->getPrintOnExport();
+    $this->AutoTransfer           = $this->getAutoTransfer();
+    $this->Message                = $this->getConsigneeMessage();
+
+    $this->NextShippingDate       = $this->getNextShippingDate();
+    $this->LastShippingDate       = $this->getLastShippingDate();
+
+    // consignee
+    $this->ShippingFirstName      = $this->getShippingFirstName();
+    $this->ShippingLastName       = $this->getShippingLastName();
+    $this->ShippingAddress1       = $this->getShippingAddress1();
+    $this->ShippingAddress2       = $this->getShippingAddress2();
+    $this->ShippingPostCode       = $this->getShippingPostcode();
+    $this->ShippingCity           = $this->getShippingCity();
+    $this->ShippingCountry        = $this->getShippingCountry();
+    $this->CustomerEmail          = $this->getCustomerEmail();
+    $this->CustomerPhone          = $this->getCustomerPhone();
   }
 
 
@@ -111,6 +134,56 @@ class Consignment{
 
   function getCustomerId(){
     return gi($this->Meta, 'customer_id');
+  }
+
+
+  function getShippingFirstName(){
+    return gi($this->Meta, '_shipping_first_name');
+  }
+
+
+  function getShippingLastName(){
+    return gi($this->Meta, '_shipping_last_name');
+  }
+
+
+  function getShippingAddress1(){
+    return gi($this->Meta, '_shipping_address_1');
+  }
+
+
+  function getShippingAddress2(){
+    return gi($this->Meta, '_shipping_address_2');
+  }
+
+
+  function getShippingCity(){
+    return gi($this->Meta, '_shipping_city');
+  }
+
+
+  function getShippingPostcode(){
+    return gi($this->Meta, '_shipping_postcode');
+  }
+
+
+  function getShippingCountry(){
+    if ( $cc = gi($this->Meta, '_shipping_country') ){
+      return $cc;
+    }
+    else{
+      return 'NO';
+    }
+  }
+
+
+  function getCustomerEmail(){
+    return gi($this->Meta, 'email');
+  }
+
+
+  function getCustomerPhone(){
+    return gi($this->Meta, 'phone');
   }
 
   
@@ -209,6 +282,7 @@ class Consignment{
 
 
   function getCarrierProductServices(){
+    
     return maybe_unserialize( get_post_meta( $this->Id, 'consignment_services', true ) );
   }
 
@@ -726,8 +800,8 @@ class Consignment{
     else{
       _log('no customer mail');
     }
-
   }
+
 
   public static function addNote( $order_id, $consignment_id ){
     _log('Consignment::addNote('.$order_id.')');
@@ -843,7 +917,6 @@ class Consignment{
 
 
   public static function calcNextShippingDate( $interval, $auto_inc=false ){
-
     if ( is_numeric($interval) && $interval > 0 ){
       $month = date('m');
       $year = date('Y');
@@ -863,7 +936,6 @@ class Consignment{
     else{
       return null;
     }
-
   }
 
 

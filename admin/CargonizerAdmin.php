@@ -39,7 +39,6 @@ class CargonizerAdmin{
         'read',
         'edit.php?post_type=consignment'
     );
-
   }
 
 
@@ -229,9 +228,11 @@ class CargonizerAdmin{
         $screen = get_current_screen();
       }
 
-      if ( gi($_GET, 'post') && gi($_GET, 'action') == 'edit' && is_object($screen) && $screen->post_type == 'shop_order' ){
-        wp_register_script( 'wcc-admin-order', $path. 'js/wcc-admin-order.js', false, '2.0.0' );
-        wp_enqueue_script( 'wcc-admin-order' );
+      if ( gi($_GET, 'post') && gi($_GET, 'action') == 'edit'){
+        if ( is_object($screen) && ($screen->post_type == 'shop_order' or $screen->post_type == 'consignment')  ){
+          wp_register_script( 'wcc-admin-order', $path. 'js/wcc-admin-order.js', false, '2.0.0' );
+          wp_enqueue_script( 'wcc-admin-order' );  
+        }
       }
 
       wp_register_script( 'popper-js', 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js', false, '1.11.0' );
@@ -314,7 +315,7 @@ class CargonizerAdmin{
 
   public static function showResetLink( $Order ){
     if ( is_object($Order) && get_post_meta( $Order->get_id(), 'is_cargonized', true ) ){
-      if ( $edit_link = get_edit_post_link($Order->id) ){
+      if ( $edit_link = get_edit_post_link($Order->get_id()) ){
         $delete_link = $edit_link.'&wcc_action=reset_consignment';
         $delete_text = __('Logistra Cargonizer: reset consignment', 'wc-cargonizer' );
 
