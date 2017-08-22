@@ -13,7 +13,7 @@ class Consignment{
   public $CarrierProductId;
   public $CarrierProductType;
   public $CarrierProductService;
-  
+
   public $ExportToCarrier;
   public $History;
   public $IsRecurring;
@@ -40,7 +40,7 @@ class Consignment{
   public $ShippingCountry;
   public $CustomerEmail;
   public $CustomerPhone;
-  
+
 
   function __construct( $post_id ){
 
@@ -54,19 +54,18 @@ class Consignment{
     $this->CarrierId        = $this->getCarrierId();
     $this->CarrierProduct   = $this->getCarrierProduct();
     $this->CarrierProductServices  = $this->getCarrierProductServices();
-    $this->CarrierProductType  = $this->getCarrierProductType(); 
+    $this->CarrierProductType  = $this->getCarrierProductType();
     // _log($this);
   }
 
 
   function init(){
     $this->Meta                   = $this->getPostMeta();
-
-    $this->Items                  = $this->getItems();
     $this->IsRecurring            = $this->isRecurring();
+    $this->Items                  = $this->getItems();
 
     $this->CustomerId             = $this->getCustomerId();
-    
+
     $this->OrderId                = $this->getOrderId();
     $this->OrderProducts          = $this->getOrderProducts();
     $this->SubscriptionProducts   = $this->getSubscriptionProducts();
@@ -82,6 +81,7 @@ class Consignment{
     $this->Message                = $this->getConsigneeMessage();
 
     $this->NextShippingDate       = $this->getNextShippingDate();
+    $this->StartDate              = $this->getStartDate();
     $this->LastShippingDate       = $this->getLastShippingDate();
 
     // consignee
@@ -186,7 +186,7 @@ class Consignment{
     return gi($this->Meta, 'phone');
   }
 
-  
+
   function getConsigneeMessage(){
     return gi($this->Meta, 'consignment_message');
   }
@@ -238,6 +238,11 @@ class Consignment{
   }
 
 
+  function getStartDate(){
+    return gi($this->Meta, 'consignment_start_date');
+  }
+
+
   function getLastShippingDate(){
     $date = null;
     // _log('$this->History');
@@ -282,7 +287,7 @@ class Consignment{
 
 
   function getCarrierProductServices(){
-    
+
     return maybe_unserialize( get_post_meta( $this->Id, 'consignment_services', true ) );
   }
 
@@ -293,6 +298,8 @@ class Consignment{
 
   public static function createOrUpdate( $Order, $recurring=false ){
     _log('Consignment::createOrUpdate('.$Order->ID.')');
+    _log('recurring: '.$recurring);
+
     $post_id = null;
     //_log($Order);
     $args = array(
@@ -337,9 +344,11 @@ class Consignment{
         update_post_meta( $post_id, 'recurring_consignment_interval', $Order->RecurringInterval );
         update_post_meta( $post_id, 'consignment_carrier_id', $Order->RecurringCarrierId );
         update_post_meta( $post_id, 'consignment_start_date', $Order->RecurringStartDate );
-        update_post_meta( $post_id, 'consignment_product', $Order->RecurringConsignmentType );
+        update_post_meta( $post_id, 'consignment_product', $Order->RecurringCarrierProduct );
+        update_post_meta( $post_id, 'consignment_product_type', $Order->RecurringConsignmentProductType );
         update_post_meta( $post_id, 'consignment_services', $Order->RecurringConsignmentServices );
         update_post_meta( $post_id, 'consignment_message', $Order->RecurringConsignmentMessage );
+        update_post_meta( $post_id, 'consignment_packages', $Order->RecurringConsignmentItems );
       }
       else{
         update_post_meta( $post_id, 'consignment_packages', $Order->ParcelPackages );
@@ -607,7 +616,7 @@ class Consignment{
 
 
     $export['consignments']['consignment']['transfer'] = ( $this->AutoTransfer ) ? 'true' : 'false';
-        
+
 
     // $export['consignments']['consignment']['booking_request'] = 'false';
     $export['consignments']['consignment']['product'] = $this->CarrierProduct;
@@ -673,7 +682,7 @@ class Consignment{
     // <item type="PK" amount="1" weight="22" volume="122" description="Something else"/>
 
     $export['consignments']['consignment']['items'] = array(); // packages
-    
+
     foreach ($this->Items as $key => $item) {
       $array = array('item' => null );
 

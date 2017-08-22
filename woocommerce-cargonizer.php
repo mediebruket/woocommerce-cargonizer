@@ -2,14 +2,14 @@
 /*woo
 Plugin Name: Woocomerce Cargonizer
 Description:
-Version: 0.1.4
+Version: 0.1.5
 Author: Mediebruket AS
 Author URI: http://mediebruket.no
 */
 
 global $plugin_file;
 $plugin_file = __FILE__;
-$plugin_path = plugin_dir_path( __FILE__ );  
+$plugin_path = plugin_dir_path( __FILE__ );
 
 require_once( $plugin_path . 'conf/conf.php');
 

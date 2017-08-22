@@ -13,7 +13,6 @@ class ConsignmentController extends CargonizerCommonController{
 
 
   function save( $post_id ){
-    _log('ConsignmentController::save()');
     global $post_id;
 
     if ( !isset($_REQUEST['post_ID']) or $_REQUEST['post_ID'] != $post_id ){
@@ -21,6 +20,7 @@ class ConsignmentController extends CargonizerCommonController{
     }
 
     if ( $Consignment = $this->isConsignment( $return_object=true ) ){
+      _log('ConsignmentController::save()');
       $tabs = array('Parcel', 'Consignee');
       //_log($_REQUEST);
       $ConsignmentOptions = new AdminConsignmentOptions();
@@ -28,12 +28,12 @@ class ConsignmentController extends CargonizerCommonController{
       foreach ($tabs as $key => $tab) {
         $method = 'load'.$tab.'Options';
         $options = $ConsignmentOptions->$method();
-        
+
         foreach ($options as $oi => $o) {
            if ( !isset($o['save_post']) or (isset($o['save_post']) && $o['save_post']) ){
             $index = $o['name'];
             $meta_value = ( isset($_POST[$index]) ) ? $_POST[$index] : null;
-                                  
+
             if ( $result = update_post_meta( $post_id, $index, $meta_value ) ){
               _log('updated: '.$index);
               _log($meta_value);
@@ -107,15 +107,15 @@ class ConsignmentController extends CargonizerCommonController{
   }
 
 
-  function preventRevision($post_id){    
+  function preventRevision($post_id){
     $post = get_post($post_id);
 
     if ( wp_is_post_revision( $post_id ) or !$post->post_title ){
-      return;  
+      return;
     }
   }
 
-   
+
   function acf_filterOrderProducts( $field ){
     global $post_id;
 

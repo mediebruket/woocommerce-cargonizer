@@ -39,7 +39,7 @@ class CargonizerHtmlBuilder{
 
 
   public static function buildOption( $option, $default_value=null ){?>
-    <div class="mb-field-row">
+    <div class="mb-field-row <?php echo gi($option, 'container'); ?>">
 
       <?php
       if( $option['type'] == 'text' or $option['type'] == 'number'):
@@ -131,16 +131,16 @@ class CargonizerHtmlBuilder{
 
       <?php if( $option['type'] == 'history'): ?>
       <table class="table table-striped table-bordered" id="history">
-        <?php if ( isset($option['options']) && is_array($option['options']) ): ?> 
+        <?php if ( isset($option['options']) && is_array($option['options']) ): ?>
           <thead>
             <tr><?php foreach ($option['options'] as $key => $name) {
-                printf('<th>%s</th>', $name); 
+                printf('<th>%s</th>', $name);
               }?></tr>
           </thead>
-          
+
           <tbody>
             <?php if ( is_array($option['value']) ): ?>
-            <?php 
+            <?php
               foreach ($option['value'] as $key => $h) {
                  printf('<tr>
                 <td class="id">%s</td>
@@ -151,7 +151,7 @@ class CargonizerHtmlBuilder{
                </tr>',
                $h['consignment_id'],
                $h['created_at'], //2017-08-18T11:42:56Z
-               $h['consignment_tracking_code'], // 40170712190101741122 
+               $h['consignment_tracking_code'], // 40170712190101741122
                $h['consignment_tracking_url'], //sporing.bring.no/sporing.html?q=40170712190101741122&layout=standalone
                $h['consignment_pdf'] // http://sandbox.cargonizer.no/consignments/label_pdf?consignment_ids%5B%5D=16233
                );
@@ -167,17 +167,17 @@ class CargonizerHtmlBuilder{
 
 
       <?php if( $option['type'] == 'table'): ?>
-       <table class="table table-striped table-bordered " id="parcel_repeater">
-          <?php if ( isset($option['options']) && is_array($option['options']) ): ?> 
+       <table class="table table-striped table-bordered parcel-items " id="<?php echo $option['name']; ?>">
+          <?php if ( isset($option['options']) && is_array($option['options']) ): ?>
           <thead>
             <tr><?php foreach ($option['options'] as $key => $name) {
-                printf('<th>%s</th>', $name); 
+                printf('<th>%s</th>', $name);
               }?></tr>
           </thead>
           <?php endif; ?>
 
           <tbody>
-          <?php if ( isset($option['value']) && is_array($option['value']) ): ?> 
+          <?php if ( isset($option['value']) && is_array($option['value']) ): ?>
             <?php foreach ($option['value'] as $key => $package) {
               printf('<tr>
                 <td class="id">%s</td>
@@ -203,7 +203,7 @@ class CargonizerHtmlBuilder{
           <?php endif; ?>
           </tbody>
         </table>
-        <button type="button" id="add-package-row" class="btn btn-dark  "><?php _e('Add row'); ?></button>
+        <button type="button" data-target="<?php echo $option['name']; ?>" class="btn btn-dark js-add-package-row"><?php _e('Add row'); ?></button>
       <?php endif; ?>
 
 

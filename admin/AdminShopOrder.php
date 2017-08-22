@@ -1,10 +1,10 @@
 <?php
 
 class AdminShopOrder extends AdminShopOptions{
-  
+
   function __construct(){
     parent::__construct();
-  
+
     add_action( 'add_meta_boxes', array($this, 'registerOrderMetaBox') );
   }
 
@@ -62,30 +62,30 @@ class AdminShopOrder extends AdminShopOptions{
       }
     }
 
-
+    $data['is_cargonized'] = ( $this->ShopOrder->IsCargonized ) ? true : false;
     // all carriers
-    $data['carriers'] = $this->CargonizerOptions->getCompanyList(); 
+    $data['carriers'] = $this->CargonizerOptions->getCompanyList();
     // active carrier
 
     //_log($this->ShopOrder);
-    $data['carrier_id'] =  ( $this->ShopOrder->CarrierId ) ?  $this->ShopOrder->CarrierId : $this->CargonizerOptions->get('CarrierId'); 
-    
+    $data['carrier_id'] =  ( $this->ShopOrder->CarrierId ) ?  $this->ShopOrder->CarrierId : $this->CargonizerOptions->get('CarrierId');
+
 
     // active product
     $data['parcel_carrier_product'] = ( $this->ShopOrder->CarrierProduct ) ? $this->ShopOrder->CarrierProduct : $this->CargonizerOptions->get('DefaultCarrierProduct');
     // all products
-    $data['products'] = CargonizerCommonController::getProductsByCarrierId( $data['carrier_id'] ); 
+    $data['products'] = CargonizerCommonController::getProductsByCarrierId( $data['carrier_id'] );
 
 
-  
+
     // all product types, handled by vue
-    $data['product_types'] = array(); 
+    $data['product_types'] = array();
     // active product type
     $data['product_type'] = ( $this->ShopOrder->ParcelType ) ? $this->ShopOrder->ParcelType : $this->CargonizerOptions->get('DefaultProductType');
 
 
     // all product services, handled by vue
-    $data['product_services'] = array();   
+    $data['product_services'] = array();
     // active product services
     $data['active_product_services'] = array();
     if ( $this->ShopOrder->ParcelServices ){
@@ -98,16 +98,25 @@ class AdminShopOrder extends AdminShopOptions{
 
     // recurring consignment
     $data['recurring_consignment_carrier_id'] = $this->CargonizerOptions->get('CarrierId');
-    $data['recurring_consignment_products'] = CargonizerCommonController::getProductsByCarrierId( $data['recurring_consignment_carrier_id'] ); 
-    $data['recurring_consignment_product_types'] = array(); 
-    
+    $data['recurring_consignment_products'] = CargonizerCommonController::getProductsByCarrierId( $data['recurring_consignment_carrier_id'] );
+    $data['recurring_consignment_product_types'] = array();
+
     $data['recurring_consignment_carrier_product'] = $this->CargonizerOptions->get('DefaultCarrierProduct');
     $data['recurring_consignment_product_type'] = $this->CargonizerOptions->get('DefaultProductType');
-    $data['recurring_consignment_product_services'] = $this->CargonizerOptions->get('DefaultProductServices'); 
+
+
+    // all recurring product servicse
+    $data['recurring_consignment_product_services'] = array();
+    $data['recurring_consignment_active_product_services'] = array();
+    if ( is_array($this->ShopOrder->RecurringConsignmentServices) ){
+      $data['recurring_consignment_active_product_services'] = $this->ShopOrder->RecurringConsignmentServices;
+    }
+    else if ( $this->ShopOrder->RecurringConsignmentServices == null ){
+      $data['recurring_consignment_active_product_services'] = $this->CargonizerOptions->get('DefaultProductServices');
+    }
 
 
     $html .= '<script>var data = '.json_encode($data).'</script>';
-
 
     $html .='<div class="tab-content vue-consignment" id="admin_shop_order">'.
               CargonizerHtmlBuilder::buildTab( $id="parcel", $this->getOptions('Parcel'), $class='show active' ).
@@ -123,8 +132,8 @@ class AdminShopOrder extends AdminShopOptions{
 
 
 add_action( 'init', 'init_admin_shop_order', 10 );
-function init_admin_shop_order(){  
+function init_admin_shop_order(){
   if ( gi($_GET, 'post') && gi($_GET, 'action') == 'edit' ){
-    new AdminShopOrder();  
+    new AdminShopOrder();
   }
 }

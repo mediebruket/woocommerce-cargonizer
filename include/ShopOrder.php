@@ -41,13 +41,13 @@ class ShopOrder{
         $this->ShippingDate   = $this->getShippingDate();
         $this->CarrierId      = $this->getCarrierId();
         $this->CarrierProduct = $this->getCarrierProduct();
-        
+
 
         $this->IsCargonized   = $this->isCargonized();
         $this->Printer        = $this->getPrinter();
         $this->PrintOnExport  = $this->getPrintOnExport();
         $this->AutoTransfer   = $this->getAutoTransfer();
-        
+
         $this->ParcelType     = $this->getParcelType();
         $this->ParcelServices = $this->getParcelServices();
         $this->ParcelMessage  = $this->getParcelMessage();
@@ -55,14 +55,15 @@ class ShopOrder{
 
 
         // recurring
-        $this->IsRecurring                  = $this->getIsRecurring();
-        $this->RecurringStartDate           = $this->getRecurringStartDate();
-        $this->RecurringCarrierId           = $this->getRecurringCarrierId();
-        $this->RecurringConsignmentType     = $this->getRecurringConsignmentType();
-        $this->RecurringConsignmentServices = $this->getRecurringConsignmentServices();
-        $this->RecurringConsignmentItems    = $this->getRecurringConsignmentItems();
-        $this->RecurringInterval            = $this->getRecurringInterval();
-        $this->RecurringConsignmentMessage  = $this->getRecurringConsignmentMessage();
+        $this->IsRecurring                      = $this->getIsRecurring();
+        $this->RecurringStartDate               = $this->getRecurringStartDate();
+        $this->RecurringCarrierId               = $this->getRecurringCarrierId();
+        $this->RecurringCarrierProduct          = $this->getRecurringCarrierProduct();
+        $this->RecurringConsignmentProductType  = $this->getRecurringConsignmentProductType();
+        $this->RecurringConsignmentServices     = $this->getRecurringConsignmentProductServices();
+        $this->RecurringConsignmentItems        = $this->getRecurringConsignmentItems();
+        $this->RecurringInterval                = $this->getRecurringInterval();
+        $this->RecurringConsignmentMessage      = $this->getRecurringConsignmentMessage();
 
         $this->ConsignmentId = $this->getConsignmentId();
         $this->getTransportAgreementSettings();
@@ -95,11 +96,35 @@ class ShopOrder{
 
 
   function getPackages(){
-    $packages = maybe_unserialize( gi($this->Meta, 'parcel_packages') ); 
+    $packages = maybe_unserialize( gi($this->Meta, 'parcel_packages') );
     //_log('$packages');
     //_log($packages);
     if ( !$packages or is_array($packages) and empty($packages) ){
-      $default = array(
+      $default = $this->getDefaultPackage();
+      $packages = array($default);
+    }
+
+    return $packages;
+  }
+
+
+  function getRecurringConsignmentItems(){
+    //_log('ShopOrder::getRecurringConsignmentItems()');
+    $packages = maybe_unserialize( gi($this->Meta, 'recurring_consignment_packages') );
+
+    if ( !$packages or is_array($packages) and empty($packages) ){
+      $default = $this->getDefaultPackage();
+      $packages = array($default);
+    }
+
+    //_log($packages);
+
+    return $packages;
+  }
+
+
+  function getDefaultPackage(){
+    return $default = array(
         'id' => 1,
         'parcel_amount'       => 1,
         'parcel_type'         => 'PK',
@@ -110,17 +135,13 @@ class ShopOrder{
         'parcel_width'        => get_option('cargonizer-parcel-width')
       );
 
-      $packages = array($default);
-    }
-
-    return $packages;
   }
 
 
   function getTotalWeight(){
     $weight = null;
     $order_items = $this->WC_Order->get_items();
-    
+
     if ( is_array($order_items) ){
       foreach( $order_items as $item ){
         if ( $item['product_id'] > 0 ){
@@ -139,7 +160,7 @@ class ShopOrder{
     return $weight;
   }
 
-  
+
 
   function getPrinter(){
     return gi($this->Meta, 'parcel_printer');
@@ -165,7 +186,7 @@ class ShopOrder{
 
 
   function getRecurringStartDate(){
-    return gi($this->Meta, 'parcel_start_date');
+    return gi($this->Meta, 'recurring_consignment_start_date');
   }
 
 
@@ -176,13 +197,13 @@ class ShopOrder{
 
 
   function getIsRecurring(){
-    return gi($this->Meta, 'parcel-is-recurring');
+    return gi($this->Meta, 'is_recurring');
     //_log($this->Printer);
   }
 
 
   function getRecurringInterval(){
-    return gi($this->Meta, 'parcel-recurring-consignment-interval' );
+    return gi($this->Meta, 'recurring_consignment_interval' );
   }
 
 
@@ -195,70 +216,67 @@ class ShopOrder{
       $default = str_replace('@order_id@', $this->Id, $default);
       return $default;
     }
-    
+
   }
 
 
   function getRecurringCarrierId(){
-    return gi($this->Meta, 'parcel_recurring_carrier_id');
+    return gi($this->Meta, 'recurring_consignment_carrier_id');
+    //_log($this->Printer);
+  }
+
+
+  function getRecurringCarrierProduct(){
+    return gi($this->Meta, 'recurring_consignment_carrier_product');
+  }
+
+
+  function getRecurringConsignmentProductType(){
+    return gi($this->Meta, 'recurring_consignment_product_type');
     //_log($this->Printer);
   }
 
 
   function getRecurringConsignmentType(){
-    return gi($this->Meta, 'parcel-recurring-consignment-type');
+    return gi($this->Meta, 'recurring_consignment_product_type');
     //_log($this->Printer);
   }
 
 
   function getRecurringConsignmentMessage(){
-    return gi($this->Meta, 'parcel-consignment-message');
-    //_log($this->Printer);
-  }
-
-
-  function getRecurringConsignmentServices(){
-    return maybe_unserialize( gi($this->Meta, 'parcel-recurring-consignment-services') );
-    //_log($this->Printer);
-  }
-
-
-  function getRecurringConsignmentItems(){
-    // _log('Parcel::getRecurringConsignmentItems()');
-
-    $items = acf_getField('parcel-recurring-consignment-items', $this->ID);
-
-    if ( is_array($items) ){
-      foreach ($items as $key => $item) {
-        if ( isset($item['parcel_recurring_consignment_type']) ){
-          $items[$key]['parcel_package_type'] = $item['parcel_recurring_consignment_type'];
-        }
-        if ( isset($item['parcel_recurring_consignment_description']) ){
-          $items[$key]['parcel_description'] = $item['parcel_recurring_consignment_description'];
-        }
-        if ( isset($item['parcel_recurring_consigment_weight']) ){
-          $items[$key]['parcel_weight'] = $item['parcel_recurring_consigment_weight'];
-        }
-        if ( isset($item['parcel_recurring_consignment_height']) ){
-          $items[$key]['parcel_height'] = $item['parcel_recurring_consignment_height'];
-        }
-        if ( isset($item['parcel_recurring_consignment_length']) ){
-          $items[$key]['parcel_length'] = $item['parcel_recurring_consignment_length'];
-        }
-        if ( isset($item['parcel_recurring_consignment_width']) ){
-          $items[$key]['parcel_width'] = $item['parcel_recurring_consignment_width'];
-        }
-        if ( isset($item['parcel_recurring_consignment_amount']) ){
-          $items[$key]['parcel_amount'] = $item['parcel_recurring_consignment_amount'];
-        }
-        if ( isset($item['parcel_recurring_consignment_type']) ){
-          $items[$key]['parcel_type'] = $item['parcel_recurring_consignment_type'];
-        }
-      }
+    if (  isset($this->Meta['recurring_consignment_message_consignee'][0]) ){
+      return $this->Meta['recurring_consignment_message_consignee'][0];
+    }
+    else{
+      $default = get_option('cargonizer-parcel-message-consignee' );
+      $default = str_replace('@order_id@', $this->Id, $default);
+      return $default;
     }
 
-    return $items;
+    //_log($this->Printer);
   }
+
+
+  function getRecurringConsignmentProductServices(){
+    $services = array();
+
+    if ( isset($this->Meta['recurring_consignment_product_services']) ){
+      $services = $this->Meta['recurring_consignment_product_services'];
+
+      if ( is_array($services) && isset($services[0]) && is_string($services[0]) ){
+        $services = $services[0];
+      }
+    }
+    else{
+      $services = null;
+    }
+
+
+    return maybe_unserialize( $services );
+    //_log($this->Printer);
+  }
+
+
 
 
   function hasFutureShippingDate(){
@@ -290,7 +308,7 @@ class ShopOrder{
     else{
       $services = null;
     }
-    
+
     return maybe_unserialize( $services );
   }
 
@@ -369,7 +387,7 @@ class ShopOrder{
 
 
   function isReady( $force = false ){
-    _log('Parcel::isReady()');
+    _log('ShopOrder::isReady()');
     $is_ready = false;
     // if parcel is not exported / cargonized
     if ( !gi($this->Meta, 'is_cargonized') or $force ){

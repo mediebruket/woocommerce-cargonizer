@@ -231,7 +231,12 @@ class CargonizerAdmin{
       if ( gi($_GET, 'post') && gi($_GET, 'action') == 'edit'){
         if ( is_object($screen) && ($screen->post_type == 'shop_order' or $screen->post_type == 'consignment')  ){
           wp_register_script( 'wcc-admin-order', $path. 'js/wcc-admin-order.js', false, '2.0.0' );
-          wp_enqueue_script( 'wcc-admin-order' );  
+          wp_enqueue_script( 'wcc-admin-order' );
+        }
+
+        if ( is_object($screen) && $screen->post_type == 'consignment'  ){
+          wp_register_script( 'wcc-admin-consignment', $path. 'js/wcc-admin-consignment.js', false, '1.0.0' );
+          wp_enqueue_script( 'wcc-admin-consignment' );
         }
       }
 
@@ -314,14 +319,16 @@ class CargonizerAdmin{
 
 
   public static function showResetLink( $Order ){
-    if ( is_object($Order) && get_post_meta( $Order->get_id(), 'is_cargonized', true ) ){
-      if ( $edit_link = get_edit_post_link($Order->get_id()) ){
-        $delete_link = $edit_link.'&wcc_action=reset_consignment';
-        $delete_text = __('Logistra Cargonizer: reset consignment', 'wc-cargonizer' );
+    if( method_exists($Order, 'get_id') ){ // woocommerce 3.x
+      if ( is_object($Order) && get_post_meta( $Order->get_id(), 'is_cargonized', true ) ){
+        if ( $edit_link = get_edit_post_link($Order->get_id()) ){
+          $delete_link = $edit_link.'&wcc_action=reset_consignment';
+          $delete_text = __('Logistra Cargonizer: reset consignment', 'wc-cargonizer' );
 
-        if ( $delete_link && $delete_text ){
-          $desc = __('Does not delete the consignment on cargonizer.no', 'wc-cargonizer');
-          printf('<p class="form-field form-field-wide wcc-delete-invoice"><span class="wcc-delete-icon">x</span> <a href="%s">%s</a><span class="wcc-delete-desc">%s</span></p>', $delete_link, $delete_text, $desc );
+          if ( $delete_link && $delete_text ){
+            $desc = __('Does not delete the consignment on cargonizer.no', 'wc-cargonizer');
+            printf('<p class="form-field form-field-wide wcc-delete-invoice"><span class="wcc-delete-icon">x</span> <a href="%s">%s</a><span class="wcc-delete-desc">%s</span></p>', $delete_link, $delete_text, $desc );
+          }
         }
       }
     }
@@ -481,7 +488,6 @@ class CargonizerAdmin{
     else{
       return $wtd;
     }
-
   }
 
 

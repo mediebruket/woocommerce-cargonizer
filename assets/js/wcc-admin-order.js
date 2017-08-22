@@ -1,20 +1,33 @@
+is_recurring = false;
+
 jQuery(document).ready(function(){
   shop_updateCarrierProduct();
 
   initTableEdit();
   initTableRepeater();
+  initIsCargonized();
 });
 
+
+function initIsCargonized(){
+  if ( typeof data.is_cargonized !== 'undefined' && data.is_cargonized ){
+    jQuery("#admin_shop_order :input").attr('disabled', true);
+  }
+}
+
 function initTableEdit(){
-  jQuery('#parcel_repeater').Tabledit(
+  jQuery('.parcel-items').Tabledit(
   {
-    url: ajaxurl+"?post_id="+jQuery('#post_ID').val(),
+    url: ajaxurl+"?post_id="+jQuery('#post_ID').val()+"&recurring=0",
     restoreButton: false,
     onSuccess: function(data, textStatus, jqXHR) {
       jQuery(".tabledit-deleted-row").remove();
-      return; 
-   },
-
+      return;
+    },
+    onAjax: function(action, serialize){
+      var recurring = ( is_recurring ) ? 'recurring=1' : 'recurring=0';
+      this.url = this.url.replace(/recurring=\d{1}/i, recurring );
+    },
     columns: {
         identifier: [0, 'id'],
         editable: [
@@ -28,16 +41,32 @@ function initTableEdit(){
       ]
     }
   });
+
+  initTableButtons();
+}
+
+
+function initTableButtons(){
+  _log('initTableButtons');
+  jQuery('.tabledit-edit-button, .tabledit-delete-button').click(function(){
+    _log('click a');
+    jQuery('.tabledit-save-button, .tabledit-confirm-button').click(function(){
+      _log('click b');
+      table_id = jQuery(this).parents('table.parcel-items').attr('id');
+      is_recurring = ( table_id == 'parcel_packages') ? false : true;
+    });
+  });
 }
 
 
 function initTableRepeater(){
-  jQuery('#add-package-row').click(function(e){
+  jQuery('.js-add-package-row').click(function(e){
     e.preventDefault();
 
-    cc = jQuery("#parcel_repeater tr:first-child th").length;
-    next_id = jQuery("#parcel_repeater tbody tr").length + 1; 
-    
+    id = jQuery(this).attr('data-target');
+    cc = jQuery("#"+id+" tr:first-child th").length;
+    next_id = jQuery("#"+id+" tbody tr").length + 1;
+
     var index = [];
     index[0] = 'id';
     index[1] = 'package-amount';
@@ -47,18 +76,16 @@ function initTableRepeater(){
     index[5] = 'package-height';
     index[6] = 'package-length';
     index[7] = 'package-width';
-        
+
     columns = '';
 
     for( i=0; i<cc; i++ ){
       value = (i==0) ? next_id : '';
-
       columns += '<td class="'+index[i]+'">'+value+'</td>';
     }
 
-   
-    jQuery("#parcel_repeater tbody").append('<tr>'+columns+'</tr>');
-    jQuery('#parcel_repeater .package-width ~ td').remove();
+    jQuery("#"+id+" tbody").append('<tr>'+columns+'</tr>');
+    jQuery("#"+id+" .package-width ~ td").remove();
     initTableEdit();
     return false;
   });

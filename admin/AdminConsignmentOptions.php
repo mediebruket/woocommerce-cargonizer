@@ -7,11 +7,11 @@ class AdminConsignmentOptions{
   public $Consignment;
 
   function __construct(){
-    $this->Id = gi($_GET, 'post'); 
+    $this->Id = gi($_GET, 'post');
     if ( !$this->Id ){
       $this->Id = gi($_REQUEST, 'post_ID');
     }
-    
+
     if ( is_numeric($this->Id) ){
       $post = get_post($this->Id);
       if ( is_object($post) && $post->post_type == 'consignment' ){
@@ -20,7 +20,7 @@ class AdminConsignmentOptions{
         $this->Consignment = new Consignment($this->Id);
         //_log($this->Consignment);
       }
-    }  
+    }
   }
 
 
@@ -44,7 +44,7 @@ class AdminConsignmentOptions{
     ob_start();
     foreach ( $this->$method() as $key => $option):
     ?>
-      <div class="mb-field-row"><?php CargonizerHtmlBuilder::buildOption( $option ); ?></div>
+    <?php CargonizerHtmlBuilder::buildOption( $option ); ?>
     <?php
 
     endforeach;
@@ -147,102 +147,113 @@ class AdminConsignmentOptions{
   function loadParcelOptions(){
 
     return array(
-      // array(
-      //   'name'    => 'parcel_is_recurring',
-      //   'label'   => __('Recurring consignment', 'wc-cargonizer'),
-      //   'type'    => 'checkbox',
-      //   'value'   => false,
-      //   'option'  => 'on'
-      // ),
       array(
-        'name'    => 'parcel_printer',
-        'label'   => __('Printer', 'wc-cargonizer'),
-        'desc'    => __('If empty, setup api settings', 'wc-cargonizer'),
-        'type'    => 'select',
-        'value'   => $this->Consignment->Printer,
-        'options'  => CargonizerOptions::getPrinterList(),
-      ),
-      array(
-        'name'    => 'consignment_print_on_export',
-        'label'   => __('Export to carrier', 'wc-cargonizer'),
-        'desc'    => __('Saves the consignment as "sent"', 'wc-cargonizer'),
+        'name'    => 'consignment_is_recurring',
+        'label'   => __('Is recurring', 'wc-cargonizer'),
         'type'    => 'checkbox',
-        'value'   => $this->Consignment->PrintOnExport,
+        'value'   => $this->Consignment->IsRecurring,
         'option'  => '1'
       ),
+
       array(
-        'name'    => 'consignment_auto_transfer',
-        'label'   => __('Print on export', 'wc-cargonizer'),
-        'desc'    => __('Prints the consignment automatically', 'wc-cargonizer'),
-        'type'    => 'checkbox',
-        'value'   => $this->Consignment->AutoTransfer,
-        'option'  => '1'
+        'name'      => 'consignment_start_date',
+        'label'     => __('Start date', 'wc-cargonizer'),
+        'desc'      => __(''),
+        'type'      => 'date',
+        'value'     => $this->Consignment->StartDate,
+        'container' => 'consignment-start-date'
+      ),
+
+      array(
+        'name'      => 'consignment_next_shipping_date',
+        'label'     => __('(Next) Shipping date', 'wc-cargonizer'),
+        'desc'      => __('Leave empty if the consignment is to be created today'),
+        'type'      => 'date',
+        'value'     => $this->Consignment->NextShippingDate,
       ),
       array(
-        'name'    => 'consignment_carrier_id',
-        'label'   => __('Carrier', 'wc-cargonizer'),
-        'desc'    => __('If empty, setup api settings', 'wc-cargonizer'),
-        'type'    => 'select',
-        'value'   => $this->Consignment->CarrierId,
-        'attr'   => ' @change="updateProducts" v-model="carrier_id" ',
-        'options' => $this->CargonizerOptions->getCompanyList(),
+        'name'      => 'parcel_printer',
+        'label'     => __('Printer', 'wc-cargonizer'),
+        'desc'      => __('If empty, setup api settings', 'wc-cargonizer'),
+        'type'      => 'select',
+        'value'     => $this->Consignment->Printer,
+        'options'   => CargonizerOptions::getPrinterList(),
       ),
       array(
-        'name'    => 'consignment_product',
-        'label'   => __('Carrier product', 'wc-cargonizer'),
-        'desc'    => __('If empty, setup api settings', 'wc-cargonizer'),
-        'type'    => 'vue_select',
+        'name'      => 'consignment_print_on_export',
+        'label'     => __('Export to carrier', 'wc-cargonizer'),
+        'desc'      => __('Saves the consignment as "sent"', 'wc-cargonizer'),
+        'type'      => 'checkbox',
+        'value'     => $this->Consignment->PrintOnExport,
+        'option'    => '1'
+      ),
+      array(
+        'name'      => 'consignment_auto_transfer',
+        'label'     => __('Print on export', 'wc-cargonizer'),
+        'desc'      => __('Prints the consignment automatically', 'wc-cargonizer'),
+        'type'      => 'checkbox',
+        'value'     => $this->Consignment->AutoTransfer,
+        'option'    => '1'
+      ),
+      array(
+        'name'      => 'consignment_carrier_id',
+        'label'     => __('Carrier', 'wc-cargonizer'),
+        'desc'      => __('If empty, setup api settings', 'wc-cargonizer'),
+        'type'      => 'select',
+        'value'     => $this->Consignment->CarrierId,
+        'attr'      => ' @change="updateProducts" v-model="carrier_id" ',
+        'options'   => $this->CargonizerOptions->getCompanyList(),
+      ),
+      array(
+        'name'      => 'consignment_product',
+        'label'     => __('Carrier product', 'wc-cargonizer'),
+        'desc'      => __('If empty, setup api settings', 'wc-cargonizer'),
+        'type'      => 'vue_select',
         'container' => 'select',
-        'attr'    => 'id="@name@" name="@name@" v-model="parcel_carrier_product" @change="updateProductTypes" ',
-        'value'   => '',
-        'options' => '<option v-for="product in products" :value="product.identifier" :selected="product.selected==true">{{ product.name }}</option>'
+        'attr'      => 'id="@name@" name="@name@" v-model="parcel_carrier_product" @change="updateProductTypes" ',
+        'value'     => '',
+        'options'   => '<option v-for="product in products" :value="product.identifier" :selected="product.selected==true">{{ product.name }}</option>'
       ),
       array(
-        'name'    => 'consignment_product_type',
-        'label'   => __('Product type', 'wc-cargonizer'),
-        'type'    => 'vue_select',
+        'name'      => 'consignment_product_type',
+        'label'     => __('Product type', 'wc-cargonizer'),
+        'type'      => 'vue_select',
         'container' => 'select',
-        'attr'    => 'id="@name@" name="@name@" v-model="product_type" ',
-        'value'   => '',
-        'options' => '<option v-for="pt in product_types" :value="pt.value" :selected="pt.selected==true">{{ pt.name }}</option>'
+        'attr'      => 'id="@name@" name="@name@" v-model="product_type" ',
+        'value'     => '',
+        'options'   => '<option v-for="pt in product_types" :value="pt.value" :selected="pt.selected==true">{{ pt.name }}</option>'
       ),
       array(
-        'name'    => 'consignment_services',
-        'label'   => __('Product services', 'wc-cargonizer'),
-        'type'    => 'vue_checkboxes',
+        'name'      => 'consignment_services',
+        'label'     => __('Product services', 'wc-cargonizer'),
+        'type'      => 'vue_checkboxes',
         'container' => 'ul',
         //'attr'    => 'id="@name@" name="@name@" ',
-        'value'   => '',
-        'options' => '<li v-for="service in product_services">
+        'value'     => '',
+        'options'   => '<li v-for="service in product_services">
                       <input type="checkbox" class="form-check-input" name="consignment_services[]" nav_menu_description="@name@[]" v-model="active_product_services" :id="service.value" :value="service.value" :checked="service.checked==true">
                       <label class="form-check-label" :for="service.value" >{{ service.name }}</label>
                       </li>'
       ),
       array(
-        'name' => 'consignment_message',
-        'label' => __('Message', 'wc-cargonizer'),
-        'type' => 'textarea',
-        'value' => $this->Consignment->Message,
+        'name'      => 'consignment_message',
+        'label'     => __('Message', 'wc-cargonizer'),
+        'type'      => 'textarea',
+        'value'     => $this->Consignment->Message,
       ),
 
       array(
-        'name'  => 'consignment_packages',
-        'label' => __('Packages', 'wc-cargonizer'),
-        'type'  => 'table',
-        'value'   => $this->Consignment->Items,
-        'options' => array('Id', 'Count', 'Parcel type', 'Description', 'Weight (kg)', 'Height (cm)', 'Length (cm)', 'Width (cm)'),
+        'name'      => 'consignment_packages',
+        'label'     => __('Packages', 'wc-cargonizer'),
+        'type'      => 'table',
+        'value'     => $this->Consignment->Items,
+        'options'   => array('Id', 'Count', 'Parcel type', 'Description', 'Weight (kg)', 'Height (cm)', 'Length (cm)', 'Width (cm)'),
         'save_post' => false
       ),
 
-      array(
-        'name' => 'consignment_next_shipping_date',
-        'label' => __('Shipping date', 'wc-cargonizer'),
-        'desc' => __('Leave empty if the consignment is to be created today'),
-        'type' => 'date',
-        'value' => $this->Consignment->NextShippingDate,
-      ),
-      
- 
+
+
+
 
     );
   }
