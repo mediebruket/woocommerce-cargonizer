@@ -39,33 +39,36 @@ class CargonizerHtmlBuilder{
 
 
   public static function buildOption( $option, $default_value=null ){?>
-    <div class="mb-field-row <?php echo gi($option, 'container'); ?>">
+    <div class="mb-field-row <?php echo gi($option, 'wrap'); ?>">
 
-      <?php
-      if( $option['type'] == 'text' or $option['type'] == 'number'):
+      <?php if( $option['type'] == 'text' or $option['type'] == 'number'):
 
-       self::buildLabel( $option['label'], $option['name'], 'mb-admin-label inline' );
+        self::buildLabel( $option['label'], $option['name'], 'mb-admin-label inline' );
 
         if (isset($option['desc']) && trim($option['desc']) ){
           self::buildDesc( $option['desc'] );
         }
 
-        self::buildInput(
-            array(
-              'type'  => gi($option, 'type'),
-              'name'  => gi($option, 'name'),
-              'id'    => gi($option, 'name'),
-              'value' => gi($option, 'value'),
-              'class'   => gi($option, 'css'),
-              'size'  => 50,
-            )
-          )
+        $args =
+          array(
+            'type'      => gi($option, 'type'),
+            'name'      => gi($option, 'name'),
+            'id'        => gi($option, 'name'),
+            'value'     => gi($option, 'value'),
+            'class'     => gi($option, 'css'),
+            'size'      => 50,
+          );
+
+        if ( isset($option['readonly']) && $option['readonly'] ){
+          $args['readonly']  = 'readonly';
+        }
+
+        self::buildInput( $args );
         ?>
       <?php endif; ?>
 
 
-      <?php
-      if( $option['type'] == 'date'):
+      <?php if( $option['type'] == 'date'):
        self::buildLabel( $option['label'], $option['name'], 'mb-admin-label inline' );
 
         if (isset($option['desc']) && trim($option['desc']) ){
@@ -91,8 +94,13 @@ class CargonizerHtmlBuilder{
           if (isset($option['desc']) && trim($option['desc']) ){
             self::buildDesc( $option['desc'] );
           }
+
+          $checked = null;
+          if ( $option['option'] == $option['value'] or $option['value'] == 'on' ){
+            $checked = ' checked="checked" ';
+          }
         ?>
-        <input type="<?php echo $option['type']; ?>" name="<?php echo $option['name']; ?>" id="<?php echo $option['name']; ?>" value="<?php echo $option['option']; ?>" <?php  checked( $option['option'], $option['value'] ); ?> >
+        <input type="<?php echo $option['type']; ?>" name="<?php echo $option['name']; ?>" id="<?php echo $option['name']; ?>" value="<?php echo $option['option']; ?>" <?php echo $checked; ?> />
       <?php endif; ?>
 
 
@@ -161,8 +169,39 @@ class CargonizerHtmlBuilder{
           </tbody>
           <?php endif; ?>
       </table>
+      <?php endif; ?>
 
 
+
+      <?php if( $option['type'] == 'products'): ?>
+      <table class="table table-striped table-bordered" id="products">
+        <?php if ( isset($option['options']) && is_array($option['options']) ): ?>
+          <thead>
+            <tr><?php foreach ($option['options'] as $key => $name) {
+                printf('<th>%s</th>', $name);
+              }?></tr>
+          </thead>
+
+          <tbody>
+            <?php _log($option['value']); ?>
+            <?php if ( is_array($option['value']) ): ?>
+            <?php
+              foreach ($option['value'] as $key => $p) {
+                printf('<tr>
+                  <td class="product-id">%s</td>
+                  <td class="product-name">%s</td>
+                  <td class="product-count">%s</td>
+                </tr>',
+                $p['product_id'],
+                $p['name'],
+                $p['quantity']
+               );
+              }
+            ?>
+            <?php endif; ?>
+          </tbody>
+          <?php endif; ?>
+      </table>
       <?php endif; ?>
 
 

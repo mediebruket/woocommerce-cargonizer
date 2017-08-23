@@ -27,6 +27,9 @@ class ShopOrderController extends CargonizerCommonController{
         if ( isset($_POST['is_recurring']) && $_POST['is_recurring'] == '1' ){
           $tabs[] = "Recurring";
         }
+        else{
+          update_post_meta( $post_id, 'is_recurring', 0 );
+        }
 
         foreach ($tabs as $tab_index => $tab) {
           $method = 'load'.$tab.'Options';
@@ -72,6 +75,7 @@ class ShopOrderController extends CargonizerCommonController{
       else{
         _log('not ready or has future shipping date');
       }
+
 
       if ( $Order->IsRecurring ){
         _log('create recurring');

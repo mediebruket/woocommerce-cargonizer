@@ -43,7 +43,6 @@ class Consignment{
 
 
   function __construct( $post_id ){
-
     $this->Id = $this->ID = $post_id;
 
     // existing consignment
@@ -55,7 +54,6 @@ class Consignment{
     $this->CarrierProduct   = $this->getCarrierProduct();
     $this->CarrierProductServices  = $this->getCarrierProductServices();
     $this->CarrierProductType  = $this->getCarrierProductType();
-    // _log($this);
   }
 
 
@@ -814,6 +812,7 @@ class Consignment{
 
   public static function addNote( $order_id, $consignment_id ){
     _log('Consignment::addNote('.$order_id.')');
+    _log( $consignment_id );
 
     $data = array(
       'comment_post_ID'       => $order_id,

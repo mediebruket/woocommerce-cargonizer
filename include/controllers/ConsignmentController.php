@@ -52,7 +52,7 @@ class ConsignmentController extends CargonizerCommonController{
 
 
   public static function createConsignment( $post_id  ){
-    _log('ConsignmentController:: ('.$post_id.')');
+    _log('ConsignmentController::createConsignment('.$post_id.')');
 
     $response = false;
     if ( is_numeric($post_id) ){
@@ -62,10 +62,7 @@ class ConsignmentController extends CargonizerCommonController{
       $CargonizerApi = new CargonizerApi();
       $result = null;
       _log('post consignment');
-
-
       $result = $CargonizerApi->postConsignment($CargonizeXml->Xml);
-
       if ( $result ){
         // _log($result);
         if ( is_array($result) && isset($result['consignments']['consignment']['errors']) ){
@@ -84,10 +81,10 @@ class ConsignmentController extends CargonizerCommonController{
           // update order
           if ( $Consignment->OrderId ){
             _log('has order id');
-            $Parcel = new ShopOrder( $Consignment->OrderId );
-            $Parcel->setCargonized();
-            $Parcel->saveConsignmentDetails( $consignment = $result['consignments']['consignment'] );
-            $Parcel->addNote();
+            $Order = new ShopOrder( $Consignment->OrderId );
+            $Order->setCargonized();
+            $Order->saveConsignmentDetails( $consignment = $result['consignments']['consignment'] );
+            $Order->addNote();
           }
           else{
             _log('no order id');

@@ -6,7 +6,25 @@ jQuery(document).ready(function(){
   initTableEdit();
   initTableRepeater();
   initIsCargonized();
+  initShopOrderIsRecurring();
 });
+
+function initShopOrderIsRecurring(){
+  toggleRecurringFields();
+  jQuery("#is_recurring").change( function(){
+    toggleRecurringFields();
+  } );
+}
+
+
+function toggleRecurringFields(){
+  if ( jQuery("#is_recurring:checked").length ){
+    jQuery(".is-recurring").show();
+  }
+  else{
+    jQuery(".is-recurring").hide();
+  }
+}
 
 
 function initIsCargonized(){

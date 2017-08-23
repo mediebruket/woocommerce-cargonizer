@@ -60,6 +60,7 @@ class AdminConsignmentOptions{
       'parcel'      => __('Parcel', 'wc-cargonizer'),
       'consignee'   => __('Consignee', 'wc-cargonizer'),
       'history'     => __('History', 'wc-cargonizer'),
+      'products'    => __('Products', 'wc-cargonizer'),
       );
   }
 
@@ -78,13 +79,27 @@ class AdminConsignmentOptions{
   }
 
 
+  function loadProductsOptions(){
+    return array(
+        array(
+          'name'    => 'consignment_order_products',
+          'label'   => __('Products', 'wc-cargonizer'),
+          'type'    => 'products',
+          'value'   => (!$this->Consignment->IsRecurring) ? $this->Consignment->OrderProducts: $this->Consignment->SubscriptionProducts,
+          'options' => array('Id', 'Product', 'Qty'),
+          'save_post' => false
+        )
+      );
+  }
+
+
   function loadConsigneeOptions(){
      return array(
       array(
         'name'    => 'customer_id',
         'label'   => __('Customer id', 'wc-cargonizer'),
         'type'    => 'text',
-        'value'   => $this->Consignment->CustomerId,
+        'value'   => $this->Consignment->CustomerId
       ),
       array(
         'name'    => '_shipping_first_name',
@@ -161,7 +176,7 @@ class AdminConsignmentOptions{
         'desc'      => __(''),
         'type'      => 'date',
         'value'     => $this->Consignment->StartDate,
-        'container' => 'consignment-start-date'
+        'wrap'      => 'consignment-start-date'
       ),
 
       array(

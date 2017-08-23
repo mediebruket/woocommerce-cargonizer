@@ -65,22 +65,24 @@ class ShopOrder{
         $this->RecurringInterval                = $this->getRecurringInterval();
         $this->RecurringConsignmentMessage      = $this->getRecurringConsignmentMessage();
 
-        $this->ConsignmentId = $this->getConsignmentId();
-        $this->getTransportAgreementSettings();
-        $this->Items = $this->getItems();
+        $this->ConsignmentId            = $this->getConsignmentId();
+        $this->ConsignmentCreatedAt     = $this->getConsignmentCreatedAt();
+        $this->ConsignmentTrackingUrl   = $this->getConsignmentTrackingUrl();
+        $this->ConsignmentTrackingCode  = $this->getConsignmentTrackingCode();
+        $this->ConsignmentPdf           = $this->getConsignmentPdf();
+        //$this->getTransportAgreementSettings();
 
-        $this->Products = $this->WC_Order->get_items();
 
-        if ( is_array($this->Products) ){
-          foreach ($this->Products as $key => $product) {
+        $order_items = $this->WC_Order->get_items();
+        $this->Products = array();
 
+        if ( is_array($order_items) ){
+          foreach ($order_items as $key => $product) {
+            $this->Products[$key] = $product->get_data();
+            $this->Products[$key]['is_subscription'] = false;
             if ( class_exists('WC_Subscriptions_Product') ){
               $this->Products[$key]['is_subscription'] = WC_Subscriptions_Product::is_subscription( $product['product_id'] );
-              unset($this->Products[$key]['item_meta_array']);
-              unset($this->Products[$key]['item_meta']);
-              unset($this->Products[$key]['line_tax_data']);
-            } // if
-
+            }
           } // foreach
         } // if
 
@@ -96,12 +98,13 @@ class ShopOrder{
 
 
   function getPackages(){
-    $packages = maybe_unserialize( gi($this->Meta, 'parcel_packages') );
-    //_log('$packages');
-    //_log($packages);
+    $meta_key = 'parcel_packages';
+    $packages = maybe_unserialize( gi($this->Meta, $meta_key) );
+
     if ( !$packages or is_array($packages) and empty($packages) ){
       $default = $this->getDefaultPackage();
       $packages = array($default);
+      update_post_meta( $this->ID, $meta_key, $packages );
     }
 
     return $packages;
@@ -109,12 +112,14 @@ class ShopOrder{
 
 
   function getRecurringConsignmentItems(){
-    //_log('ShopOrder::getRecurringConsignmentItems()');
-    $packages = maybe_unserialize( gi($this->Meta, 'recurring_consignment_packages') );
+    $meta_key = 'recurring_consignment_packages';
+    $packages = maybe_unserialize( gi($this->Meta, $meta_key) );
 
     if ( !$packages or is_array($packages) and empty($packages) ){
       $default = $this->getDefaultPackage();
       $packages = array($default);
+
+      update_post_meta( $this->ID, $meta_key, $packages );
     }
 
     //_log($packages);
@@ -168,7 +173,12 @@ class ShopOrder{
 
 
   function getPrintOnExport(){
-    return gi($this->Meta, 'parcel_print_on_post');
+    if ( isset($this->Meta['parcel_print_on_post']) ){
+      return gi($this->Meta, 'parcel_print_on_post' );
+    }
+    else{
+      return get_option( 'cargonizer-auto-transfer' );
+    }
   }
 
 
@@ -176,12 +186,19 @@ class ShopOrder{
     return gi($this->Meta, 'parcel_carrier_id');
   }
 
+
   function getCarrierProduct(){
     return gi($this->Meta, 'parcel_carrier_product');
   }
 
+
   function getAutoTransfer(){
-    return gi($this->Meta, 'parcel_auto_transfer');
+     if ( isset($this->Meta['parcel_auto_transfer']) ){
+      return gi($this->Meta, 'parcel_auto_transfer' );
+    }
+    else{
+      return get_option( 'cargonizer-print-on-export' );
+    }
   }
 
 
@@ -216,7 +233,6 @@ class ShopOrder{
       $default = str_replace('@order_id@', $this->Id, $default);
       return $default;
     }
-
   }
 
 
@@ -277,8 +293,6 @@ class ShopOrder{
   }
 
 
-
-
   function hasFutureShippingDate(){
     if ( cleanDate($this->ShippingDate) > date('Ymd') ){
       return true;
@@ -317,6 +331,24 @@ class ShopOrder{
     return gi($this->Meta, 'consignment_id');
   }
 
+
+  function getConsignmentCreatedAt(){
+    return gi($this->Meta, 'consignment_created_at');
+  }
+
+  function getConsignmentTrackingUrl(){
+    return gi($this->Meta, 'consignment_tracking_url');
+  }
+
+
+  function getConsignmentTrackingCode(){
+    return gi($this->Meta, 'consignment_tracking_code');
+  }
+
+
+  function getConsignmentPdf(){
+    return gi($this->Meta, 'consignment_pdf');
+  }
 
 
   function isCargonized(){
@@ -360,7 +392,7 @@ class ShopOrder{
 
 
   function reset(){
-    _log('Parcell::reset('.$this->ID.')');
+    _log('ShopOrder::reset('.$this->ID.')');
     $rf =
       array(
           'is_cargonized',
@@ -381,7 +413,7 @@ class ShopOrder{
 
     foreach ($rf as $index => $field) {
       _log('reset: '.$field);
-      acf_updateField($field, null, $this->ID );
+      delete_post_meta($this->ID, $field);
     }
   }
 
@@ -393,25 +425,25 @@ class ShopOrder{
     if ( !gi($this->Meta, 'is_cargonized') or $force ){
       // if parcel has transport agreement id & product && items
 
-      if ( !$this->TransportAgreementId ){
-        _log('missing transport agreement id');
+      if ( !$this->CarrierId ){
+        _log('missing CarrierId');
       }
 
-      if ( !$this->TransportAgreementProduct ){
-        _log('missing transport agreement product');
+      if ( !$this->CarrierProduct ){
+        _log('missing CarrierProduct');
       }
 
-      if ( !$this->Items ){
+      if ( !$this->ParcelPackages ){
         _log('missing items');
       }
 
-      if ( $this->TransportAgreementId && $this->TransportAgreementProduct && $this->Items ){
+      if ( $this->CarrierId && $this->CarrierProduct && $this->ParcelPackages ){
         // checkbox create_consignment is on
-        if ( gi($this->Meta, 'create_consignment') ){
+        if ( gi($_POST, 'parcel_create_consignment_now') ){
           $is_ready = true;
         }
         else{
-          _log('do not send to cargonizer');
+          _log('parcel_create_consignment_now not checked');
         }
       }
     }
@@ -424,38 +456,34 @@ class ShopOrder{
   }
 
 
-  function getTransportAgreementSettings(){
-    // _log('Parcel::getTransportAgreementSettings');
-    $this->TransportAgreementId = null;
-    if ( $ta = gi($this->Meta, 'transport_agreement') ){
+  // function getTransportAgreementSettings(){
+  //   _log('ShopOrder::getTransportAgreementSettings');
+  //   $this->TransportAgreementId = null;
+  //   if ( $ta = gi($this->Meta, 'transport_agreement') ){
+  //     _log($ta);
 
-      $transport_agreement = explode('|', $ta);
-      // _log('$ta');
-      // _log($ta);
-      if ( isset($transport_agreement[0]) ){
-        $this->TransportAgreementId = $transport_agreement[0];
-      }
-    }
+  //     $transport_agreement = explode('|', $ta);
+  //     // _log('$ta');
+  //     // _log($ta);
+  //     if ( isset($transport_agreement[0]) ){
+  //       $this->TransportAgreementId = $transport_agreement[0];
+  //     }
+  //   }
 
-    $this->TransportAgreementProduct = $this->TransportAgreementProductType = null;
-    if ( $parcel_type = gi($this->Meta, 'parcel_type') ){
-      $parcel_type = explode('|', $parcel_type);
-      // _log('$parcel_type');
-      // _log($parcel_type);
-      if ( isset($parcel_type[0]) ){
-        $this->TransportAgreementProduct = $parcel_type[0];
-      }
+  //   $this->TransportAgreementProduct = $this->TransportAgreementProductType = null;
+  //   if ( $parcel_type = gi($this->Meta, 'parcel_type') ){
+  //     $parcel_type = explode('|', $parcel_type);
+  //     // _log('$parcel_type');
+  //     // _log($parcel_type);
+  //     if ( isset($parcel_type[0]) ){
+  //       $this->TransportAgreementProduct = $parcel_type[0];
+  //     }
 
-      if ( isset($parcel_type[1]) ){
-        $this->TransportAgreementProductType = $parcel_type[1];
-      }
-    }
-  }
-
-
-  function getItems(){
-    return acf_getField('consignment_items', $this->ID);
-  }
+  //     if ( isset($parcel_type[1]) ){
+  //       $this->TransportAgreementProductType = $parcel_type[1];
+  //     }
+  //   }
+  // }
 
 
   public static function getPlaceholders(){
@@ -471,7 +499,12 @@ class ShopOrder{
   function saveConsignmentDetails( $consignment ){
     _log('Parcel::saveConsignmentDetails');
     _log($consignment);
-    acf_updateField('consignment_created_at', $consignment['created-at']['$'], $this->ID);
+
+    update_post_meta( $this->ID, 'consignment_created_at', $consignment['created-at']['$'] );
+    update_post_meta( $this->ID, 'consignment_tracking_code', $consignment['number'] );
+    update_post_meta( $this->ID, 'consignment_tracking_url', $consignment['tracking-url'] );
+    update_post_meta( $this->ID, 'consignment_pdf', $consignment['consignment-pdf'] );
+
 
     if ( $consignment['bundles']['bundle'] ){
       $bundle = $consignment['bundles']['bundle'];
@@ -481,15 +514,9 @@ class ShopOrder{
       else {
        $consignment_id = $bundle['consignment-id']['$'];
       }
-
-      acf_updateField('consignment_id', $consignment_id, $this->ID);
+      update_post_meta( $this->ID, 'consignment_id', $consignment_id );
     }
 
-
-    acf_updateField('consignment_tracking_code', $consignment['number'], $this->ID);
-    acf_updateField('consignment_tracking_url', $consignment['tracking-url'], $this->ID);
-    acf_updateField('consignment_pdf', $consignment['consignment-pdf'], $this->ID);
-    //acf_updateField('consignment_estimated_costs', '1234', $this->ID);
     $this->getPostMeta();
   }
 

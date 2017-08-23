@@ -3,6 +3,7 @@ jQuery(document).ready(function(){
 });
 
 function initConsignmentIsRecurring(){
+  consignmentToggleStartDate();
   jQuery('#consignment_is_recurring').click(function(){
     consignmentToggleStartDate();
   })

@@ -1,7 +1,7 @@
 <?php
 
 class AdminConsignment extends AdminConsignmentOptions{
-  
+
   function __construct(){
     parent::__construct();
     add_action( 'add_meta_boxes', array($this, 'registerOrderMetaBox') );
@@ -37,28 +37,28 @@ class AdminConsignment extends AdminConsignmentOptions{
     }
 
     // all carriers
-    $data['carriers'] = $this->CargonizerOptions->getCompanyList(); 
+    $data['carriers'] = $this->CargonizerOptions->getCompanyList();
     // active carrier
 
-    $data['carrier_id'] =  ( $this->Consignment->CarrierId ) ?  $this->Consignment->CarrierId : $this->CargonizerOptions->get('CarrierId'); 
-    
+    $data['carrier_id'] =  ( $this->Consignment->CarrierId ) ?  $this->Consignment->CarrierId : $this->CargonizerOptions->get('CarrierId');
+
     // active product
     $data['parcel_carrier_product'] = ( $this->Consignment->CarrierProduct ) ? $this->Consignment->CarrierProduct : $this->CargonizerOptions->get('DefaultCarrierProduct');
     // all products
-    $data['products'] = CargonizerCommonController::getProductsByCarrierId( $data['carrier_id'] ); 
+    $data['products'] = CargonizerCommonController::getProductsByCarrierId( $data['carrier_id'] );
 
 
     // all product types, handled by vue
-    $data['product_types'] = array(); 
+    $data['product_types'] = array();
     // active product type
     $data['product_type'] = ( $this->Consignment->CarrierProductType ) ? $this->Consignment->CarrierProductType : $this->CargonizerOptions->get('DefaultProductType');
 
 
     // all product services, handled by vue
-    $data['product_services'] = array();   
+    $data['product_services'] = array();
     // active product services
     $data['active_product_services'] = array();
-    
+
     if ( $this->Consignment->CarrierProductServices ){
       $data['active_product_services'] = $this->Consignment->CarrierProductServices;
     }
@@ -72,8 +72,9 @@ class AdminConsignment extends AdminConsignmentOptions{
               CargonizerHtmlBuilder::buildTab( $id="parcel", $this->getOptions('Parcel'), $class='show active' ).
                 CargonizerHtmlBuilder::buildTab( $id="consignee", $this->getOptions('Consignee') ).
                   CargonizerHtmlBuilder::buildTab( $id="history", $this->getOptions('History') ).
+                  CargonizerHtmlBuilder::buildTab( $id="products", $this->getOptions('Products') ).
                   '</div>';
-     
+
     echo $html;
   }
 
@@ -82,8 +83,8 @@ class AdminConsignment extends AdminConsignmentOptions{
 
 
 add_action( 'init', 'init_admin_consignment', 10 );
-function init_admin_consignment(){  
+function init_admin_consignment(){
   if ( gi($_GET, 'post') && gi($_GET, 'action') == 'edit' ){
-    new AdminConsignment();  
+    new AdminConsignment();
   }
 }

@@ -6,6 +6,7 @@ class AdminShopOptions{
   public $ParcelPackages;
   public $ShopOrder;
 
+
   function __construct(){
     $this->Id = gi($_GET, 'post');
     if ( !$this->Id ){
@@ -41,12 +42,10 @@ class AdminShopOptions{
   function getOptions( $type ){
     $method = 'load'.$type.'Options';
     ob_start();
-    foreach ( $this->$method() as $key => $option):
-    ?>
-      <div class="mb-field-row"><?php CargonizerHtmlBuilder::buildOption( $option ); ?></div>
-    <?php
+    foreach ( $this->$method() as $key => $option){
+      CargonizerHtmlBuilder::buildOption( $option );
+    }
 
-    endforeach;
     $output = ob_get_contents();
     ob_end_clean();
 
@@ -169,8 +168,8 @@ class AdminShopOptions{
         'label'   => __('Create consignment now', 'wc-cargonizer'),
         'desc'    => __('To create a consignment on cargonizer.no:<br/>- Will only work if shipping date is empty<br/>- Enable this checkox if carrier is selected and the parcel(s) added.', 'wc-cargonizer'),
         'type'    => 'checkbox',
-        'value'   => false,
-        'option'  => 'on'
+        'value'   => null,
+        'option'  => '1'
       ),
 
 
@@ -181,37 +180,40 @@ class AdminShopOptions{
   function loadConfirmationOptions(){
     return array(
        array(
-        'name' => 'consignment_created_at',
-        'label' => __('Date', 'wc-cargonizer'),
-        'type' => 'text',
-        'value' => '',
+        'name'      => 'consignment_created_at',
+        'label'     => __('Date', 'wc-cargonizer'),
+        'type'      => 'text',
+        'value'     => $this->ShopOrder->ConsignmentCreatedAt,
+        'readonly'  => true
       ),
       array(
-        'name' => 'consignment_id',
-        'label' => __('Consignment id', 'wc-cargonizer'),
-        'type' => 'text',
-        'value' => '',
+        'name'      => 'consignment_id',
+        'label'     => __('Consignment id', 'wc-cargonizer'),
+        'type'      => 'text',
+        'value'     => $this->ShopOrder->ConsignmentId,
+        'readonly'  => true
       ),
       array(
-        'name' => 'consignment_tracking_code',
-        'label' => __('Tracking code', 'wc-cargonizer'),
-        'type' => 'text',
-        'value' => '',
+        'name'      => 'consignment_tracking_code',
+        'label'     => __('Tracking code', 'wc-cargonizer'),
+        'type'      => 'text',
+        'value'     => $this->ShopOrder->ConsignmentTrackingCode,
+        'readonly'  => true
       ),
       array(
-        'name' => 'consignment_tracking_url',
-        'label' => __('Tracking url', 'wc-cargonizer'),
-        'type' => 'text',
-        'value' => '',
+        'name'      => 'consignment_tracking_url',
+        'label'     => __('Tracking url', 'wc-cargonizer'),
+        'type'      => 'text',
+        'value'     => $this->ShopOrder->ConsignmentTrackingUrl,
+        'readonly'  => true
       ),
       array(
-        'name' => 'consignment_pdf',
-        'label' => __('Consignment pdf', 'wc-cargonizer'),
-        'type' => 'text',
-        'value' => '',
-      ),
-
-
+        'name'      => 'consignment_pdf',
+        'label'     => __('Consignment pdf', 'wc-cargonizer'),
+        'type'      => 'text',
+        'value'     => $this->ShopOrder->ConsignmentPdf,
+        'readonly'  => true
+      )
     );
   }
 
@@ -232,13 +234,15 @@ class AdminShopOptions{
         'label' => __('Interval', 'wc-cargonizer'),
         'type'  => 'select',
         'value' => $this->ShopOrder->RecurringInterval,
-        'options' => CargonizerCommonController::getRecurringConsignmentInterval()
+        'options' => CargonizerCommonController::getRecurringConsignmentInterval(),
+        'wrap' => 'is-recurring'
       ),
       array(
         'name'  => 'recurring_consignment_start_date',
         'label' => __('Startdate', 'wc-cargonizer'),
         'type'  => 'date',
         'value' => $this->ShopOrder->RecurringStartDate,
+        'wrap' => 'is-recurring'
       ),
 
       array(
@@ -248,6 +252,7 @@ class AdminShopOptions{
         'value'   => $this->ShopOrder->RecurringCarrierId,
         'attr'   => ' @change="updateRecurringProducts" v-model="recurring_consignment_carrier_id" ',
         'options' => $this->CargonizerOptions->getCompanyList(),
+        'wrap' => 'is-recurring'
       ),
 
       array(
@@ -258,7 +263,8 @@ class AdminShopOptions{
         'container' => 'select',
         'attr'    => 'id="@name@" name="@name@" v-model="@name@" @change="updateRecurringProductTypes" ',
         'value'   => '',
-        'options' => '<option v-for="product in recurring_consignment_products" :value="product.identifier" :selected="product.selected==true">{{ product.name }}</option>'
+        'options' => '<option v-for="product in recurring_consignment_products" :value="product.identifier" :selected="product.selected==true">{{ product.name }}</option>',
+        'wrap' => 'is-recurring'
       ),
       array(
         'name'    => 'recurring_consignment_product_type',
@@ -267,7 +273,8 @@ class AdminShopOptions{
         'container' => 'select',
         'attr'    => 'id="@name@" name="@name@" v-model="recurring_consignment_product_type" ',
         'value'   => '',
-        'options' => '<option v-for="pt in recurring_consignment_product_types" :value="pt.value" :selected="pt.selected==true">{{ pt.name }}</option>'
+        'options' => '<option v-for="pt in recurring_consignment_product_types" :value="pt.value" :selected="pt.selected==true">{{ pt.name }}</option>',
+        'wrap' => 'is-recurring'
       ),
       array(
         'name'    => 'recurring_consignment_product_services',
@@ -287,13 +294,15 @@ class AdminShopOptions{
                       :checked="service.checked==true"
                       >
                       <label class="form-check-label" >{{ service.name }}</label>
-                      </li>'
+                      </li>',
+        'wrap' => 'is-recurring'
       ),
       array(
         'name' => 'recurring_consignment_message_consignee',
         'label' => __('Message', 'wc-cargonizer'),
         'type' => 'textarea',
         'value' => $this->ShopOrder->RecurringConsignmentMessage,
+        'wrap' => 'is-recurring'
       ),
       array(
         'name'  => 'recurring_consignment_packages',
@@ -301,7 +310,8 @@ class AdminShopOptions{
         'type'  => 'table',
         'value'   => $this->ShopOrder->RecurringConsignmentItems,
         'options' => array('Id', 'Count', 'Parcel type', 'Description', 'Weight (kg)', 'Height (cm)', 'Length (cm)', 'Width (cm)'),
-        'save_post' => false
+        'save_post' => false,
+        'wrap' => 'is-recurring'
       ),
 
     );
