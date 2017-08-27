@@ -93,6 +93,7 @@ class ConsignmentController extends CargonizerCommonController{
         else{
           _log('consignment: else error');
           _log($result);
+          $response = htmlspecialchars_decode(strip_tags($result));
         }
       }
       else{

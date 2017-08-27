@@ -6,7 +6,14 @@ class CargonizerOptions{
   protected $DefaultProductType;
   protected $AvailableProducts;
   protected $TransportAgreements;
+
+  // recurring consignments
   protected $RecurringConsignmentWarningTime;
+  protected $RecurringConsignmentDefaultInterval;
+  protected $RecurringConsignmentSkipInterval;
+  protected $RecurringConsignmentCountSkipIntervals;
+  protected $RecurringConsignmentSkipAfter;
+
   protected $SelectedTransportAgreement;
   protected $TransportCompanyId;
   protected $TransportProduct;
@@ -34,9 +41,14 @@ class CargonizerOptions{
     $this->DefaultPrinter             = $this->getDefaultPrinter();
     $this->PrintOnExport              = $this->getPrintOnExport();
 
-
     $this->TransportAgreementServices = $this->getSelectedTransportAgreementServices();
-    $this->RecurringConsignmentWarningTime = $this->getRecurringConsignmentWarningTime();
+
+    // recurring consignments
+    $this->RecurringConsignmentWarningTime        = $this->getRecurringConsignmentsWarningTime();
+    $this->RecurringConsignmentDefaultInterval    = $this->getRecurringConsignmentsDefaultInterval();
+    $this->RecurringConsignmentSkipInterval       = $this->getRecurringConsignmentsSkipInterval();
+    $this->RecurringConsignmentCountSkipIntervals = $this->getRecurringConsignmentsCountSkipIntervals();
+    $this->RecurringConsignmentSkipAfter          = $this->getRecurringConsignmentsSkipAfter();
   }
 
 
@@ -48,7 +60,6 @@ class CargonizerOptions{
       return array();
     }
   }
-
 
 
   function productsToKeyValue( $products ){
@@ -122,12 +133,11 @@ class CargonizerOptions{
   function getOptions( $type ){
     $method = 'load'.$type.'Options';
     ob_start();
-    foreach ( $this->$method() as $key => $option):
-    ?>
-      <div class="mb-field-row"><?php CargonizerHtmlBuilder::buildOption( $option ); ?></div>
-    <?php
+    foreach ( $this->$method() as $key => $option){
+       CargonizerHtmlBuilder::buildOption( $option );
+    }
+     
 
-    endforeach;
     $output = ob_get_contents();
     ob_end_clean();
 
@@ -135,9 +145,30 @@ class CargonizerOptions{
   }
 
 
-  function getRecurringConsignmentWarningTime(){
+  function getRecurringConsignmentsWarningTime(){
     return get_option( 'cargonizer-recurring-consignments-warning-time', '1' );
   }
+
+
+  function getRecurringConsignmentsDefaultInterval(){
+    return get_option( 'cargonizer-recurring-consignments-default-interval' );
+  }
+
+
+  function getRecurringConsignmentsSkipInterval(){
+    return get_option( 'cargonizer-recurring-consignments-skip-interval' );
+  }
+
+
+  function getRecurringConsignmentsSkipAfter(){
+    return get_option( 'cargonizer-recurring-consignments-skip-after' );
+  }
+
+
+  function getRecurringConsignmentsCountSkipIntervals(){
+    return get_option( 'cargonizer-recurring-consignments-count-skip-intervals', 0 );
+  }
+
 
   function getTransportCompanyId(){
     return get_option('cargonizer-carrier-id');
@@ -546,13 +577,6 @@ class CargonizerOptions{
         'value' => get_option('cargonizer-parcel-message-consignee'),
       ),
       array(
-        'name'    => 'cargonizer-recurring-consignments-warning-time',
-        'label'   => __('Recurring consignments warning time'),
-        'desc' => __('Default 1 day'),
-        'type'    => 'text',
-        'value'   => $this->RecurringConsignmentWarningTime,
-      ),
-      array(
         'name' => 'cargonizer-estimate-shipping-costs',
         'label' => __('Estimate shipping costs?'),
         'type' => 'checkbox',
@@ -568,6 +592,56 @@ class CargonizerOptions{
       ),
 
     );
+  }
+
+
+  function loadRecurringOptions(){
+     return
+     array(
+      array(
+        'name'    => 'cargonizer-recurring-consignments-default-interval',
+        'label'   => __('Default interval'),
+        'desc'   => __('Default interval'),
+        'type'    => 'select',
+        'value'   => $this->RecurringConsignmentDefaultInterval,
+        'options' => CargonizerCommonController::getRecurringConsignmentInterval()
+      ),
+      array(
+        'name'    => 'cargonizer-recurring-consignments-warning-time',
+        'label'   => __('Warning time'),
+        'desc'    => __('Default 1 day'),
+        'type'    => 'number',
+        'min'     => 0,
+        'value'   => $this->RecurringConsignmentWarningTime,
+      ),
+      array(
+        'name'    => 'cargonizer-recurring-consignments-skip-interval',
+        'label'   => __('Skip first shipping if order is placed after default interval'),
+        'desc'    => __('i.e. default interval is every 15th and order is placed on 20th'),
+        'type'    => 'checkbox',
+        'value'   => $this->RecurringConsignmentSkipInterval,
+        'option'  => '1'
+      ),
+      array(
+        'name'    => 'cargonizer-recurring-consignments-skip-after',
+        'label'   => __('Skip interval after ...'),
+        'desc'    => __('must be higher than default interval'),
+        'type'    => 'select',
+        'value'   => $this->RecurringConsignmentSkipAfter,
+        'options' => CargonizerCommonController::getRecurringConsignmentInterval()
+      ),
+      array(
+        'name'    => 'cargonizer-recurring-consignments-count-skip-intervals',
+        'label'   => __('Count intervals (months) to skip'),
+        'desc'    => __(''),
+        'type'    => 'number',
+        'value'   => $this->RecurringConsignmentCountSkipIntervals,
+        'max'     => 5,
+        'min'     => 0,
+      ),
+
+    );
+     
   }
 
 

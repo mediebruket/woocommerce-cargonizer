@@ -56,7 +56,6 @@ class ShopOrder{
 
         // recurring
         $this->IsRecurring                      = $this->getIsRecurring();
-        $this->RecurringStartDate               = $this->getRecurringStartDate();
         $this->RecurringCarrierId               = $this->getRecurringCarrierId();
         $this->RecurringCarrierProduct          = $this->getRecurringCarrierProduct();
         $this->RecurringConsignmentProductType  = $this->getRecurringConsignmentProductType();
@@ -64,6 +63,7 @@ class ShopOrder{
         $this->RecurringConsignmentItems        = $this->getRecurringConsignmentItems();
         $this->RecurringInterval                = $this->getRecurringInterval();
         $this->RecurringConsignmentMessage      = $this->getRecurringConsignmentMessage();
+        $this->RecurringStartDate               = $this->getRecurringStartDate();
 
         $this->ConsignmentId            = $this->getConsignmentId();
         $this->ConsignmentCreatedAt     = $this->getConsignmentCreatedAt();
@@ -202,11 +202,6 @@ class ShopOrder{
   }
 
 
-  function getRecurringStartDate(){
-    return gi($this->Meta, 'recurring_consignment_start_date');
-  }
-
-
   function getShippingDate(){
     return gi($this->Meta, 'parcel_shipping_date');
     //_log($this->Printer);
@@ -220,12 +215,40 @@ class ShopOrder{
 
 
   function getRecurringInterval(){
-    return gi($this->Meta, 'recurring_consignment_interval' );
+    if ( isset($this->Meta['recurring_consignment_interval'][0]) ){
+      return $this->Meta['recurring_consignment_interval'][0];
+    }
+    else{
+      return get_option( 'cargonizer-recurring-consignments-default-interval', 1 );
+    }
+  }
+
+
+  function getRecurringStartDate(){
+    if ( isset($this->Meta['recurring_consignment_start_date'][0]) ){
+      return gi($this->Meta, 'recurring_consignment_start_date');
+    }
+    // estimate a default start date
+    else{
+      $start_date = Consignment::calcNextShippingDate( $this->RecurringInterval, $auto_inc=false );  
+      if ( get_option( 'cargonizer-recurring-consignments-skip-interval' ) ){
+        $today = time();
+        //$today =  strtotime("2017-08-15");
+        $after_date = date('Y')."-".date('m')."-".get_option( 'cargonizer-recurring-consignments-skip-after' );
+        $after_time = strtotime( $after_date );        
+
+        if ( $today > $after_time ){
+          $start_date = Consignment::calcSkippedShipppingDate( $start_date, get_option( 'cargonizer-recurring-consignments-count-skip-intervals', 0 ) );
+        }
+      }
+            
+      return $start_date;     
+    }
   }
 
 
   function getParcelMessage(){
-    if (  isset($this->Meta['parcel_message_consignee'][0]) ){
+    if ( isset($this->Meta['parcel_message_consignee'][0]) ){
       return $this->Meta['parcel_message_consignee'][0];
     }
     else{

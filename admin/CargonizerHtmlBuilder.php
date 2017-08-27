@@ -56,6 +56,8 @@ class CargonizerHtmlBuilder{
             'id'        => gi($option, 'name'),
             'value'     => gi($option, 'value'),
             'class'     => gi($option, 'css'),
+            'max'       => gi($option, 'max'),
+            'min'       => gi($option, 'min'),
             'size'      => 50,
           );
 

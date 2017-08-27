@@ -23,12 +23,13 @@ class CargonizerAjax{
 
       if ( isset($_REQUEST['id']) && is_object($post) ){
         // _log($post->post_type);
-        $meta_key =  ( $post->post_type == 'consignment' ) ? 'consignment_packages' : 'parcel_packages';
+        $meta_key = ( $post->post_type == 'consignment' ) ? 'consignment_packages' : 'parcel_packages';
 
-        if ( isset($_REQUEST['recurring']) && $_REQUEST['recurring'] == '1' ){
+        if ( isset($_REQUEST['recurring']) && $_REQUEST['recurring'] == '1' && $post->post_type != 'consignment' ){
           $meta_key = 'recurring_consignment_packages';
           unset($_REQUEST['recurring'] );
         }
+
         _log($meta_key);
         $packages = get_post_meta( $post_id, $meta_key, true );
         $packages[ $_REQUEST['id'] ] = $_REQUEST;

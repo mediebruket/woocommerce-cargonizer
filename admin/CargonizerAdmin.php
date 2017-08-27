@@ -48,6 +48,7 @@ class CargonizerAdmin{
       'generalPage'       => __('Carrier', 'wc-cargonizer'),
       'parcelPage'        => __('Parcel', 'wc-cargonizer'),
       'notificationPage'  => __('Notification', 'wc-cargonizer'),
+      'recurringPage'     => __('Recurring', 'wc-cargonizer'),
       'addressPage'       => __('Address', 'wc-cargonizer'),
       'licencePage'       => __('Licence', 'wc-cargonizer'),
       );
@@ -109,6 +110,16 @@ class CargonizerAdmin{
     }
 
     $this->showToolBox( __('Package defaults', 'wc-cargonizer'), $this->Options->getOptions('Parcel') );
+  }
+
+
+  function recurringPage(){
+    if ( isset($_POST['update']) ){
+      $this->Options->updateOptions('Recurring');
+      $this->showUpdateMessage ( __( 'Recurring settings updated', 'wc-cargonizer' ) );
+    }
+
+    $this->showToolBox( __('Recurring defaults', 'wc-cargonizer'), $this->Options->getOptions('Recurring') );
   }
 
 
@@ -412,11 +423,12 @@ class CargonizerAdmin{
 
       }
       else if ( $column == 'consignment-status'){
+        // _log('consignment-status');
         $next_shipping_date = gi($post_meta, 'consignment_next_shipping_date');
-        // _log('$next_shipping_date');
         // _log($next_shipping_date);
 
         $wtd = self::isInTime( $next_shipping_date, $today=date('Ymd') );
+        //_log($wtd);
 
         $ok = false;
         if ( !$Consignment->IsRecurring && $Consignment->LastShippingDate ){
@@ -424,12 +436,11 @@ class CargonizerAdmin{
         }
 
         if ( $Consignment->IsRecurring && !$wtd ){
-          // _log('recurring');
           $wtd2 = self::isInTime( $next_shipping_date, date('Ymd', strtotime($Consignment->LastShippingDate)) );
           if ( !$wtd2 ){
             $ok = true;
           }
-          // _log($wtd2);
+           //_log($wtd2);
         }
 
         // _log($wtd);
@@ -438,6 +449,9 @@ class CargonizerAdmin{
         }
         else if ( $wtd < 0 && !$ok ){
          echo self::makeStatus( 'danger', __('Delay in dispatch', 'wc-cargonizer') );
+        }
+        else if ( $wtd > 0 && !$ok ){
+         echo self::makeStatus( 'info', $wtd." ".__('days left', 'wc-cargonizer') );
         }
         else{
           echo self::makeStatus('success', __('OK', 'wc-cargonizer') );
@@ -480,9 +494,19 @@ class CargonizerAdmin{
 
   public static function isInTime( $next_shipping_date, $check_date ){
     $warning_time = get_option( 'cargonizer-recurring-consignments-warning-time', '1' );
-    $wtd = $next_shipping_date - $check_date;
+    $wtd = 0;
 
-    if ( $wtd == 0 or $wtd == $warning_time ){
+    $nsd = new DateTime($next_shipping_date);
+    $diff = $nsd->diff( new DateTime($check_date) );
+
+    if ( is_object($diff) && is_numeric($diff->days) ){
+      $wtd = $diff->days;
+    }
+
+    //_log('is in time');
+    //_log($wtd);
+    //_log($warning_time);
+    if ( $wtd == 0 or $wtd <= $warning_time ){
       return false;
     }
     else{

@@ -1,6 +1,6 @@
 <?php
 add_action( 'init', array('Consignment', '_registerPostType'), 10 );
-// add_action( 'init', array('Consignment', '_updateNextShippingDates'), 20 ); // OBS check next shipping date first
+add_action( 'admin_init', array('Consignment', '_updateNextShippingDates'), 20 ); // OBS check next shipping date first
 add_action( 'pre_get_posts', array('Consignment', '_orderConsignmentsByShippingDate'), 20 );
 add_filter( 'woocommerce_package_rates' , array('Consignment', '_setShippingCosts'), 10, 2 );
 
@@ -862,30 +862,50 @@ class Consignment{
 
 
   public static function _updateNextShippingDates(){
+ 
+    if ( !is_admin() or !isset($_GET['post_type']) or $_GET['post_type'] && $_GET['post_type']!='consignment' ){
+      return false;
+    }
+    
+    _log('Consignment::_updateNextShippingDates');
+    // get all recurring consignments
     $post_ids = self::getAllRecurringConsignments();
     if ( is_array($post_ids) ){
       foreach ($post_ids as $key => $post_id) {
+        _log('post: '.$post_id);
+        // check if consignment has interval, i.e. every 15th of a month
         if ( $interval = get_post_meta( $post_id, 'recurring_consignment_interval', true ) ){
+          // calculate next shipping date based on today
           $next_calculated_shipping_date = self::calcNextShippingDate( $interval );
+
+          // get next shipping date
           $current_next_shipping_date = get_post_meta( $post_id, 'consignment_next_shipping_date', true );
-          $start_date = get_post_meta( $post_id, 'consignment_start_date', true );
+
+          // get start date 
+          $start_date = get_post_meta( $post_id, 'consignment_start_date', true );          
           $next_shipping_date = null;
-          if ( strtotime($next_calculated_shipping_date) > strtotime($current_next_shipping_date) ){
-            _log('calculated date is bigger than current date');
-            $next_shipping_date = $next_calculated_shipping_date;
-          }
+
+
           if ( strtotime($start_date) > strtotime($next_calculated_shipping_date) ){
             _log('custom start date is bigger than next calculated shipping date');
             $next_shipping_date = $start_date;
           }
+          elseif ( strtotime($next_calculated_shipping_date) > strtotime($current_next_shipping_date) ){
+            _log('calculated date is bigger than current date');
+            $next_shipping_date = $next_calculated_shipping_date;
+          }
+          else if( $next_calculated_shipping_date == $current_next_shipping_date ){
+            _log('next and current shipping date are equal');
+          }
+
+
           if ( $next_shipping_date ){
-            _log('update next shipping date');
             update_post_meta( $post_id, 'consignment_next_shipping_date', $next_shipping_date );
             _log('next shipping date updated ('.$post_id.'): ' .$next_shipping_date );
           }
-          //else{
-           // _log('no update');
-          //}
+        }
+        else{
+          _log('missing interval');
         }
       }
     }
@@ -894,13 +914,18 @@ class Consignment{
 
   function setNextShippingDate( $auto_inc=false ){
     _log('Consignment::setNextShippingDate()');
+    _log($auto_inc);
     // has Subscription
     // check Subs
     if ( $this->IsRecurring && $this->RecurringInterval ){
       _log('is recurring');
 
+      // auto_inc to get the next shipping date
       $nsd = self::calcNextShippingDate( $this->RecurringInterval, $auto_inc );
       $active = true;
+
+      // check if subscription products are still active
+      //  or subscription cancellation is pending
       if ( $this->hasSubscriptionWarning() ){
         _log('has subscription warning');
         $end_date = get_post_meta( $this->Subscription->ID, '_schedule_end', true );
@@ -929,6 +954,7 @@ class Consignment{
       $month = date('m');
       $year = date('Y');
 
+
       if ( date('d') > $interval or $auto_inc ){
         if ( $month != 12 ){
           $month += 1;
@@ -939,11 +965,16 @@ class Consignment{
         }
       }
 
-      return $year.str_pad($month, 2, "0", STR_PAD_LEFT).str_pad($interval, 2, "0", STR_PAD_LEFT);
+      return $year."-".str_pad($month, 2, "0", STR_PAD_LEFT)."-".str_pad($interval, 2, "0", STR_PAD_LEFT);
     }
     else{
       return null;
     }
+  }
+
+
+  public static function calcSkippedShipppingDate( $date, $interval ){
+    return date("Y-m-d", strtotime("+".$interval." month", strtotime($date) ) );
   }
 
 

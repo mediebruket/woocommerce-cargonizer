@@ -2,7 +2,7 @@
 /*woo
 Plugin Name: Woocomerce Cargonizer
 Description:
-Version: 0.1.6
+Version: 0.1.7
 Author: Mediebruket AS
 Author URI: http://mediebruket.no
 */
@@ -14,7 +14,6 @@ $plugin_path = plugin_dir_path( __FILE__ );
 require_once( $plugin_path . 'conf/conf.php');
 
 require_once( $plugin_path . 'include/util/utils.php');
-require_once( $plugin_path . 'include/util/acf.php');
 require_once( $plugin_path . 'include/util/XmlConverter.php');
 
 require_once( $plugin_path . 'include/api/CargonizerApi.php');
