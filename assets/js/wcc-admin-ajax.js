@@ -4,8 +4,17 @@ jQuery(document).ready(
     initAjaxCreateConsignment(); // single consignment
     initAjaxPrintLatestConsignment(); // print the latest consignment one more time
     initAjaxCreateConsignments(); // multiple consignments
+    initCheckDueConsignments();
   }
 );
+
+
+function initCheckDueConsignments(){
+  jQuery('#js-check-consignments').click(function(){
+    var elements = jQuery(".consignment-status div.alert-warning").parents('.type-consignment').find('.check-column input');
+    elements.attr('checked', !elements.attr('checked') );
+  });
+}
 
 
 // creates multiple consignments

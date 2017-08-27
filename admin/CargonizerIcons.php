@@ -21,5 +21,9 @@ class CargonizerIcons{
     return '<i class="fa fa-print" aria-hidden="true"></i>';
   }
 
+  public static function check(){
+    return '<i class="fa fa-check" aria-hidden="true"></i>';
+  }
+
 
 }

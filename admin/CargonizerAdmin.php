@@ -535,6 +535,7 @@ class CargonizerAdmin{
   public static function _addBatchButton( $x=null ){
     if ( gi($_GET, 'post_type') == 'consignment' ){
       echo '<div class="alignleft actions"><a href="#" id="ajax-create-consignments" class="button">'.CargonizerIcons::consignment().' '. __('Create new consignment', 'wc-cargonizer'). '</a></div>';
+      echo '<div class="alignleft actions"><a href="#" id="js-check-consignments" class="button">'.CargonizerIcons::check().' '. __('Check consignments', 'wc-cargonizer'). '</a></div>';
     }
   }
 
