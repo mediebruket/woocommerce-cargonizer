@@ -153,7 +153,7 @@ class AdminShopOptions{
         'label' => __('Packages', 'wc-cargonizer'),
         'type'  => 'table',
         'value'   => $this->ShopOrder->ParcelPackages,
-        'options' => array('Id', 'Count', 'Parcel type', 'Description', 'Weight (kg)', 'Height (cm)', 'Length (cm)', 'Width (cm)'),
+        'options' => array('Id', 'Count', 'Description', 'Weight (kg)', 'Height (cm)', 'Length (cm)', 'Width (cm)'),
         'save_post' => false
       ),
       array(
@@ -309,7 +309,7 @@ class AdminShopOptions{
         'label' => __('Packages', 'wc-cargonizer'),
         'type'  => 'table',
         'value'   => $this->ShopOrder->RecurringConsignmentItems,
-        'options' => array('Id', 'Count', 'Parcel type', 'Description', 'Weight (kg)', 'Height (cm)', 'Length (cm)', 'Width (cm)'),
+        'options' => array('Id', 'Count', 'Description', 'Weight (kg)', 'Height (cm)', 'Length (cm)', 'Width (cm)'),
         'save_post' => false,
         'wrap' => 'is-recurring'
       ),

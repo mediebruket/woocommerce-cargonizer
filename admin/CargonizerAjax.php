@@ -42,24 +42,35 @@ class CargonizerAjax{
 
 
   function _deletePackageRow(){
+    _log('CargonizerAjax::_deletePackageRow');
     $post_id = gi($_REQUEST, 'post_id');
     $package_id = gi($_REQUEST, 'id');
+    _log($_REQUEST);
 
     if ( $post_id && $package_id ){
       $post = get_post($post_id );
       $meta_key = ( $post->post_type == 'consignment' ) ? 'consignment_packages' : 'parcel_packages';
-      if ( isset($_REQUEST['recurring']) && $_REQUEST['recurring'] == '1' ){
+
+      if ( isset($_REQUEST['recurring']) && $_REQUEST['recurring'] == '1' && $post->post_type != 'consignment' ){
         $meta_key = 'recurring_consignment_packages';
       }
 
       $packages = get_post_meta( $post_id, $meta_key, true );
 
+      _log('before');
+      _log($packages);
       if ( isset($packages[$package_id]) ){
         unset($packages[$package_id]);
-        $packages = array_values($packages);
       }
+      _log('after');
+      _log($packages);
 
       update_post_meta( $post_id, $meta_key, $packages );
+    }
+    else{
+      _log('missing:');
+      _log($post_id);
+      _log($package_id);
     }
 
     wp_die();

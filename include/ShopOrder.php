@@ -102,8 +102,9 @@ class ShopOrder{
     $packages = maybe_unserialize( gi($this->Meta, $meta_key) );
 
     if ( !$packages or is_array($packages) and empty($packages) ){
+      _log('get default package...');
       $default = $this->getDefaultPackage();
-      $packages = array($default);
+      $packages = array('1' => $default);
       update_post_meta( $this->ID, $meta_key, $packages );
     }
 
@@ -117,12 +118,11 @@ class ShopOrder{
 
     if ( !$packages or is_array($packages) and empty($packages) ){
       $default = $this->getDefaultPackage();
-      $packages = array($default);
-
+      $packages = array('1' => $default);
       update_post_meta( $this->ID, $meta_key, $packages );
     }
 
-    //_log($packages);
+    _log($packages);
 
     return $packages;
   }
@@ -132,7 +132,6 @@ class ShopOrder{
     return $default = array(
         'id' => 1,
         'parcel_amount'       => 1,
-        'parcel_type'         => 'PK',
         'parcel_description'  => '',
         'parcel_weight'       =>  $this->getTotalWeight(),
         'parcel_height'       => get_option('cargonizer-parcel-height'),
@@ -230,19 +229,19 @@ class ShopOrder{
     }
     // estimate a default start date
     else{
-      $start_date = Consignment::calcNextShippingDate( $this->RecurringInterval, $auto_inc=false );  
+      $start_date = Consignment::calcNextShippingDate( $this->RecurringInterval, $auto_inc=false );
       if ( get_option( 'cargonizer-recurring-consignments-skip-interval' ) ){
         $today = time();
         //$today =  strtotime("2017-08-15");
         $after_date = date('Y')."-".date('m')."-".get_option( 'cargonizer-recurring-consignments-skip-after' );
-        $after_time = strtotime( $after_date );        
+        $after_time = strtotime( $after_date );
 
         if ( $today > $after_time ){
           $start_date = Consignment::calcSkippedShipppingDate( $start_date, get_option( 'cargonizer-recurring-consignments-count-skip-intervals', 0 ) );
         }
       }
-            
-      return $start_date;     
+
+      return $start_date;
     }
   }
 

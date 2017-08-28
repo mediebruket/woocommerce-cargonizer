@@ -185,7 +185,6 @@ class CargonizerHtmlBuilder{
           </thead>
 
           <tbody>
-            <?php _log($option['value']); ?>
             <?php if ( is_array($option['value']) ): ?>
             <?php
               foreach ($option['value'] as $key => $p) {
@@ -223,7 +222,6 @@ class CargonizerHtmlBuilder{
               printf('<tr>
                 <td class="id">%s</td>
                 <td class="package-amount">%s</td>
-                <td class="package-type">%s</td>
                 <td class="package-desc">%s</td>
                 <td class="package-weight">%s</td>
                 <td class="package-height">%s</td>
@@ -232,7 +230,6 @@ class CargonizerHtmlBuilder{
                </tr>',
                $package['id'],
                $package['parcel_amount'],
-               $package['parcel_type'],
                $package['parcel_description'],
                $package['parcel_weight'],
                $package['parcel_height'],

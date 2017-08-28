@@ -50,12 +50,11 @@ function initTableEdit(){
         identifier: [0, 'id'],
         editable: [
           [1, 'parcel_amount'],
-          [2, 'parcel_type'],
-          [3, 'parcel_description'],
-          [4, 'parcel_weight'],
-          [5, 'parcel_height'],
-          [6, 'parcel_length'],
-          [7, 'parcel_width'],
+          [2, 'parcel_description'],
+          [3, 'parcel_weight'],
+          [4, 'parcel_height'],
+          [5, 'parcel_length'],
+          [6, 'parcel_width'],
       ]
     }
   });
@@ -65,11 +64,8 @@ function initTableEdit(){
 
 
 function initTableButtons(){
-  _log('initTableButtons');
   jQuery('.tabledit-edit-button, .tabledit-delete-button').click(function(){
-    _log('click a');
     jQuery('.tabledit-save-button, .tabledit-confirm-button').click(function(){
-      _log('click b');
       table_id = jQuery(this).parents('table.parcel-items').attr('id');
       is_recurring = ( table_id == 'parcel_packages') ? false : true;
     });
@@ -83,17 +79,22 @@ function initTableRepeater(){
 
     id = jQuery(this).attr('data-target');
     cc = jQuery("#"+id+" tr:first-child th").length;
-    next_id = jQuery("#"+id+" tbody tr").length + 1;
+
+    last_id = jQuery("#"+id+" tbody tr:last-child").attr('id');
+
+    next_id = 1;
+    if ( !isNaN(last_id) ){
+      next_id = parseInt(last_id) + 1;
+    }
 
     var index = [];
     index[0] = 'id';
     index[1] = 'package-amount';
-    index[2] = 'package-type';
-    index[3] = 'package-desc';
-    index[4] = 'package-weight';
-    index[5] = 'package-height';
-    index[6] = 'package-length';
-    index[7] = 'package-width';
+    index[2] = 'package-desc';
+    index[3] = 'package-weight';
+    index[4] = 'package-height';
+    index[5] = 'package-length';
+    index[6] = 'package-width';
 
     columns = '';
 

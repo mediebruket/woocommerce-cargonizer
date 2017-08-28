@@ -262,7 +262,7 @@ class AdminConsignmentOptions{
         'label'     => __('Packages', 'wc-cargonizer'),
         'type'      => 'table',
         'value'     => $this->Consignment->Items,
-        'options'   => array('Id', 'Count', 'Parcel type', 'Description', 'Weight (kg)', 'Height (cm)', 'Length (cm)', 'Width (cm)'),
+        'options'   => array('Id', 'Count', 'Description', 'Weight (kg)', 'Height (cm)', 'Length (cm)', 'Width (cm)'),
         'save_post' => false
       ),
 

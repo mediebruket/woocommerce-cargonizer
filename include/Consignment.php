@@ -222,7 +222,31 @@ class Consignment{
 
 
   function getItems(){
-    return maybe_unserialize( gi($this->Meta, 'consignment_packages') );
+    $meta_key = 'consignment_packages';
+    $packages = maybe_unserialize( gi($this->Meta, $meta_key) );
+
+    if ( !$packages or is_array($packages) and empty($packages) ){
+      $default = $this->getDefaultPackage();
+      $packages = array('1' => $default);
+      update_post_meta( $this->ID, $meta_key, $packages );
+    }
+
+
+    return $packages;
+  }
+
+
+  function getDefaultPackage(){
+    return $default = array(
+        'id' => 1,
+        'parcel_amount'       => 1,
+        'parcel_description'  => '',
+        'parcel_weight'       => 0,
+        'parcel_height'       => get_option('cargonizer-parcel-height'),
+        'parcel_length'       => get_option('cargonizer-parcel-length'),
+        'parcel_width'        => get_option('cargonizer-parcel-width')
+      );
+
   }
 
 
@@ -285,9 +309,9 @@ class Consignment{
 
 
   function getCarrierProductServices(){
-
     return maybe_unserialize( get_post_meta( $this->Id, 'consignment_services', true ) );
   }
+
 
   function getCarrierProductType(){
     return get_post_meta( $this->Id, 'consignment_product_type', true );
@@ -736,7 +760,7 @@ class Consignment{
     $export['consignments']['consignment']['messages']['consignor'] = 'messages-consignor';
     $export['consignments']['consignment']['messages']['consignee'] = gi( $this->Meta, 'consignment_message');
 
-    $export['consignments']['references']['consignor'] = $this->OrderId;
+    $export['consignments']['references']['carrier'] = $this->OrderId;
     $export['consignments']['references']['consignee'] = $this->CustomerId;
 
     _log($export);
@@ -862,11 +886,11 @@ class Consignment{
 
 
   public static function _updateNextShippingDates(){
- 
+
     if ( !is_admin() or !isset($_GET['post_type']) or $_GET['post_type'] && $_GET['post_type']!='consignment' ){
       return false;
     }
-    
+
     _log('Consignment::_updateNextShippingDates');
     // get all recurring consignments
     $post_ids = self::getAllRecurringConsignments();
@@ -881,8 +905,8 @@ class Consignment{
           // get next shipping date
           $current_next_shipping_date = get_post_meta( $post_id, 'consignment_next_shipping_date', true );
 
-          // get start date 
-          $start_date = get_post_meta( $post_id, 'consignment_start_date', true );          
+          // get start date
+          $start_date = get_post_meta( $post_id, 'consignment_start_date', true );
           $next_shipping_date = null;
 
 
