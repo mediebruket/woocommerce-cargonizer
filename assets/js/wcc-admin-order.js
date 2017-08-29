@@ -188,8 +188,6 @@ function shop_updateCarrierProduct(){
             });
           }
 
-          _log('services');
-          _log(services);
           data.recurring_consignment_product_services = services;
         }
       },

@@ -1,3 +1,5 @@
 function _log( object ){
-  console.log( object );
+  if( (window['console'] !== undefined) ){
+    console.log( object );
+  }
 }
