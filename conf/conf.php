@@ -1,6 +1,6 @@
 <?php
 
-define('WCC_Version', '0.2.2');
+define('WCC_Version', '0.2.3');
 define('WCC_Admin', 'woocommerce-cargonizer-admin');
 
 class CargonizerConfig{

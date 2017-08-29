@@ -213,15 +213,14 @@ class CargonizerAdmin{
       echo '<link rel="stylesheet" href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" integrity="sha384-dNpIIXE8U05kAbPhy3G1cz+yZmTzA6CY8Vg/u2L9xRnHjJiAK76m2BIEaSEV+/aU" crossorigin="anonymous">';
       echo '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" >';
 
+      wp_register_script( 'wcc-vue', $path. 'js/vue.js', false, '2.0.0' );
+      wp_enqueue_script( 'wcc-vue' );
+
       wp_register_script( 'wcc-util', $path. 'js/wcc-util.js', false, WCC_Version );
       wp_enqueue_script( 'wcc-util' );
 
       wp_register_script( 'wcc-admin-ajax', $path. 'js/wcc-admin-ajax.js', false, WCC_Version );
       wp_enqueue_script( 'wcc-admin-ajax' );
-
-
-      wp_register_script( 'wcc-vue', $path. 'js/vue.js', false, '2.0.0' );
-      wp_enqueue_script( 'wcc-vue' );
 
       $screen = null;
       if ( function_exists('get_current_screen') ){

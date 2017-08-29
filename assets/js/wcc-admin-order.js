@@ -191,8 +191,6 @@ function shop_updateCarrierProduct(){
           data.recurring_consignment_product_services = services;
         }
       },
-
-
     },
     beforeMount(){
       this.updateProductTypes();
