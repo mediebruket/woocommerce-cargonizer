@@ -11,8 +11,8 @@ function initConsignmentIsRecurring(){
 
 
 function consignmentToggleStartDate(){
-  jQuery('.consignment-start-date').hide();
+  jQuery('.recurring-field').hide();
   if ( jQuery('#consignment_is_recurring:checked').length ){
-    jQuery('.consignment-start-date').show();
+    jQuery('.recurring-field').show();
   }
 }

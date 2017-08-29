@@ -122,8 +122,6 @@ class ShopOrder{
       update_post_meta( $this->ID, $meta_key, $packages );
     }
 
-    _log($packages);
-
     return $packages;
   }
 
@@ -138,7 +136,6 @@ class ShopOrder{
         'parcel_length'       => get_option('cargonizer-parcel-length'),
         'parcel_width'        => get_option('cargonizer-parcel-width')
       );
-
   }
 
 

@@ -169,16 +169,22 @@ class AdminConsignmentOptions{
         'value'   => $this->Consignment->IsRecurring,
         'option'  => '1'
       ),
-
       array(
         'name'      => 'consignment_start_date',
         'label'     => __('Start date', 'wc-cargonizer'),
         'desc'      => __(''),
         'type'      => 'date',
         'value'     => $this->Consignment->StartDate,
-        'wrap'      => 'consignment-start-date'
+        'wrap'      => 'recurring-field'
       ),
-
+      array(
+        'name'  => 'recurring_consignment_interval',
+        'label' => __('Interval', 'wc-cargonizer'),
+        'type'  => 'select',
+        'value' => $this->Consignment->RecurringInterval,
+        'options' => CargonizerCommonController::getRecurringConsignmentInterval(),
+        'wrap' => 'recurring-field'
+      ),
       array(
         'name'      => 'consignment_next_shipping_date',
         'label'     => __('(Next) Shipping date', 'wc-cargonizer'),
