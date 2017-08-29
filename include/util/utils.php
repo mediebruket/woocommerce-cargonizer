@@ -3,7 +3,7 @@
 
 if ( !function_exists('gi') ){
   function gi( $array, $index ){
-    if ( isset($array[$index]) ){
+    if ( is_array($array) && isset($array[$index]) ){
 
       if ( is_string($array[$index]) or is_numeric($array[$index]) ){
         return $array[$index];

@@ -219,7 +219,7 @@ class CargonizerAdmin{
       wp_register_script( 'wcc-util', $path. 'js/wcc-util.js', false, '1.0.0' );
       wp_enqueue_script( 'wcc-util' );
 
-      wp_register_script( 'wcc-admin-ajax', $path. 'js/wcc-admin-ajax.js', false, '1.0.0' );
+      wp_register_script( 'wcc-admin-ajax', $path. 'js/wcc-admin-ajax.js', false, '1.0.1' );
       wp_enqueue_script( 'wcc-admin-ajax' );
 
       //wp_register_script( 'wcc-admin-consignment', $path. 'js/wcc-admin-consignment.js', false, '1.0.1' );
@@ -241,12 +241,12 @@ class CargonizerAdmin{
 
       if ( gi($_GET, 'post') && gi($_GET, 'action') == 'edit'){
         if ( is_object($screen) && ($screen->post_type == 'shop_order' or $screen->post_type == 'consignment')  ){
-          wp_register_script( 'wcc-admin-order', $path. 'js/wcc-admin-order.js', false, '2.0.0' );
+          wp_register_script( 'wcc-admin-order', $path. 'js/wcc-admin-order.js', false, '2.0.1' );
           wp_enqueue_script( 'wcc-admin-order' );
         }
 
         if ( is_object($screen) && $screen->post_type == 'consignment'  ){
-          wp_register_script( 'wcc-admin-consignment', $path. 'js/wcc-admin-consignment.js', false, '1.0.0' );
+          wp_register_script( 'wcc-admin-consignment', $path. 'js/wcc-admin-consignment.js', false, '1.0.1' );
           wp_enqueue_script( 'wcc-admin-consignment' );
         }
       }

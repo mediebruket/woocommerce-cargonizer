@@ -173,7 +173,7 @@ class ShopOrder{
       return gi($this->Meta, 'parcel_print_on_post' );
     }
     else{
-      return get_option( 'cargonizer-auto-transfer' );
+      return get_option( 'cargonizer-print-on-export' );
     }
   }
 
@@ -193,7 +193,7 @@ class ShopOrder{
       return gi($this->Meta, 'parcel_auto_transfer' );
     }
     else{
-      return get_option( 'cargonizer-print-on-export' );
+      return get_option( 'cargonizer-auto-transfer' );
     }
   }
 
