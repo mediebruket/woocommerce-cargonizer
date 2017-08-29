@@ -255,3 +255,56 @@ text-align: center;
 .wcc-admin-message.active{
   display: block;
 }
+
+.wcc-tab{
+  padding:20px 20px;
+}
+
+.glyphicon-pencil:before{
+  content: "edit"
+}
+
+.glyphicon-pencil{
+  margin-right:5px;
+}
+
+.glyphicon-trash:before{
+  content: "delete"
+}
+
+.tabledit-delete-button{
+  color: white;
+  background: red;
+}
+
+td.id{
+  width: 2%;
+}
+
+td.package-amount,
+td.package-weight,
+td.package-height,
+td.package-length,
+td.package-width
+{
+  width:8%;
+}
+
+td.package-type,
+td.package-desc
+{
+  width: 10%;
+}
+
+td.package-width.tabledit-view-mode ~ td,
+td.package-width.tabledit-edit-mode ~ td
+{
+  width: 200px !important;
+}
+
+.tabledit-confirm-button,
+.tabledit-save-button{
+  margin-left: 30px;
+}
+
+

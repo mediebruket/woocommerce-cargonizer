@@ -1,14 +1,17 @@
-
 {
-  "name": "API",
-  "repositories": [
+  "name": "mediebruket/woocommerce-cargonizer",
+  "description": "Logistra Cargonizer for Woocommerce",
+  "keywords": ["Woocommerce","Cargonizer","Logistra"],
+  "homepage": "http://github.com/mediebruket/woocommerce-cargonizer",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
     {
-      "type": "vcs",
-      "url": "git@github.com:mediebruket/woocommerce-cargonizer.git"
+      "name": "mediebruket",
+      "homepage": "http://mediebruket.no"
     }
   ],
   "require": {
-    "mediebruket/woocommerce-cargonizer": "dev-master"
+    "php": ">=5.3.0"
   }
 }
-
