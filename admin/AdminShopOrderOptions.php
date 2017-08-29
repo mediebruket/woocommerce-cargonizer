@@ -234,7 +234,7 @@ class AdminShopOptions{
         'label' => __('Interval', 'wc-cargonizer'),
         'type'  => 'select',
         'value' => $this->ShopOrder->RecurringInterval,
-        'options' => CargonizerCommonController::getRecurringConsignmentInterval(),
+        'options' => CargonizerCommonController::getRecurringConsignmentInterval( __('every', 'wc-cargonizer' ) ),
         'wrap' => 'is-recurring'
       ),
       array(

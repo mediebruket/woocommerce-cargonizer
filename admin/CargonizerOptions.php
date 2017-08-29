@@ -136,7 +136,7 @@ class CargonizerOptions{
     foreach ( $this->$method() as $key => $option){
        CargonizerHtmlBuilder::buildOption( $option );
     }
-     
+
 
     $output = ob_get_contents();
     ob_end_clean();
@@ -553,39 +553,46 @@ class CargonizerOptions{
     return array(
       array(
         'name' => 'cargonizer-parcel-height',
-        'label' => __('Height&nbsp;(cm)'),
+        'label' => __('Height&nbsp;(cm)', 'wc-cargonizer' ),
         'type' => 'text',
         'value' => get_option('cargonizer-parcel-height'),
       ),
       array(
         'name' => 'cargonizer-parcel-length',
-        'label' => __('Length&nbsp;(cm)'),
+        'label' => __('Length&nbsp;(cm)', 'wc-cargonizer' ),
         'type' => 'text',
         'value' => get_option('cargonizer-parcel-length'),
       ),
       array(
         'name' => 'cargonizer-parcel-width',
-        'label' => __('Width&nbsp;(cm)'),
+        'label' => __('Width&nbsp;(cm)' , 'wc-cargonizer'),
         'type' => 'text',
         'value' => get_option('cargonizer-parcel-width'),
       ),
       array(
         'name' => 'cargonizer-parcel-message-consignee',
-        'label' => __('Message consignee'),
+        'label' => __('Message consignee', 'wc-cargonizer' ),
         'desc' => 'placeholders: @order_id@',
         'type' => 'text',
         'value' => get_option('cargonizer-parcel-message-consignee'),
       ),
       array(
+        'name' => 'cargonizer-parcel-ref-consignor',
+        'label' => __('Reference prefix', 'wc-cargonizer' ),
+        'desc' => '',
+        'type' => 'text',
+        'value' => get_option('cargonizer-parcel-ref-consignor', __('Order', 'wc-cargonizer') ),
+      ),
+      array(
         'name' => 'cargonizer-estimate-shipping-costs',
-        'label' => __('Estimate shipping costs?'),
+        'label' => __('Estimate shipping costs?', 'wc-cargonizer'),
         'type' => 'checkbox',
         'value' => get_option('cargonizer-estimate-shipping-costs'),
         'option' => 'on'
       ),
       array(
         'name' => 'cargonizer-auto-transfer',
-        'label' => __('Transfer automatically to carrier?'),
+        'label' => __('Transfer automatically to carrier?', 'wc-cargonizer'),
         'type' => 'checkbox',
         'value' => get_option('cargonizer-auto-transfer'),
         'option' => 'on'
@@ -604,7 +611,7 @@ class CargonizerOptions{
         'desc'   => __('Default interval'),
         'type'    => 'select',
         'value'   => $this->RecurringConsignmentDefaultInterval,
-        'options' => CargonizerCommonController::getRecurringConsignmentInterval()
+        'options' => CargonizerCommonController::getRecurringConsignmentInterval( __('every', 'wc-cargonizer' ) )
       ),
       array(
         'name'    => 'cargonizer-recurring-consignments-warning-time',
@@ -628,7 +635,7 @@ class CargonizerOptions{
         'desc'    => __('must be higher than default interval'),
         'type'    => 'select',
         'value'   => $this->RecurringConsignmentSkipAfter,
-        'options' => CargonizerCommonController::getRecurringConsignmentInterval()
+        'options' => CargonizerCommonController::getRecurringConsignmentInterval( __('after', 'wc-cargonizer' ) )
       ),
       array(
         'name'    => 'cargonizer-recurring-consignments-count-skip-intervals',
@@ -641,7 +648,7 @@ class CargonizerOptions{
       ),
 
     );
-     
+
   }
 
 

@@ -22,13 +22,13 @@ class CargonizerCommonController{
 
     return $choices;
   }
-   
 
-  public static function getRecurringConsignmentInterval(){
+
+  public static function getRecurringConsignmentInterval( $prefix = null ){
     $intervals = array();
 
     for( $i=1; $i<=30; $i++ ){
-      $intervals[$i] = sprintf( __('every %sth', 'wc-cargonizer'), $i );
+      $intervals[$i] = sprintf( __('%s %sth', 'wc-cargonizer'), $prefix, $i );
     }
     return $intervals;
   }
@@ -99,11 +99,11 @@ class CargonizerCommonController{
     }
 
     //_log($products);
-    
+
     return $products;
   }
 
 
-   
+
 
 } // end of class

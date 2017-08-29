@@ -757,11 +757,11 @@ class Consignment{
       }
     }
 
-    $export['consignments']['consignment']['messages']['consignor'] = 'messages-consignor';
+    $export['consignments']['consignment']['messages']['carrier'] = '';
     $export['consignments']['consignment']['messages']['consignee'] = gi( $this->Meta, 'consignment_message');
 
-    $export['consignments']['references']['carrier'] = $this->OrderId;
-    $export['consignments']['references']['consignee'] = $this->CustomerId;
+    $export['consignments']['consignment']['references']['consignor'] = get_option( 'cargonizer-parcel-ref-consignor' )." ".$this->OrderId;
+    $export['consignments']['consignment']['references']['consignee'] = $this->CustomerId;
 
     _log($export);
     return $export;

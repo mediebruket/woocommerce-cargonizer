@@ -42,12 +42,10 @@ class AdminConsignmentOptions{
   function getOptions( $type ){
     $method = 'load'.$type.'Options';
     ob_start();
-    foreach ( $this->$method() as $key => $option):
-    ?>
-    <?php CargonizerHtmlBuilder::buildOption( $option ); ?>
-    <?php
+    foreach ( $this->$method() as $key => $option){
+      CargonizerHtmlBuilder::buildOption( $option );
+    }
 
-    endforeach;
     $output = ob_get_contents();
     ob_end_clean();
 
@@ -139,7 +137,7 @@ class AdminConsignmentOptions{
       ),
       array(
         'name'    => '_shipping_country',
-        'label'   => __('Countyr', 'wc-cargonizer'),
+        'label'   => __('Country', 'wc-cargonizer'),
         'type'    => 'text',
         'value'   => $this->Consignment->ShippingCountry,
       ),
@@ -182,7 +180,7 @@ class AdminConsignmentOptions{
         'label' => __('Interval', 'wc-cargonizer'),
         'type'  => 'select',
         'value' => $this->Consignment->RecurringInterval,
-        'options' => CargonizerCommonController::getRecurringConsignmentInterval(),
+        'options' => CargonizerCommonController::getRecurringConsignmentInterval( __('every', 'wc-cargonizer' ) ),
         'wrap' => 'recurring-field'
       ),
       array(
@@ -271,92 +269,6 @@ class AdminConsignmentOptions{
         'options'   => array('Id', 'Count', 'Description', 'Weight (kg)', 'Height (cm)', 'Length (cm)', 'Width (cm)'),
         'save_post' => false
       ),
-
-
-
-
-
-    );
-  }
-
-
-  function loadConfirmationOptions(){
-    return array(
-       array(
-        'name' => 'consignment_created_at',
-        'label' => __('Date', 'wc-cargonizer'),
-        'type' => 'text',
-        'value' => '',
-      ),
-      array(
-        'name' => 'consignment_id',
-        'label' => __('Consignment id', 'wc-cargonizer'),
-        'type' => 'text',
-        'value' => '',
-      ),
-      array(
-        'name' => 'consignment_tracking_code',
-        'label' => __('Tracking code', 'wc-cargonizer'),
-        'type' => 'text',
-        'value' => '',
-      ),
-      array(
-        'name' => 'consignment_tracking_url',
-        'label' => __('Tracking url', 'wc-cargonizer'),
-        'type' => 'text',
-        'value' => '',
-      ),
-      array(
-        'name' => 'consignment_pdf',
-        'label' => __('Consignment pdf', 'wc-cargonizer'),
-        'type' => 'text',
-        'value' => '',
-      ),
-
-
-    );
-  }
-
-
-
-  function loadRecurringOptions(){
-    return array(
-       array(
-        'name'  => 'copy_consignment',
-        'label' => __('Copy from parcels', 'wc-cargonizer'),
-        'desc'  => __('Copies carrier, type, services and message from the main parcel', 'wc-cargonizer'),
-        'type'  => 'checkbox',
-        'value' => '',
-        'option'=> 'on'
-      ),
-      array(
-        'name'  => 'recurring_consignment_interval',
-        'label' => __('Interval', 'wc-cargonizer'),
-        'type'  => 'select',
-        'value' => '',
-        'options' => CargonizerCommonController::getRecurringConsignmentInterval()
-      ),
-      array(
-        'name'  => 'recurring_consignment_start_date',
-        'label' => __('Startdate', 'wc-cargonizer'),
-        'type'  => 'text',
-        'value' => '',
-      ),
-
-      array(
-        'name'  => 'recurring_consignment_carrier_id',
-        'label' => __('Carrier', 'wc-cargonizer'),
-        'type'  => 'select',
-        'value'   => null,
-        'options' => $this->CargonizerOptions->getCompanyList(),
-      ),
-       array(
-        'name' => 'recurring_consignment_message_consignee',
-        'label' => __('Message', 'wc-cargonizer'),
-        'type' => 'textarea',
-        'value' => '',
-      ),
-
     );
   }
 
