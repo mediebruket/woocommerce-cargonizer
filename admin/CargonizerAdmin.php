@@ -370,8 +370,8 @@ class CargonizerAdmin{
         echo gi($post_meta, '_shipping_last_name').', <br/>'.gi($post_meta, '_shipping_first_name');
       }
       else if ( $column == 'consignment-interval' ){
-        if ( $interval = gi($post_meta, 'recurring_consignment_interval') ){
-          printf("every %sth", $interval) ;
+        if ( gi($post_meta, 'consignment_is_recurring') ){
+          printf("every %sth",   gi($post_meta, 'recurring_consignment_interval') ) ;
         }
         else{
           echo 'n/a';
@@ -416,7 +416,8 @@ class CargonizerAdmin{
         // _log($next_shipping_date);
 
         $wtd = self::isInTime( $next_shipping_date, $today=date('Ymd') );
-        //_log($wtd);
+        // _log('is in time>>>');
+        // _log($wtd);
 
         $ok = false;
         if ( !$Consignment->IsRecurring && $Consignment->LastShippingDate ){
@@ -431,7 +432,9 @@ class CargonizerAdmin{
            //_log($wtd2);
         }
 
-        // _log($wtd);
+         // _log('result>>>');
+         // _log($wtd);
+         // _log($ok);
         if ( !$wtd && !$ok ){
           echo self::makeStatus( 'warning', __('Create consignment', 'wc-cargonizer') );
         }
@@ -483,18 +486,21 @@ class CargonizerAdmin{
   public static function isInTime( $next_shipping_date, $check_date ){
     $warning_time = get_option( 'cargonizer-recurring-consignments-warning-time', '1' );
     $wtd = 0;
-
+    // _log('isInTime');
+    $cd = new DateTime($check_date);
     $nsd = new DateTime($next_shipping_date);
-    $diff = $nsd->diff( new DateTime($check_date) );
+    $diff = $cd->diff( $nsd );
 
+    // _log($diff);
     if ( is_object($diff) && is_numeric($diff->days) ){
       $wtd = $diff->days;
+      if ( isset($diff->invert) && $diff->invert ){
+        $wtd *= -1;
+      }
     }
-
-    //_log('is in time');
-    //_log($wtd);
-    //_log($warning_time);
-    if ( $wtd == 0 or $wtd <= $warning_time ){
+    // _log($wtd);
+    // _log($warning_time);
+    if ( $wtd == 0 or $wtd >0 && $wtd <= $warning_time ){
       return false;
     }
     else{
