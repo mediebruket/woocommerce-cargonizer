@@ -14,18 +14,18 @@ class CargonizerUpdater{
   protected $IsActive;
 
 
-  function __construct($plugin_file ){
+  function __construct( $plugin_file ){
     $this->PluginFile = $plugin_file;
     add_filter( "plugins_api", array( $this, "setPluginInfo" ), 10, 3 );
     add_filter( "pre_set_site_transient_update_plugins", array( $this, "setTransitent" ), 1 );
     add_action( 'admin_notices', array($this, 'getLicenceKeyInfo') );
-    add_action( 'activated_plugin', array($this, 'registerPlugin') , 10, 2 );
+    // add_action( 'activated_plugin', array($this, 'registerPlugin') , 10, 2 );
     add_filter( "upgrader_post_install", array( $this, "afterUpdate" ), 10, 3 );
   }
 
 
   function afterUpdate( $true, $hook_extra, $result ){
-    _debug('after update');
+    // _log('after update');
     global $wp_filesystem;
     //$this->getCurrentVersionInfo();
 
@@ -82,10 +82,10 @@ class CargonizerUpdater{
 
     if( isset($transient->response) ){
       if ( !isset($transient->response[$this->Plugin]) ){
-        // _debug('if');
+        // _log('if');
 
         $current_tag = $this->updateAvailable();
-        // _debug($current_tag);
+        // _log($current_tag);
 
         if ( strlen($current_tag) && $current_tag != '1' ){
           $tag = json_decode($current_tag);
@@ -109,7 +109,7 @@ class CargonizerUpdater{
           $response = wp_remote_retrieve_body(wp_remote_get($url) );
 
           if ( $response && !is_numeric($response) ){
-            // _debug($response);
+            // _log($response);
             $obj->package = $response;
             $transient->response[$this->Plugin] = $obj;
           }
@@ -117,7 +117,7 @@ class CargonizerUpdater{
       }
     }
 
-    // _debug($transient);
+    // _log($transient);
 
     return $transient;
   }
@@ -170,7 +170,7 @@ class CargonizerUpdater{
 
     $url = self::buildUrl('update', $query_vars);
 
-    _debug($url);
+    // _log($url);
     $response = wp_remote_retrieve_body(wp_remote_get( $url ));
 
     return $response;
@@ -179,10 +179,10 @@ class CargonizerUpdater{
 
   function getReleaseInfo(){
     $query_vars = array( 'plugin' => $this->Slug );
-    _debug('$url');
+    // _log('$url');
     $url = self::buildUrl('releases', $query_vars);
 
-    _debug($url);
+    // _log($url);
     $response = wp_remote_retrieve_body(wp_remote_get( $url ));
 
     return $response;
@@ -218,11 +218,11 @@ class CargonizerUpdater{
     'licence' => get_option( $this->Slug.'_licence_key' )
     );
 
-    _log($this->Slug);
+    // _log($this->Slug);
 
     $url = self::buildUrl('licence', $query_vars);
 
-    _debug($url);
+    // _log($url);
     $response = wp_remote_retrieve_body(wp_remote_get( $url ));
 
     return $response;
@@ -237,7 +237,7 @@ class CargonizerUpdater{
       );
 
     $url = self::buildUrl('activation', $query_vars);
-    _debug($url);
+    // _log($url);
     wp_remote_get( $url );
   }
 

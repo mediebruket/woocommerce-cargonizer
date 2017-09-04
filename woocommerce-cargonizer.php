@@ -11,12 +11,16 @@ global $plugin_file;
 $plugin_file = __FILE__;
 $plugin_path = plugin_dir_path( __FILE__ );
 
+require_once( $plugin_path . 'admin/CargonizerUpdater.php');
+$CargonizerUpdater = new CargonizerUpdater( __FILE__ );
+
 require_once( $plugin_path . 'conf/conf.php');
 
 require_once( $plugin_path . 'include/util/utils.php');
 require_once( $plugin_path . 'include/util/XmlConverter.php');
 
 require_once( $plugin_path . 'include/api/CargonizerApi.php');
+
 
 require_once( $plugin_path . 'admin/CargonizerIcons.php');
 require_once( $plugin_path . 'admin/CargonizerOptions.php');
@@ -27,6 +31,7 @@ require_once( $plugin_path . 'admin/AdminConsignmentOptions.php');
 require_once( $plugin_path . 'admin/AdminConsignment.php');
 require_once( $plugin_path . 'admin/CargonizerHtmlBuilder.php');
 require_once( $plugin_path . 'admin/CargonizerAjax.php');
+
 
 require_once( $plugin_path . 'include/ShopOrder.php');
 require_once( $plugin_path . 'include/CargonizeXml.php');
