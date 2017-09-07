@@ -202,7 +202,7 @@ class CargonizerUpdater{
     if ( !isset($_GET['tab'])|| $_GET['tab']!='licencePage'){
       if ( $valid != '1' ){
         $class = "error";
-        $message = sprintf("%s: <a href='%s'>Licence key not valid</a>", $this->PluginName, admin_url('admin.php?page='._247_ADMIN.'&tab=licencePage') );
+        $message = sprintf("%s: <a href='%s'>Licence key not valid</a>", $this->PluginName, admin_url('admin.php?page='.WCC_Admin.'&tab=licencePage') );
         echo "<div class=\"$class\"> <p>$message</p></div>";
       }
     }
