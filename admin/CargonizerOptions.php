@@ -441,10 +441,10 @@ class CargonizerOptions{
   function loadLicenceOptions(){
     return array(
        array(
-        'name'  => 'woocomerce-cargonizer_licence_key',
+        'name'  => 'woocommerce-cargonizer_licence_key',
         'label' => __('Licence key', 'wc-cargonizer' ),
         'type'  => 'text',
-        'value' => get_option('cargonizer-licence-key'),
+        'value' => get_option('woocommerce-cargonizer_licence_key'),
         'css'   => 'licence-key',
       )
     );
