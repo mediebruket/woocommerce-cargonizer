@@ -97,7 +97,7 @@ class AdminConsignmentOptions{
         'name'    => 'customer_id',
         'label'   => __('Customer id', 'wc-cargonizer'),
         'type'    => 'text',
-        'value'   => $this->Consignment->CustomerId
+        'value'   => $this->Consignment->CustomerId,
       ),
       array(
         'name'    => '_shipping_first_name',

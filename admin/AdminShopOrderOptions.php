@@ -145,7 +145,7 @@ class AdminShopOptions{
       array(
         'name' => 'parcel_message_consignee',
         'label' => __('Message', 'wc-cargonizer'),
-        'type' => 'textarea',
+        'type' => 'text',
         'value' => $this->ShopOrder->ParcelMessage,
       ),
       array(

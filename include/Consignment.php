@@ -763,7 +763,6 @@ class Consignment{
     $export['consignments']['consignment']['references']['consignor'] = get_option( 'cargonizer-parcel-ref-consignor' )." ".$this->OrderId;
     $export['consignments']['consignment']['references']['consignee'] = $this->CustomerId;
 
-    _log($export);
     return $export;
   }
 

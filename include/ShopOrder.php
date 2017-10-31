@@ -13,6 +13,7 @@ class ShopOrder{
   public $ParcelMessage;
   public $ParcelServices;
   public $ParcelPackages;
+  public $Products;
   public $ShippingDate;
   public $TrackingProvider;
   public $TransportAgreements;
@@ -24,7 +25,7 @@ class ShopOrder{
 
 
   function __construct($post_id){
-    //_log("ShopOrder::__construct");
+    // _log("ShopOrder::__construct");
 
     if ( is_numeric($post_id) ){
       // set woocommerce order object
@@ -37,11 +38,13 @@ class ShopOrder{
           $this->$attribute = $value;
         }
 
+        $order_items = $this->WC_Order->get_items();
+        $this->Products = $this->getProducts();
+
         $this->Meta           = $this->getPostMeta();
         $this->ShippingDate   = $this->getShippingDate();
         $this->CarrierId      = $this->getCarrierId();
         $this->CarrierProduct = $this->getCarrierProduct();
-
 
         $this->IsCargonized   = $this->isCargonized();
         $this->Printer        = $this->getPrinter();
@@ -70,26 +73,30 @@ class ShopOrder{
         $this->ConsignmentTrackingUrl   = $this->getConsignmentTrackingUrl();
         $this->ConsignmentTrackingCode  = $this->getConsignmentTrackingCode();
         $this->ConsignmentPdf           = $this->getConsignmentPdf();
-        //$this->getTransportAgreementSettings();
 
 
-        $order_items = $this->WC_Order->get_items();
-        $this->Products = array();
-
-        if ( is_array($order_items) ){
-          foreach ($order_items as $key => $product) {
-            $this->Products[$key] = $product->get_data();
-            $this->Products[$key]['is_subscription'] = false;
-            if ( class_exists('WC_Subscriptions_Product') ){
-              $this->Products[$key]['is_subscription'] = WC_Subscriptions_Product::is_subscription( $product['product_id'] );
-            }
-          } // foreach
-        } // if
 
       } // if post
     } // if is numeric
   } // construct
 
+
+  function getProducts(){
+    $products = array();
+
+    $order_items = $this->WC_Order->get_items();
+    if ( is_array($order_items) ){
+      foreach ($order_items as $key => $product) {
+        $products[$key] = $product->get_data();
+        $products[$key]['is_subscription'] = false;
+        if ( class_exists('WC_Subscriptions_Product') ){
+          $products[$key]['is_subscription'] = WC_Subscriptions_Product::is_subscription( $product['product_id'] );
+        }
+      } // foreach
+    } // if
+
+    return $products;
+  }
 
 
   function getPostMeta(){
@@ -244,14 +251,37 @@ class ShopOrder{
 
 
   function getParcelMessage(){
+    // _log('ShopOrder::getParcelMessage');
+    // _log($this->Products);
     if ( isset($this->Meta['parcel_message_consignee'][0]) ){
       return $this->Meta['parcel_message_consignee'][0];
     }
     else{
       $default = get_option('cargonizer-parcel-message-consignee' );
       $default = str_replace('@order_id@', $this->Id, $default);
+      $default = str_replace('@products@', $this->getProductsList($recurring=false), $default);
       return $default;
     }
+  }
+
+
+  function getProductsList( $recurring=false ){
+    $list = array();
+    foreach ($this->Products as $key => $p) {
+      if ( $recurring && $p['is_subscription'] ){
+        $list[] = $p['name'];
+      }
+      elseif( !$recurring && !$p['is_subscription'] ){
+        $list[] = $p['name'];
+      }
+    }
+
+    $products = implode(', ', $list);
+    if ( strlen($products) > 56 ){
+      $products = substr($products, 0, 56);
+    }
+
+    return $products;
   }
 
 
@@ -285,6 +315,7 @@ class ShopOrder{
     else{
       $default = get_option('cargonizer-parcel-message-consignee' );
       $default = str_replace('@order_id@', $this->Id, $default);
+      $default = str_replace('@products@', $this->getProductsList($recurring=false), $default);
       return $default;
     }
 

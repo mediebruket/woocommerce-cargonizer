@@ -572,7 +572,7 @@ class CargonizerOptions{
       array(
         'name' => 'cargonizer-parcel-message-consignee',
         'label' => __('Message to consignee', 'wc-cargonizer' ),
-        'desc' => 'placeholders: @order_id@',
+        'desc' => 'placeholders: @order_id@, @products@ (max. 56 chars)',
         'type' => 'text',
         'value' => get_option('cargonizer-parcel-message-consignee'),
       ),

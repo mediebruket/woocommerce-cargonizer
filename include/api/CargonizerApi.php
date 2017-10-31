@@ -106,15 +106,13 @@ class CargonizerApi{
 
   function estimateCosts( $xml ){
     // curl -g -XPOST -d@consignment.xml -H'X-Cargonizer-Key: 12345' -H'X-Cargonizer-Sender: 678' 'http://cargonizer.no/consignment_costs.xml'
-
     _log('CargonizerApi::estimateCosts()');
-
     $headers =
       array(
         'Content-Type' =>  'application/xml'
       );
 
-    return $this->rest('consignment_costs.xml', $headers, 'POST', $xml, $debug=true );
+    return $this->rest('consignment_costs.xml', $headers, 'POST', $xml, $debug=false );
   }
 
 
