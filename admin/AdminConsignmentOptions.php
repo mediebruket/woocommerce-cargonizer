@@ -256,8 +256,10 @@ class AdminConsignmentOptions{
       ),
       array(
         'name'      => 'consignment_message',
-        'label'     => __('Message', 'wc-cargonizer'),
-        'type'      => 'textarea',
+        'label'     => __('Message (max. 56 chars)', 'wc-cargonizer'),
+        'type'      => 'text',
+        'maxlength' => 56,
+        'size'       => 60,
         'value'     => $this->Consignment->Message,
       ),
 

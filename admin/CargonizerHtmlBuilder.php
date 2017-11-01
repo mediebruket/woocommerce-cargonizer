@@ -58,7 +58,8 @@ class CargonizerHtmlBuilder{
             'class'     => gi($option, 'css'),
             'max'       => gi($option, 'max'),
             'min'       => gi($option, 'min'),
-            'size'      => 50,
+            'size'      => gi($option, 'size', 50),
+            'maxlength' => gi($option, 'maxlength', ''),
           );
 
         if ( isset($option['readonly']) && $option['readonly'] ){

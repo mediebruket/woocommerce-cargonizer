@@ -2,21 +2,22 @@
 
 
 if ( !function_exists('gi') ){
-  function gi( $array, $index ){
+  function gi( $array, $index, $default=null ){
+    $value = $default;
+
     if ( is_array($array) && isset($array[$index]) ){
       if ( is_string($array[$index]) or is_numeric($array[$index]) ){
-        return $array[$index];
+        $value = $array[$index];
       }
       elseif ( is_string($array[$index][0]) ){
-        return $array[$index][0];
+        $value = $array[$index][0];
       }
     }
     else if ( is_object($array) && isset($array->$index) ){
-      return $array->$index;
+      $value = $array->$index;
     }
-    else{
-      return null;
-    }
+
+    return $value;
   }
 }
 
