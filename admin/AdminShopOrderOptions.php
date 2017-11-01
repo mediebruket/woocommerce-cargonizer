@@ -299,8 +299,8 @@ class AdminShopOptions{
       ),
       array(
         'name' => 'recurring_consignment_message_consignee',
-        'label' => __('Message', 'wc-cargonizer'),
-        'type' => 'textarea',
+        'label' => __('Message (max. 56 chars)', 'wc-cargonizer'),
+        'type' => 'text',
         'value' => $this->ShopOrder->RecurringConsignmentMessage,
         'wrap' => 'is-recurring'
       ),
