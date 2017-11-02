@@ -261,7 +261,7 @@ class CargonizerHtmlBuilder{
               $id = uniqid();
               $checked = null;
 
-              if ( is_numeric( array_search($o_id, $option['value'])  ) ){
+              if ( is_array($option['value']) && is_numeric( array_search($o_id, $option['value'])  ) ){
                 $checked = ' checked="checked" ';
               }
 

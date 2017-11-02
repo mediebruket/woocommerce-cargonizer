@@ -441,6 +441,9 @@ class CargonizerOptions{
       if ( !empty($array) ){
         set_transient( $transient, $array, 1*60*60 );
       }
+      else{
+        $array[0] = 'no printer available';
+      }
     }
 
     return $array;
