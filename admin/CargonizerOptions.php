@@ -281,7 +281,6 @@ class CargonizerOptions{
     $transport_agreements = get_transient('transport_agreements');
 
     if ( !$transport_agreements or $force_update ){
-      // _log('update transient');
       $Api = new CargonizerApi(true);
       if ( $ta = $this->sanitizeTransportAgreements( $Api->TransportAgreements['transport-agreements']['transport-agreement'] ) ){
          $this->saveTransportAgreements( $ta );
@@ -315,19 +314,28 @@ class CargonizerOptions{
 
           // set products
           $products = array();
+
           if ( is_array($value['products']['product']) ){
             foreach ( $value['products']['product']  as $key => $product) {
-                // _log($key);
-                // _log($product);
 
               $types = array();
               if ( isset($product['item_types']['item_type']) && is_array($product['item_types']['item_type']) ){
+                // default
                 foreach ($product['item_types']['item_type'] as $index => $type){
-                  if ( $abbreviation = gi($type, '@abbreviation' ) ){
+                  if ( $abbreviation = gi($type, '@abbreviation' )  ){
                     $types[ $type['@abbreviation'] ] = $type['@name_no'];
+                  }
+                  break;
+                }
+
+                // exception
+                if ( empty($types) ){
+                  if ( isset($product['item_types']['item_type']['@abbreviation']) && isset($product['item_types']['item_type']['@name_no']) ){
+                    $types[$product['item_types']['item_type']['@abbreviation']] = $product['item_types']['item_type']['@name_no'];
                   }
                 }
               }
+
 
               $services = array();
               if ( isset($product['services']) && is_array($product['services']['service']) ){
@@ -349,9 +357,11 @@ class CargonizerOptions{
 
                 }
               }
-              else{
-                //_log('no services: '.$product['name']);
-              }
+              // else{
+              //   _log('no services: '.$product['name']);
+              // }
+              //
+
 
 
               if ( !empty($types) ){
@@ -364,7 +374,6 @@ class CargonizerOptions{
               }
             }
           }
-
 
           // add carrier if has products
           if ( $products ){
