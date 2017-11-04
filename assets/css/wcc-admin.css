@@ -228,6 +228,10 @@ tr.consignment-created td
 text-align: center;
 }
 
+.alert.service-partner-address{
+  text-align: left;
+}
+
 .status-ok{
   color: green;
 }

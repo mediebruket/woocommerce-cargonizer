@@ -1,5 +1,8 @@
 <?php
 
+add_action( 'save_post', array('ShopOrderController', 'saveServicePartner'), $priority = 10, $accepted_args = 2 );
+
+
 class ShopOrderController extends CargonizerCommonController{
   protected $Order;
   protected $WC_Order;
@@ -7,10 +10,23 @@ class ShopOrderController extends CargonizerCommonController{
 
   function __construct( ){
     parent::__construct();
-
     add_action( 'save_post', array($this, 'saveConsignmentSettgings'), 10, 1 );
     add_action( 'save_post', array($this, 'saveConsignment'), 20, 1 );
     add_action( 'init',  array($this, 'resetConsignment') , 10, 2 );
+  }
+
+
+  public static function saveServicePartner( $post_id, $post){
+    if ( !is_admin() ){
+      if ($post->post_type == 'shop_order' ){
+        _log('ShopOrderController::saveServicePartner()');
+        $copy = array( 'wcc-service-partner-id', 'wcc-service-partner-name', 'wcc-service-partner-address', 'wcc-service-partner-postcode', 'wcc-service-partner-city', 'wcc-service-partner-country' );
+        foreach($copy as $key => $index) {
+          update_post_meta( $post_id, $index, gi($_REQUEST, $index ) );
+          _log('copied: '.$index);
+        }
+      }   
+    }
   }
 
 

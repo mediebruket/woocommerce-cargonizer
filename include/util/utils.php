@@ -22,7 +22,6 @@ if ( !function_exists('gi') ){
 }
 
 if ( !function_exists('_is') ){
-
   function _is( $array, $index ) {
     gi($array, $index);
   }
@@ -30,7 +29,8 @@ if ( !function_exists('_is') ){
 
 if(!function_exists('_log')){
   function _log( $message ) {
-    if( WP_DEBUG === true ){
+    global $enable_logging;
+    if( WP_DEBUG === true && $enable_logging ){
       if( is_array( $message ) || is_object( $message ) ){
         error_log( print_r( $message, true ) );
       } else {

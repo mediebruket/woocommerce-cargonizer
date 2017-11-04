@@ -19,6 +19,7 @@ class CargonizerAdmin{
     add_action( 'admin_menu', array($this, 'createSubmenu' ) );
     add_action( 'admin_footer', array($this, 'addTransportAgreements' ) );
     add_action( 'admin_enqueue_scripts', array( $this, 'registerScripts' ) );
+    add_action( 'wp_enqueue_scripts', array( $this, 'registerFrontendScripts' ) );
   }
 
 
@@ -194,6 +195,30 @@ class CargonizerAdmin{
     <?php
   }
 
+  function registerFrontendScripts(){
+    if ( is_checkout() && get_option('cargonizer-use-service-partners') ){
+      $plugin_path =  str_replace('admin/', null, plugin_dir_url(__FILE__) );
+      $path = $plugin_path.'assets/';
+        
+      //wp_deregister_script('jquery');
+      wp_register_script( 'wcc-jquery', 'https://code.jquery.com/jquery-2.2.4.min.js', false, '2.2.5' );
+      wp_enqueue_script('wcc-jquery');
+
+      wp_register_script( 'wcc-vue', $path. 'js/vue.js', false, '2.0.0' );
+      wp_enqueue_script( 'wcc-vue' );
+
+      wp_register_script( 'wcc-frontend-checkout', $path.'/js/wcc-frontend-checkout.js', false, '1.0.0' );
+      wp_enqueue_script( 'wcc-frontend-checkout' );
+
+      $styles = array( 'wcc-frontend.css' );
+
+      foreach ($styles as $s) {
+        echo '<link rel="stylesheet" href="'.$path .'css/'.$s.'" type="text/css" />' . "\n";
+      }  
+    }
+    
+  }
+
 
   function registerScripts(){
     if ( is_admin() ) {
@@ -249,6 +274,7 @@ class CargonizerAdmin{
       wp_enqueue_script( 'tableedit-js' );
 
     }
+    
   }
 
 

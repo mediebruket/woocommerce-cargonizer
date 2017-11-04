@@ -65,13 +65,12 @@ class AdminShopOptions{
   function loadParcelOptions(){
 
     return array(
-      // array(
-      //   'name'    => 'parcel_is_recurring',
-      //   'label'   => __('Recurring consignment', 'wc-cargonizer'),
-      //   'type'    => 'checkbox',
-      //   'value'   => false,
-      //   'option'  => 'on'
-      // ),
+      array(
+        'name'    => 'shipping_to_service_partner',
+        'label'   => __('Receiver', 'wc-cargonizer'),
+        'type'    => 'service_partner',
+        'value'   => $this->ShopOrder->ServicePartner,
+      ),
       array(
         'name'    => 'parcel_printer',
         'label'   => __('Printer', 'wc-cargonizer'),

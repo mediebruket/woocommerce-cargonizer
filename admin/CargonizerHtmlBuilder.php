@@ -91,7 +91,19 @@ class CargonizerHtmlBuilder{
         ?>
       <?php endif; ?>
 
-       <?php if( $option['type'] == 'checkbox'): ?>
+      <?php if( $option['type'] == 'service_partner' && is_array($option['value']) && !empty($option['value']) ): ?>
+        <div class="alert alert-info service-partner-address">
+          <strong><?php _e('Pick-up point:', 'wc-cargonizer'); ?></strong><br/>
+          <?php echo $option['value']['name']; ?> (<?php echo $option['value']['number']; ?>)<br/>
+          <?php echo $option['value']['address']; ?><br/>
+          <?php echo $option['value']['postcode']; ?><br/>
+          <?php echo $option['value']['city']; ?><br/>
+          <?php echo $option['value']['country']; ?><br/>
+        </div>
+      <?php endif; ?>
+
+
+      <?php if( $option['type'] == 'checkbox'): ?>
        <?php self::buildLabel( $option['label'], $option['name'], 'mb-admin-label inline' ); ?>
         <?php
           if (isset($option['desc']) && trim($option['desc']) ){

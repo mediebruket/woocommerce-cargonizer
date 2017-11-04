@@ -15,6 +15,7 @@ class ShopOrder{
   public $ParcelPackages;
   public $Products;
   public $ShippingDate;
+  public $ServicePartner;
   public $TrackingProvider;
   public $TransportAgreements;
   public $TransportAgreementId;
@@ -56,6 +57,8 @@ class ShopOrder{
         $this->ParcelMessage  = $this->getParcelMessage();
         $this->ParcelPackages = $this->getPackages();
 
+        $this->ServicePartner = $this->getServicePartner();
+
 
         // recurring
         $this->IsRecurring                      = $this->getIsRecurring();
@@ -73,8 +76,6 @@ class ShopOrder{
         $this->ConsignmentTrackingUrl   = $this->getConsignmentTrackingUrl();
         $this->ConsignmentTrackingCode  = $this->getConsignmentTrackingCode();
         $this->ConsignmentPdf           = $this->getConsignmentPdf();
-
-
 
       } // if post
     } // if is numeric
@@ -104,12 +105,32 @@ class ShopOrder{
   }
 
 
+  function getServicePartner(){
+    //_log('ShopOrder::getServicePartner()');
+    $number = gi($this->Meta, 'wcc-service-partner-id');
+    $name       = gi($this->Meta, 'wcc-service-partner-name');
+    $address    = gi($this->Meta, 'wcc-service-partner-address');
+    $postcode   = gi($this->Meta, 'wcc-service-partner-postcode');
+    $city       = gi($this->Meta, 'wcc-service-partner-city');
+    $country    = gi($this->Meta, 'wcc-service-partner-country');
+    
+    //_log($name);
+    $partner = null;
+    if ( $name && $address && $postcode && $city ){
+      $partner = compact('number', 'name', 'address', 'postcode', 'city', 'country');  
+    }
+    
+    //_log($partner);
+    return $partner;    
+  }
+
+
   function getPackages(){
     $meta_key = 'parcel_packages';
     $packages = maybe_unserialize( gi($this->Meta, $meta_key) );
 
     if ( !$packages or is_array($packages) and empty($packages) ){
-      _log('get default package...');
+      //_log('get default package...');
       $default = $this->getDefaultPackage();
       $packages = array('1' => $default);
       update_post_meta( $this->ID, $meta_key, $packages );
@@ -167,7 +188,6 @@ class ShopOrder{
 
     return $weight;
   }
-
 
 
   function getPrinter(){
@@ -506,38 +526,8 @@ class ShopOrder{
   }
 
 
-  // function getTransportAgreementSettings(){
-  //   _log('ShopOrder::getTransportAgreementSettings');
-  //   $this->TransportAgreementId = null;
-  //   if ( $ta = gi($this->Meta, 'transport_agreement') ){
-  //     _log($ta);
-
-  //     $transport_agreement = explode('|', $ta);
-  //     // _log('$ta');
-  //     // _log($ta);
-  //     if ( isset($transport_agreement[0]) ){
-  //       $this->TransportAgreementId = $transport_agreement[0];
-  //     }
-  //   }
-
-  //   $this->TransportAgreementProduct = $this->TransportAgreementProductType = null;
-  //   if ( $parcel_type = gi($this->Meta, 'parcel_type') ){
-  //     $parcel_type = explode('|', $parcel_type);
-  //     // _log('$parcel_type');
-  //     // _log($parcel_type);
-  //     if ( isset($parcel_type[0]) ){
-  //       $this->TransportAgreementProduct = $parcel_type[0];
-  //     }
-
-  //     if ( isset($parcel_type[1]) ){
-  //       $this->TransportAgreementProductType = $parcel_type[1];
-  //     }
-  //   }
-  // }
-
-
   public static function getPlaceholders(){
-    return array( '@order_id@', '@shop_name@', '@parcel_tracking_url@', '@parcel_tracking_link@', '@parcel_tracking_code@', '@parcel_date@' );
+    return array( '@order_id@', '@shop_name@', '@parcel_tracking_url@', '@parcel_tracking_link@', '@parcel_tracking_code@', '@parcel_date@', '@service_partner@' );
   }
 
 

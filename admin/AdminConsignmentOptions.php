@@ -170,7 +170,7 @@ class AdminConsignmentOptions{
       array(
         'name'      => 'consignment_start_date',
         'label'     => __('Start date', 'wc-cargonizer'),
-        'desc'      => __(''),
+        'desc'      => null,
         'type'      => 'date',
         'value'     => $this->Consignment->StartDate,
         'wrap'      => 'recurring-field'

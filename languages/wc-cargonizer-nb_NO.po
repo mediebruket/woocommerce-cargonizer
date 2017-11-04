@@ -1,0 +1,2082 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Infosoft plugin\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-11-04 10:48+0100\n"
+"PO-Revision-Date: 2017-11-04 10:49+0100\n"
+"Last-Translator: \n"
+"Language-Team: Mediebruket <post@mediebruket.no>\n"
+"Language: nn_NO\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=n!=1;\n"
+"X-Generator: Poedit 2.0.4\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: admin/AdminConsignmentOptions.php:58 admin/AdminShopOrderOptions.php:58
+#: admin/CargonizerAdmin.php:50
+msgid "Parcel"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:59
+msgid "Consignee"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:60 admin/AdminConsignmentOptions.php:70
+msgid "History"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:61 admin/AdminConsignmentOptions.php:84
+msgid "Products"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:98
+msgid "Customer id"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:104
+msgid "First name"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:110
+msgid "Last name"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:116
+msgid "Shipping address 1"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:122
+msgid "Shipping address 2"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:128 admin/CargonizerOptions.php:733
+msgid "Postcode"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:134 admin/CargonizerOptions.php:740
+msgid "City"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:140 admin/CargonizerOptions.php:726
+msgid "Country"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:146
+msgid "E-mail"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:152
+msgid "Phone"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:165
+msgid "Is recurring"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:172
+msgid "Start date"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:180 admin/AdminShopOrderOptions.php:233
+#: conf/conf.php:28
+msgid "Interval"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:183 admin/AdminShopOrderOptions.php:236
+#: admin/CargonizerOptions.php:653
+msgid "every"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:188
+msgid "(Next) Shipping date"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:189 admin/AdminShopOrderOptions.php:161
+msgid "Leave empty if the consignment is to be created today"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:195 admin/AdminShopOrderOptions.php:76
+msgid "Printer"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:196 admin/AdminConsignmentOptions.php:220
+#: admin/AdminConsignmentOptions.php:229 admin/AdminShopOrderOptions.php:77
+#: admin/AdminShopOrderOptions.php:101 admin/AdminShopOrderOptions.php:110
+#: admin/AdminShopOrderOptions.php:260
+msgid "If empty, setup api settings"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:203 admin/AdminShopOrderOptions.php:84
+msgid "Export to carrier"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:204 admin/AdminShopOrderOptions.php:85
+msgid "Saves the consignment as \"sent\""
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:211 admin/AdminShopOrderOptions.php:92
+#: admin/CargonizerOptions.php:536
+msgid "Print on export"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:212 admin/AdminShopOrderOptions.php:93
+msgid "Prints the consignment automatically"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:219 admin/AdminShopOrderOptions.php:100
+#: admin/AdminShopOrderOptions.php:249 admin/CargonizerAdmin.php:49
+msgid "Carrier"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:228 admin/AdminShopOrderOptions.php:109
+#: admin/AdminShopOrderOptions.php:259
+msgid "Carrier product"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:238 admin/AdminShopOrderOptions.php:119
+#: admin/AdminShopOrderOptions.php:270
+msgid "Product type"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:247 admin/AdminShopOrderOptions.php:128
+#: admin/AdminShopOrderOptions.php:280
+msgid "Product services"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:259 admin/AdminShopOrderOptions.php:301
+msgid "Message (max. 56 chars)"
+msgstr ""
+
+#: admin/AdminConsignmentOptions.php:268 admin/AdminShopOrderOptions.php:152
+#: admin/AdminShopOrderOptions.php:308
+msgid "Packages"
+msgstr ""
+
+#: admin/AdminShopOrderOptions.php:59
+msgid "Confirmation"
+msgstr ""
+
+#: admin/AdminShopOrderOptions.php:60 admin/CargonizerAdmin.php:52
+msgid "Recurring"
+msgstr ""
+
+#: admin/AdminShopOrderOptions.php:70 conf/conf.php:27
+msgid "Receiver"
+msgstr ""
+
+#: admin/AdminShopOrderOptions.php:146 admin/CargonizerOptions.php:705
+msgid "Message"
+msgstr ""
+
+#: admin/AdminShopOrderOptions.php:160
+msgid "Shipping date"
+msgstr ""
+
+#: admin/AdminShopOrderOptions.php:167
+msgid "Create consignment now"
+msgstr ""
+
+#: admin/AdminShopOrderOptions.php:168
+msgid ""
+"To create a consignment on cargonizer.no:<br/>- Will only work if shipping "
+"date is empty<br/>- Enable this checkox if carrier is selected and the "
+"parcel(s) added."
+msgstr ""
+
+#: admin/AdminShopOrderOptions.php:183
+msgid "Date"
+msgstr ""
+
+#: admin/AdminShopOrderOptions.php:190 admin/CargonizerAdmin.php:319
+msgid "Consignment id"
+msgstr ""
+
+#: admin/AdminShopOrderOptions.php:197
+msgid "Tracking code"
+msgstr ""
+
+#: admin/AdminShopOrderOptions.php:204 admin/CargonizerAdmin.php:320
+#: admin/CargonizerAdmin.php:337
+msgid "Tracking url"
+msgstr ""
+
+#: admin/AdminShopOrderOptions.php:211
+msgid "Consignment pdf"
+msgstr ""
+
+#: admin/AdminShopOrderOptions.php:225
+msgid "Create recurring consignment"
+msgstr ""
+
+#: admin/AdminShopOrderOptions.php:241
+msgid "Startdate"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:29 admin/CargonizerAdmin.php:30
+msgid "Cargonizer"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:38 admin/CargonizerAdmin.php:39
+msgid "Consignments"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:48
+msgid "API"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:51
+msgid "Notification"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:53 admin/CargonizerOptions.php:747
+msgid "Address"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:54
+msgid "Licence"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:82 admin/CargonizerAdmin.php:130
+msgid "API settings updated"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:85
+msgid "API setttings"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:92
+msgid "General settings updated"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:103
+msgid "General setttings"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:110
+msgid "Parcel settings updated"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:113
+msgid "Package defaults"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:120
+msgid "Recurring settings updated"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:123
+msgid "Recurring defaults"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:133
+msgid "Address settings"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:140
+msgid "Notification settings updated"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:143
+msgid "Notifications"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:147
+msgid "Placeholders"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:157
+msgid "Licence updated"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:160
+msgid "Licence settings"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:178
+msgid "update"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:180
+msgid "reset"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:351
+msgid "Logistra Cargonizer: reset consignment"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:354
+msgid "Does not delete the consignment on cargonizer.no"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:465
+msgid "Create consignment"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:468
+msgid "Delay in dispatch"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:471
+msgid "days left"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:474
+msgid "OK"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:557
+msgid "Create new consignment"
+msgstr ""
+
+#: admin/CargonizerAdmin.php:558
+msgid "Check consignments"
+msgstr ""
+
+#: admin/CargonizerAjax.php:131
+#, php-format
+msgid "New consignment created: %s"
+msgstr ""
+
+#: admin/CargonizerAjax.php:197
+msgid "Missing post id"
+msgstr ""
+
+#: admin/CargonizerHtmlBuilder.php:96
+msgid "Pick-up point:"
+msgstr "Leveringssted:"
+
+#: admin/CargonizerHtmlBuilder.php:257
+msgid "Add row"
+msgstr ""
+
+#: admin/CargonizerOptions.php:476
+msgid "Licence key"
+msgstr ""
+
+#: admin/CargonizerOptions.php:490
+msgid "Api key"
+msgstr ""
+
+#: admin/CargonizerOptions.php:496
+msgid "Api sender"
+msgstr ""
+
+#: admin/CargonizerOptions.php:502
+msgid "Sandbox"
+msgstr ""
+
+#: admin/CargonizerOptions.php:509
+msgid "Sandbox api key"
+msgstr ""
+
+#: admin/CargonizerOptions.php:515
+msgid "Sandbox api sender"
+msgstr ""
+
+#: admin/CargonizerOptions.php:528
+msgid "Default printer"
+msgstr ""
+
+#: admin/CargonizerOptions.php:544
+msgid "Use service partners<br/>(pick-up points)"
+msgstr ""
+
+#: admin/CargonizerOptions.php:545
+msgid "Required for PostNord"
+msgstr ""
+
+#: admin/CargonizerOptions.php:552
+msgid "Default delivery company"
+msgstr ""
+
+#: admin/CargonizerOptions.php:553
+msgid "Api settings required to load delivery companies"
+msgstr ""
+
+#: admin/CargonizerOptions.php:560
+msgid "Default product"
+msgstr ""
+
+#: admin/CargonizerOptions.php:561
+msgid "If empty, select delivery company and update"
+msgstr ""
+
+#: admin/CargonizerOptions.php:568
+msgid "Default product type"
+msgstr ""
+
+#: admin/CargonizerOptions.php:569
+msgid "If empty, select product and update"
+msgstr ""
+
+#: admin/CargonizerOptions.php:577
+msgid "Default product services"
+msgstr ""
+
+#: admin/CargonizerOptions.php:595
+msgid "Height&nbsp;(cm)"
+msgstr ""
+
+#: admin/CargonizerOptions.php:601
+msgid "Length&nbsp;(cm)"
+msgstr ""
+
+#: admin/CargonizerOptions.php:607
+msgid "Width&nbsp;(cm)"
+msgstr ""
+
+#: admin/CargonizerOptions.php:613
+msgid "Message to consignee"
+msgstr ""
+
+#: admin/CargonizerOptions.php:620
+msgid "Reference prefix"
+msgstr ""
+
+#: admin/CargonizerOptions.php:623
+msgid "Order"
+msgstr ""
+
+#: admin/CargonizerOptions.php:627
+msgid "Estimate shipping costs?"
+msgstr ""
+
+#: admin/CargonizerOptions.php:634
+msgid "Transfer automatically to carrier?"
+msgstr ""
+
+#: admin/CargonizerOptions.php:649 admin/CargonizerOptions.php:650
+msgid "Default interval"
+msgstr ""
+
+#: admin/CargonizerOptions.php:657
+msgid "Warning time"
+msgstr ""
+
+#: admin/CargonizerOptions.php:658
+msgid "Default 1 day"
+msgstr ""
+
+#: admin/CargonizerOptions.php:665
+msgid "Skip first shipping if order is placed after default interval"
+msgstr ""
+
+#: admin/CargonizerOptions.php:666
+msgid "i.e. default interval is every 15th and order is placed on 20th"
+msgstr ""
+
+#: admin/CargonizerOptions.php:673
+msgid "Skip interval after ..."
+msgstr ""
+
+#: admin/CargonizerOptions.php:674
+msgid "must be higher than default interval"
+msgstr ""
+
+#: admin/CargonizerOptions.php:677
+msgid "after"
+msgstr ""
+
+#: admin/CargonizerOptions.php:681
+msgid "Count intervals (months) to skip"
+msgstr ""
+
+#: admin/CargonizerOptions.php:698
+msgid "Subject"
+msgstr ""
+
+#: admin/CargonizerOptions.php:699
+msgid "i.e. \"Order @order_id@ at @shop_name@ is sent"
+msgstr ""
+
+#: admin/CargonizerOptions.php:706
+msgid "E-Mail notification to customer after export to Cargonizer"
+msgstr ""
+
+#: admin/CargonizerOptions.php:719
+#: include/controllers/ConsignmentController.php:163
+msgid "Name"
+msgstr ""
+
+#: conf/conf.php:26
+msgid "ID"
+msgstr ""
+
+#: conf/conf.php:29
+msgid "Next shipping date"
+msgstr ""
+
+#: conf/conf.php:30
+msgid "Actions"
+msgstr ""
+
+#: conf/conf.php:31 include/controllers/ConsignmentController.php:166
+msgid "Status"
+msgstr ""
+
+#: conf/conf.php:32
+msgid "Last shipping date"
+msgstr ""
+
+#: frontend/ServicePartners.php:39
+msgid "stengt"
+msgstr ""
+
+#: frontend/ServicePartners.php:89
+msgid "Choose pick-up point"
+msgstr "Velg leveringssted"
+
+#: frontend/ServicePartners.php:94
+msgid "Show opening hours"
+msgstr "Vis åpningstider"
+
+#: include/Consignment.php:860
+#, php-format
+msgid "Consignment created: <a href=\"%s\">edit</a>"
+msgstr ""
+
+#: include/Consignment.php:1144
+msgid "consignment"
+msgstr ""
+
+#: include/Consignment.php:1145
+msgid "consignments"
+msgstr ""
+
+#: include/Consignment.php:1150
+msgid "Add "
+msgstr ""
+
+#: include/ShopOrder.php:440
+#, php-format
+msgid "Cargonizer: Parcel %s"
+msgstr ""
+
+#: include/ShopOrder.php:451
+#, php-format
+msgid "Consignment id: %s"
+msgstr ""
+
+#: include/controllers/CargonizerCommonController.php:31
+#, php-format
+msgid "%s %sth"
+msgstr ""
+
+#: include/controllers/ConsignmentController.php:162
+msgid "Id"
+msgstr ""
+
+#: include/controllers/ConsignmentController.php:164
+msgid "Count"
+msgstr ""
+
+#: include/controllers/ConsignmentController.php:165
+msgid "Subscription"
+msgstr ""
+
+#, fuzzy
+#~| msgid "Midlertidig leveringsadresse"
+#~ msgid "Velg leveringssted"
+#~ msgstr "Mellombels leveringsadresse"
+
+#~ msgid "Innstillingene er lagret"
+#~ msgstr "Innstillingane er lagra"
+
+#~ msgid "Faste lenker"
+#~ msgstr "Faste lenker"
+
+#, fuzzy
+#~ msgid "Abonnementsendringer"
+#~ msgstr "Abonnementsendringar"
+
+#~ msgid "Produktkoder"
+#~ msgstr "Produktkodar"
+
+#~ msgid "Meldinger"
+#~ msgstr "Meldingar"
+
+#, fuzzy
+#~ msgid "E-postbekreftelser"
+#~ msgstr "Stadfesting"
+
+#~ msgid "Midlertidig stans av papiravisen"
+#~ msgstr "Mellombels stopp av papiravisa"
+
+#~ msgid "Oppbevaring av papiravisen"
+#~ msgstr "Oppbevaring av papiravisa"
+
+#~ msgid "Klage p&aring; levering"
+#~ msgstr "Klage p&aring; levering"
+
+#~ msgid "Fast omadressering"
+#~ msgstr "Varig omadressering"
+
+#~ msgid "Endre midlertidig endring"
+#~ msgstr "Rediger mellombels endring."
+
+#~ msgid "Endre abonnementstype"
+#~ msgstr "Endre abonnementstype"
+
+#~ msgid "Si opp papiravisen"
+#~ msgstr "Sei opp papiravisa"
+
+#~ msgid "S&oslash;ndag"
+#~ msgstr "S&oslash;ndag"
+
+#~ msgid "Mandag"
+#~ msgstr "Måndag"
+
+#~ msgid "Tirsdag"
+#~ msgstr "Tysdag"
+
+#~ msgid "L&oslash;rdag"
+#~ msgstr "Laurdag"
+
+#~ msgid "Digital"
+#~ msgstr "Digital"
+
+#, fuzzy
+#~ msgid "Digital & Helg"
+#~ msgstr "Digital + Helg"
+
+#~ msgid "Komplett"
+#~ msgstr "Komplett"
+
+#~ msgid "Neste faktura skal sendes til"
+#~ msgstr "Neste faktura skal sendast til"
+
+#~ msgid "din nye adresse"
+#~ msgstr "di nye adresse"
+
+#~ msgid "P&aring;g&aring;ende endringer"
+#~ msgstr "Pågande endringar"
+
+#~ msgid "Planlagte endringer"
+#~ msgstr "Planlagde endringar"
+
+#~ msgid "Lukkede endringer"
+#~ msgstr "Lukka endringar"
+
+#~ msgid "digital"
+#~ msgstr "digital"
+
+#~ msgid "Endre"
+#~ msgstr "Endre"
+
+#~ msgid "Slett"
+#~ msgstr "Slett"
+
+#~ msgid "Velg periode"
+#~ msgstr "Vel periode"
+
+#~ msgid "Fra dato (dd.mm.&aring;&aring;&aring;&aring;)"
+#~ msgstr "Frå dato (dd.mm.&aring;&aring;&aring;&aring;)"
+
+#~ msgid "Inntil videre"
+#~ msgstr "Inntil vidare"
+
+#~ msgid "Vi ser at du har flere abonnementer"
+#~ msgstr "Vi ser at du har fleire abonnement"
+
+#~ msgid ""
+#~ "Husk &aring; flytte eventuelle andre papiraviser du har. Du kan gj&oslash;"
+#~ "re dette her:"
+#~ msgstr ""
+#~ "Hugs å flytte eventuelle andre papiraviser du har. Du kan gjere dette her:"
+
+#~ msgid "Velg en adresse du har brukt f&oslash;r (valgfritt)"
+#~ msgstr "Vel ei adresse du har brukt (valfritt)"
+
+#~ msgid "C/O (valgfritt)"
+#~ msgstr "C/O (valfritt)"
+
+#, fuzzy
+#~ msgid "Gate/vei"
+#~ msgstr "Veg"
+
+#~ msgid "Husnummer"
+#~ msgstr "Husnummer"
+
+#~ msgid "Bokstav (valgfritt)"
+#~ msgstr "Bokstav (valfritt)"
+
+#~ msgid "Postnummer"
+#~ msgstr "Postnummer"
+
+#~ msgid "Sted"
+#~ msgstr "Stad"
+
+#~ msgid "Norge"
+#~ msgstr "Noreg"
+
+#~ msgid "Leilighetsnummer (valgfritt)"
+#~ msgstr "Leilighetsnummer (valfritt)"
+
+#~ msgid "Etasje (valgfritt)"
+#~ msgstr "Etasje (valfritt)"
+
+#~ msgid "Fra dato:"
+#~ msgstr "Frå dato:"
+
+#~ msgid "Til dato:"
+#~ msgstr "Til dato:"
+
+#~ msgid "Gave/vei:"
+#~ msgstr "Veg:"
+
+#~ msgid "Husnummer:"
+#~ msgstr "Husnummer:"
+
+#~ msgid "Postnummer:"
+#~ msgstr "Postnummer:"
+
+#~ msgid "Sted:"
+#~ msgstr "Stad:"
+
+#, fuzzy
+#~ msgid "Leilighetsnummer:"
+#~ msgstr "Leilighetsnr.:"
+
+#~ msgid "Etasje:"
+#~ msgstr "Etasje:"
+
+#~ msgid "inntil videre"
+#~ msgstr "inntil vidare"
+
+#, fuzzy
+#~ msgid "Feil i oppsummeringen? G&aring; tilbake og endre!"
+#~ msgstr "Feil i oppsummeringa? Endre!"
+
+#, fuzzy
+#~ msgid "Lag en ny midlertidig adresseendring"
+#~ msgstr "Legg til mellombels adresse"
+
+#~ msgid "Feil i oppsummeringen? Endre!"
+#~ msgstr "Feil i oppsummeringa? Endre!"
+
+#, fuzzy
+#~ msgid "Lag en ny midlertidig oppbevaring"
+#~ msgstr "Mellombels oppbevaring"
+
+#, fuzzy
+#~ msgid "Lag en ny midlertidig stans"
+#~ msgstr "Legg til mellombels stopp"
+
+#, fuzzy
+#~ msgid "Vennligst kontroller de markerte feltene."
+#~ msgstr "Ver venleg å kontrollere felta over."
+
+#~ msgid "Takk for din henvendelse. Vi har registrert %s:"
+#~ msgstr "Takk for henvendinga. Vi har registrert %s:"
+
+#~ msgid "G&aring; til oversikten"
+#~ msgstr "G&aring; til oversikta"
+
+#~ msgid "Bekreftelse"
+#~ msgstr "Stadfesting"
+
+#~ msgid "Hva har skjedd?"
+#~ msgstr "Kva har skjedd?"
+
+#~ msgid ""
+#~ "Takk for at du hjelper oss &aring; bli bedre! Vi har registrert klagen:\t"
+#~ msgstr ""
+#~ "Takk for at du hjelper oss med å bli betre! Vi har registrert klagen:"
+
+#, fuzzy
+#~ msgid "Hva skjedde:"
+#~ msgstr "Kva har skjedd?"
+
+#~ msgid "Vinn gavekort p&aring; 1000kr"
+#~ msgstr "Vinn gåvekort på 1000kr"
+
+#~ msgid ""
+#~ "Alle abonnenter som registrerer seg med AvtaleGiro innen 1. november er "
+#~ "med i trekningen av 5 VISA-gavekort p&aring; 1000 kr. Har du AvtaleGiro, "
+#~ "s&aring; er du automatisk med i trekningen."
+#~ msgstr ""
+#~ "Alle abonnentar som registrerer seg med AvtaleGiro innan 1. november er "
+#~ "med i trekkinga av 5 VISA-gåvekort på 1000 kroner. Om du har avtalegiro "
+#~ "er du automatisk med i trekkinga."
+
+#~ msgid "Aktiver AvtaleGiro"
+#~ msgstr "Aktiver AvtaleGiro"
+
+#~ msgid "Hva er AvtaleGiro?"
+#~ msgstr "Kva er AvtaleGiro?"
+
+#~ msgid ""
+#~ "Med AvtaleGiro trekkes prisen p&aring; abonnementet fra konto uten at du "
+#~ "beh&oslash;ver &aring; gj&oslash;re noe. Du trenger aldri &aring; se en "
+#~ "papirfaktura igjen, og du slipper fakturagebyret."
+#~ msgstr ""
+#~ "Med AvtaleGiro vert pris på abonnementet trukke frå kontoen din utan at "
+#~ "du treng å gjere noko. Du treng aldri å sjå ein papirfaktura igjen, og du "
+#~ "slepp fakturagebyret."
+
+#~ msgid "Betaling"
+#~ msgstr "Betaling"
+
+#~ msgid "Forfalt"
+#~ msgstr "Forfalle"
+
+#~ msgid "Ubetalt"
+#~ msgstr "Ubetalte"
+
+#~ msgid "Betalingshistorikk"
+#~ msgstr "Betalingshistorikk"
+
+#~ msgid "Se betalingshistorikk"
+#~ msgstr "Sjå betalingshistorikk"
+
+#~ msgid "Betalingskort"
+#~ msgstr "Betalingskort"
+
+#, fuzzy
+#~ msgid "Endre til et annet betalingskort"
+#~ msgstr "Endre til eit anna kort"
+
+#~ msgid "Fjern betalingskort"
+#~ msgstr "Fjern betalingskort"
+
+#~ msgid "Legg til betalingskort"
+#~ msgstr "Legg til betalingskort"
+
+#~ msgid "Du har ikke betalingskort registrert"
+#~ msgstr "Du har ikkje registrert eit betalingskort"
+
+#~ msgid "Fakturaadresse"
+#~ msgstr "Fakturaadresse"
+
+#, fuzzy
+#~ msgid ""
+#~ "Med eFaktura f&aring;r du fakturaen elektronisk i din nettbank, og du "
+#~ "m&aring; inn i din nettbank for &aring; godkjenne den. Med eFaktura "
+#~ "slipper du fakturagebyret."
+#~ msgstr ""
+#~ "Med eFaktura får du fakturaen elektronisk i nettbanken din, og du må inn "
+#~ "i nettbanken for å godkjenne den. Med eFaktura slepp du fakturagebyret."
+
+#~ msgid "Aktiver eFaktura"
+#~ msgstr "Aktiver eFaktura"
+
+#~ msgid ""
+#~ "Med AvtaleGiro trekkes prisen p&aring; abonnementet fra konto uten at du "
+#~ "beh&oslash;ver &aring; gj&oslash;re noe. Med AvtaleGiro slipper du "
+#~ "fakturagebyret."
+#~ msgstr ""
+#~ "Med AvtaleGiro vert abonnementsprisen trukke frå konto utan at du treng å "
+#~ "gjere noko. Med AvtaleGiro slepp du fakturagebyret."
+
+#, fuzzy
+#~ msgid "AvtaleGiro er aktivert."
+#~ msgstr "AvtaleGiro er blitt oppdatert."
+
+#~ msgid "AvtaleGiro ble ikke oppdatert."
+#~ msgstr "AvtaleGiro vart ikkje oppdatert."
+
+#~ msgid "eFaktura er aktivert."
+#~ msgstr "eFaktura er oppdatert."
+
+#~ msgid "eFaktura ble ikke oppdatert."
+#~ msgstr "eFaktura vart ikkje oppdatert."
+
+#~ msgid "Betalingskort er registrert."
+#~ msgstr "Betalingskort er registrert."
+
+#~ msgid "Betalingskort ble ikke registrert."
+#~ msgstr "Betalingskort vart ikkje registrert."
+
+#~ msgid "Betalingen er registrert."
+#~ msgstr "Betalinga er registrert."
+
+#~ msgid "Betalingen ble ikke registrert."
+#~ msgstr "Betalinga vart ikkje registrert."
+
+#~ msgid "Faktura er allerede betalt."
+#~ msgstr "Faktura er allereie betalt."
+
+#~ msgid "Velg en tidligere brukt adresse"
+#~ msgstr "Vel ei tidlegare brukt adresse"
+
+#~ msgid "Velg en grunn her"
+#~ msgstr "Vel ein årsak her"
+
+#~ msgid "Betalte"
+#~ msgstr "Betalte"
+
+#~ msgid "&Aring;pne"
+#~ msgstr "Opne"
+
+#~ msgid "Mine fakturaer"
+#~ msgstr "Mine fakturaer"
+
+#~ msgid "Abonnementsperiode"
+#~ msgstr "Abonnementsperiode"
+
+#~ msgid "Bel&oslash;p"
+#~ msgstr "Bel&oslash;p"
+
+#~ msgid "Betal"
+#~ msgstr "Betal"
+
+#, fuzzy
+#~ msgid "Varig adresseendring"
+#~ msgstr "Varig omadressering"
+
+#~ msgid "Hvor skal avisa sendes"
+#~ msgstr "Kor skal avisa sendast"
+
+#~ msgid "varig endring"
+#~ msgstr "varig endring"
+
+#~ msgid "Si opp abonnement"
+#~ msgstr "Sei opp abonnement"
+
+#~ msgid "Hva er &aring;rsaken til at du &oslash;nsker dette?"
+#~ msgstr "Kva er årsaken til at du ønskjer dette?"
+
+#, fuzzy
+#~ msgid "Ja, si opp n&aring;"
+#~ msgstr "Ta vare p&aring;"
+
+#~ msgid "Du er velkommen tilbake som kunde ved en senere anledning!"
+#~ msgstr "Du er velkomen tilbake som kunde ved eit seinare høve!"
+
+#, fuzzy
+#~ msgid "&Oslash;nsker du fortsatt &aring; lese oss digitalt?"
+#~ msgstr "Ønsker du å legge inn ei mellombels ferieadresse?"
+
+#~ msgid ""
+#~ "Takk. Ditt abonnement endres fra <strong>Komplett</strong> til "
+#~ "<strong>Digital</strong> den %s"
+#~ msgstr ""
+#~ "Takk. Abonnementet ditt er endra frå <strong>Komplett</strong> til "
+#~ "<strong>Digital</strong> den %s"
+
+#~ msgid ""
+#~ "Takk. Ditt abonnement endres fra <strong>Digital</strong> til "
+#~ "<strong>Komplett</strong> den %s"
+#~ msgstr ""
+#~ "Takk. Abonnementet ditt er endra frå <strong>Digital</strong> til "
+#~ "<strong>Komplett</strong> den %s"
+
+#~ msgid "Ditt abonnement avsluttes den <strong>%s</strong>."
+#~ msgstr "Abonnementet ditt vert avslutta den <strong>%s</strong>."
+
+#~ msgid ""
+#~ "Hvis du vil bytte til Komplett eller Digital + Helg, trenger vi en gyldig "
+#~ "leveringsadresse."
+#~ msgstr ""
+#~ "Vi treng ei gyldig leveringsadresse om du vil byte til Komplett eller "
+#~ "Digital + Helg."
+
+#~ msgid "Digital + Helg"
+#~ msgstr "Digital + Helg"
+
+#~ msgid ""
+#~ "Endring av abonnement kan f&oslash;re til prisendring. Se priser <a href="
+#~ "\"%s\">her</a>."
+#~ msgstr ""
+#~ "Endring av abonnement kan føre til prisendring. Sjå prisar <a href=\"%s"
+#~ "\">her</a>."
+
+#~ msgid "Jeg &oslash;nsker &aring; endre abonnementstype til:"
+#~ msgstr "Eg ønskjer å endre abonnementstype til:"
+
+#, fuzzy
+#~ msgid "Takk. Ditt abonnement endres til <strong>Digital</strong> den %s."
+#~ msgstr "Takk. Abonnementet ditt endrast til strong>Digital</strong> den %s"
+
+#, fuzzy
+#~ msgid "Takk. Ditt abonnement endres til <strong>Komplett</strong> den %s."
+#~ msgstr ""
+#~ "Takk. Abonnementet ditt endrast til <strong>Komplett</strong> den %s"
+
+#, fuzzy
+#~ msgid ""
+#~ "Takk. Ditt abonnement endres til <strong>Digital + Helg</strong> den %s."
+#~ msgstr ""
+#~ "Takk. Abonnementet ditt endrast til <strong>Digital + Helg</strong> den %s"
+
+#~ msgid "Oppbevaring"
+#~ msgstr "Oppbevaring"
+
+#~ msgid "midlertidig oppbevaring av papiravisen"
+#~ msgstr "Mellombels oppbevaring av papiravisa"
+
+#~ msgid "Reaktiver ditt abonnement"
+#~ msgstr "Reaktiver abonnementet ditt."
+
+#~ msgid "Velg startdato"
+#~ msgstr "Vel startdato"
+
+#~ msgid "Du har sendt oss f&oslash;lgende informasjon:"
+#~ msgstr "Du har sendt oss følgande informasjon"
+
+#, fuzzy
+#~ msgid "Produkt:"
+#~ msgstr "Produkt"
+
+#, fuzzy
+#~ msgid "m&aring;ned"
+#~ msgstr "Opne"
+
+#~ msgid "Neste faktura"
+#~ msgstr "Neste faktura"
+
+#~ msgid "Betalt"
+#~ msgstr "Betalte"
+
+#~ msgid "Ingen faktura"
+#~ msgstr "Ingen faktura"
+
+#, fuzzy
+#~ msgid "Betales til"
+#~ msgstr "Betalte"
+
+#~ msgid "Betal denne og fremtidige fakturaer med betalingskort"
+#~ msgstr "Betal denne og framtidige fakturaer med betalingskort"
+
+#~ msgid "Endre fra digital til komplett"
+#~ msgstr "Endre fr&aring; digital til komplett"
+
+#~ msgid ""
+#~ "Full tilgang til alt v&aring;rt innhold i alle digitale kanaler (eAvisen "
+#~ "og nettavisen) og papiravisen levert hjem 6 dager i uken."
+#~ msgstr ""
+#~ "Full tilgang til vårt innhald i alle digitale kanalar (eAvisa og "
+#~ "nettavisa) og papiravisa levert heim 6 dagar i veka."
+
+#~ msgid "Endre n&aring;"
+#~ msgstr "Endre no"
+
+#~ msgid "Reaktiver mitt abonnement"
+#~ msgstr "Reaktiver abonnementet mitt"
+
+#, fuzzy
+#~ msgid "aktiver n&aring;"
+#~ msgstr "Ta vare p&aring;"
+
+#~ msgid "Papiravisen"
+#~ msgstr "Papiravisa"
+
+#~ msgid "Papiravisen levert i din postkasse, mandag til l&oslash;rdag."
+#~ msgstr "Papiravisa levert i postkassa di, måndag til laurdag"
+
+#~ msgid "Hele nettavisen"
+#~ msgstr "Heile nettavisa"
+
+#~ msgid ""
+#~ "Du kan lese hele nettavisen, ogs&aring; l&aring;ste saker, p&aring; PC, "
+#~ "nettbrett og mobil."
+#~ msgstr ""
+#~ "Du kan lese heile nettavisa, også låste saker, på PC, nettbrett og mobil."
+
+#~ msgid "G&aring; til nettavisen"
+#~ msgstr "G&aring; til nettavisa"
+
+#~ msgid "eAvisen"
+#~ msgstr "eAvisa"
+
+#~ msgid ""
+#~ "Samme avisen som du er vant til &aring; holde i hendene, tilgjengelig "
+#~ "digitalt."
+#~ msgstr ""
+#~ "Same avisa som du er vand med å halde i hendene, tilgjengeleg digitalt."
+
+#~ msgid "&Aring;pne eAvisen"
+#~ msgstr "Opne eAvisa"
+
+#~ msgid "Midlertidig adresseendring"
+#~ msgstr "Mellombels adresseendring"
+
+#, fuzzy
+#~ msgid "Hvor skal avisen sendes?"
+#~ msgstr "Kor skal avisa sendast"
+
+#, fuzzy
+#~ msgid "midlertidig adresseendring"
+#~ msgstr "Legg til mellombels adresse"
+
+#~ msgid "Mine endringer"
+#~ msgstr "Mine endringar"
+
+#, fuzzy
+#~ msgid "Endringen ble oppdatert"
+#~ msgstr "Endringa blei lagra"
+
+#~ msgid "Midlertidig stans"
+#~ msgstr "Mellombels stans"
+
+#~ msgid "Permanent stopp"
+#~ msgstr "Permanent stopp"
+
+#~ msgid "Midlertidig oppbevaring"
+#~ msgstr "Mellombels oppbevaring"
+
+#~ msgid "Varig endring"
+#~ msgstr "Varig endring"
+
+#, fuzzy
+#~ msgid "Abonnementsendring"
+#~ msgstr "Abonnementsendringar"
+
+#~ msgid "midlertidig stans av papiravisen"
+#~ msgstr "mellombels stopp av papiravisa"
+
+#~ msgid "Midlertidige endringer"
+#~ msgstr "Mellombelse endringar"
+
+#~ msgid "N&aring;v&aelig;rende betalingsm&aring;te: %s"
+#~ msgstr "Noverande betalingsmåte: %s"
+
+#~ msgid "KID-nummer"
+#~ msgstr "KID-nummer"
+
+#~ msgid "Her kan du reaktivere ditt gamle abonnement."
+#~ msgstr "Her kan du reaktivere det gamle abonnementet ditt."
+
+#, fuzzy
+#~ msgid "G&aring; til midlertidig leveringsadresse."
+#~ msgstr "Send avisa til ei mellombels adresse"
+
+#~ msgid "Lukket"
+#~ msgstr "Lukka"
+
+#~ msgid "Planlagt"
+#~ msgstr "Planlagd"
+
+#~ msgid "Fra dato"
+#~ msgstr "Frå dato"
+
+#~ msgid "Tilbake dato"
+#~ msgstr "Tilbake dato"
+
+#~ msgid "Endre p&aring;g&aring;ende omadressering"
+#~ msgstr "Endre pågåande omadressering"
+
+#~ msgid "Legg til endring"
+#~ msgstr "Legg til endring"
+
+#~ msgid "Gatenavn"
+#~ msgstr "Gatenamn"
+
+#~ msgid "Oppgang"
+#~ msgstr "Oppgang"
+
+#~ msgid "Leilighetsnr."
+#~ msgstr "Leiligheitsnr."
+
+#~ msgid "Etasje"
+#~ msgstr "Etasje"
+
+#~ msgid "Gatenavn:"
+#~ msgstr "Gatenamn:"
+
+#~ msgid "Oppgang:"
+#~ msgstr "Oppgang:"
+
+#~ msgid "Flere planlagte ferier? Legg til en til!"
+#~ msgstr "Fleire planlagte feriar? Legg til ein til!"
+
+#~ msgid "Klagedato:"
+#~ msgstr "Klagedato:"
+
+#~ msgid "Klagegrunn:"
+#~ msgstr "Klageårsak:"
+
+#~ msgid "Melding:"
+#~ msgstr "Melding:"
+
+#~ msgid "N&aring;r skjedde dette?"
+#~ msgstr "Kva dag skjedde det?"
+
+#~ msgid "Nytt kredittkort er blitt registrert."
+#~ msgstr "Nytt kredittkort er registrert."
+
+#~ msgid "Nytt kredittkort ble ikke registrert."
+#~ msgstr "Nytt kredittkort vart ikkje registrert."
+
+#~ msgid "Betalingen er blitt lagret."
+#~ msgstr "Betalinga er lagra."
+
+#~ msgid "Si opp papiravisen, men beholde digital tilgang"
+#~ msgstr "Sei opp papiravisa, men behalde digital tilgang"
+
+#~ msgid "Endre fra Digital til Komplett abonnement"
+#~ msgstr "Endre frå Digital til Komplett abonnement"
+
+#~ msgid "Vi setter pris p&aring; om du deler hvorfor med oss"
+#~ msgstr "Vi set pris på om du deler kvifor med oss"
+
+#~ msgid "Kun digital tilgang fra og med:"
+#~ msgstr "Kun digital tilgang fr&aring; og med:"
+
+#~ msgid "Produktendringen gjelder fra og med:"
+#~ msgstr "Produktendringa gjeld frå og med:"
+
+#~ msgid "Oppsigelsesdato:"
+#~ msgstr "Oppseiingsdato"
+
+#~ msgid "Grunn:"
+#~ msgstr "Årsak:"
+
+#~ msgid "Vi tar vare p&aring; avisen mens du er p&aring; ferie."
+#~ msgstr "Vi tek vare p&aring; avisa di medan du er på ferie!"
+
+#~ msgid "Lagre"
+#~ msgstr "Lagre"
+
+#~ msgid "Her kan du legge inn midlertidig leveringsadresse for din papiravis."
+#~ msgstr "Her kan du legge inn mellombels leveringsadresse for papiravisa."
+
+#~ msgid ""
+#~ "&Oslash;nsker du &aring; stoppe papiravisleveringen mens du er p&aring; "
+#~ "ferie?"
+#~ msgstr "Ønsker du å stoppe papiravisleveringa mens du er på ferie? "
+
+#~ msgid "G&aring; til midlertidig stans av papiravisa."
+#~ msgstr "G&aring; til mellombels stopp av papiravisa."
+
+#~ msgid ""
+#~ "Legge inn midlertidig stans av papiravisleveringen. Du vil fortsatt ha "
+#~ "den digitale tilgangen."
+#~ msgstr ""
+#~ "Legg inn mellombels stans av papiravisleveringa. Du vil framleis ha den "
+#~ "digitale tilgangen."
+
+#~ msgid "F&aring; avisen sendt til annen adresse?"
+#~ msgstr "Få avisa tilsendt på ei anna adresse?"
+
+#~ msgid "Tilgang til papiravisen og alle digitale medier fra og med:"
+#~ msgstr "Tilgang til papiravisa og alle digitale medier fr&aring; og med:"
+
+#~ msgid "Skjema inneholder feil"
+#~ msgstr "Skjema inneheld feil"
+
+#~ msgid ""
+#~ "Du m&aring; velge hva du &oslash;nsker &aring; gj&oslash;re med avisen"
+#~ msgstr "Du m&aring; velge kva du &oslash;nskjer &aring; gjere med avisa"
+
+#~ msgid "Send avisen til en midlertidig adresse"
+#~ msgstr "Send avisa til ei mellombels adresse"
+
+#~ msgid ""
+#~ "Send avisen direkte til en valgfri adresse. Du kan enten benytte deg av "
+#~ "adresser du har brukt tidligere, eller velge en ny adresse."
+#~ msgstr ""
+#~ "Send avisa direkte til ei valfri adresse. Du kan enten nytte deg av "
+#~ "adresser du har brukt tidlegare, eller velge ei ny adresse."
+
+#~ msgid "Gi avisen til en institusjon"
+#~ msgstr "Gje avisa til ein institusjon"
+
+#~ msgid ""
+#~ "Vi velger en institusjon i n&aelig;romr&aring;det som kan ha glede av "
+#~ "avisen i mellomtiden."
+#~ msgstr ""
+#~ "Vi vel ein institusjon i nærleiken som kan ha glede av avisa i mellomtida."
+
+#~ msgid "La oss oppbevare avisen for deg"
+#~ msgstr "Lat oss oppbevare avisa for deg"
+
+#~ msgid "Vi kan oppbevare avisene for deg mens du er bortreist."
+#~ msgstr "Vi kan oppbevare avisene for deg medan du er vekkreist."
+
+#~ msgid "Stopp avisleveringen midlertidig, og les avisen som eAvis"
+#~ msgstr "Stopp avisleveringa mellombels, og les avisa som eAvis"
+
+#~ msgid ""
+#~ "Avislevering opph&oslash;rer, og du f&aring;r tilgang til &aring; lese "
+#~ "avisen som eAvis. Denne digitale utgaven kan du lese p&aring; din PC "
+#~ "eller et lesebrett."
+#~ msgstr ""
+#~ "Avisleveringa stopper og du f&aring;r tilgang til &aring; lese avisa som "
+#~ "eAvis. Den digitale utgåva kan du lese p&aring; PC eller eit lesebrett."
+
+#~ msgid "Gi avisen til en venn"
+#~ msgstr "Gi avisa til ein venn"
+
+#~ msgid ""
+#~ "Oppgi adressen til en venn eller bekjent, s&aring; kan vedkommende ha "
+#~ "glede av avisen."
+#~ msgstr ""
+#~ "Oppgje adressa til ein ven eller bekjent, s&aring; kan vedkomande ha "
+#~ "glede av avisa."
+
+#, fuzzy
+#~ msgid "Andre henvendelser"
+#~ msgstr "Abonnementsnummer"
+
+#, fuzzy
+#~ msgid "Bestillingsskjema"
+#~ msgstr "Betalingsdato"
+
+#, fuzzy
+#~ msgid "Endrigen er blitt lagret."
+#~ msgstr "Endringa er lagra"
+
+#~ msgid "(p&aring;krevet)"
+#~ msgstr "påkrevd"
+
+#~ msgid "Tall er ikke tillat"
+#~ msgstr "Tal er ikkje tillete"
+
+#, fuzzy
+#~ msgid "Brukerdata er blitt lagret"
+#~ msgstr "Endringa er lagra"
+
+#~ msgid "Glemt passord?"
+#~ msgstr "Gl&oslash;ymt passord?"
+
+#~ msgid "Logg inn"
+#~ msgstr "Logg inn"
+
+#, fuzzy
+#~ msgid "Brukernavn"
+#~ msgstr "Brukarnamn"
+
+#~ msgid "Passord"
+#~ msgstr "Passord"
+
+#, fuzzy
+#~ msgid "Brukernavn eller passord ugyldig"
+#~ msgstr "Epost eller passord ugyldig"
+
+#~ msgid "Mobilnummer"
+#~ msgstr "Mobilnummer"
+
+#, fuzzy
+#~ msgid "Mobilnummer eller passord ugyldig"
+#~ msgstr "Epost eller passord ugyldig"
+
+#~ msgid ""
+#~ "Kun abonnenter kan logge seg inn og administrere Min side.<br/"
+#~ ">Husstandsmedlemmer og pr&oslash;veabonnenter kan logge inn p&aring; e-"
+#~ "avis."
+#~ msgstr ""
+#~ "Kun abonnentar kan logge seg inn og administrere Mi side.<br/"
+#~ ">Husstandsmedlemmar og prøveabonnentar kan logge inn på e-avis."
+
+#, fuzzy
+#~ msgid "Passordet er blitt lagret."
+#~ msgstr "Endringa er lagra"
+
+#~ msgid "Koden du har tastet inn er ikke gyldig."
+#~ msgstr "Koden du har tasta inn er ikkje gyldig."
+
+#~ msgid "Logger du p&aring; for f&oslash;rste gang?"
+#~ msgstr "Logger du på for første gong? "
+
+#~ msgid "Er du ikke registrert tidligere?"
+#~ msgstr "Er du ikkje registrert tidligare?"
+
+#~ msgid "Virker ikke passordet ditt?"
+#~ msgstr "Virkar ikkje passordet ditt?"
+
+#, fuzzy
+#~ msgid "Har du glemt passordet ditt?"
+#~ msgstr "Har du gl&oslash;ymt passordet?"
+
+#, fuzzy
+#~ msgid "F&aring; passord tilsendt p&aring; SMS"
+#~ msgstr "Passord og brukarnamn p&aring; SMS"
+
+#~ msgid "Vi har sendt et nytt engangspassord til "
+#~ msgstr "Vi har sendt eit nytt engongspassord til "
+
+#~ msgid ""
+#~ "Passordet trenger en minstelengde p&aring; 7 tegn og m&aring; inneholder "
+#~ "minst 1 siffer"
+#~ msgstr ""
+#~ "Passordet treng ei minstelengd p&aring; 7 teikn og m&aring; innehalde "
+#~ "minst 1 siffer"
+
+#~ msgid "Passordet m&aring; inneholde minimum 1 bokstav."
+#~ msgstr "Passordet m&aring; innehalde minimum 1 bokstav."
+
+#, fuzzy
+#~ msgid "Passordet m&aring; inneholde minimum 1 siffer."
+#~ msgstr "Passordp&aring;minning"
+
+#~ msgid "Passordet m&aring; ha en minstelengde p&aring; 7 tegn."
+#~ msgstr "Passordet m&aring; ha ei minstelengde p&aring; 7 teikn."
+
+#~ msgid "Du m&aring; velge hvilket abonnement endringen skal gjelde"
+#~ msgstr "Du m&aring; velge kva abonnement endringa skal gjelde"
+
+#~ msgid ""
+#~ "Vi finner ingen abonnement tilknyttet ditt mobilnummer.<br/>Dersom du "
+#~ "likevel har et abonnement, ber vi deg kontakte kundeservice p&aring; "
+#~ "telefon @service_phone@ slik at mobilnummeret ditt kan kobles til "
+#~ "abonnementet."
+#~ msgstr ""
+#~ "Vi finn ingen abonnement knytta til ditt mobilnummer.<br/>Dersom du "
+#~ "likevel har eit abonnement, ber vi deg kontakte kundeservice p&aring; "
+#~ "telefon @service_phone@ slik at mobilnummeret ditt kan koblast til "
+#~ "abonnementet."
+
+#~ msgid "Til hvilken adresse skal vi sende avisen?"
+#~ msgstr "Kva adresse skal vi sende avisa til? "
+
+#, fuzzy
+#~ msgid "Bruk annen adresse"
+#~ msgstr "Vel adresse"
+
+#, fuzzy
+#~ msgid "Fornavn"
+#~ msgstr "Fornamn*"
+
+#~ msgid "Gatenavn eller sted:"
+#~ msgstr "Gatenamn eller stad:"
+
+#, fuzzy
+#~ msgid "Postnr"
+#~ msgstr "Postnummer.*"
+
+#~ msgid "Navn"
+#~ msgstr "Namn"
+
+#, fuzzy
+#~ msgid "Mobilnummer: "
+#~ msgstr "Mobilnummer"
+
+#, fuzzy
+#~ msgid "Kundenummer: "
+#~ msgstr "Gatenummer*"
+
+#, fuzzy
+#~ msgid "E-post"
+#~ msgstr "E-post"
+
+#~ msgid "Ja, takk! Send meg tilbud og informasjon p&aring; e-post."
+#~ msgstr "Ja, takk! Send meg tilbod og informasjon p&aring; e-post."
+
+#~ msgid "Jeg vil helst kontaktes p&aring; e-post fremfor telefon"
+#~ msgstr "Eg vil helst kontaktast p&aring; e-post i staden for telefon"
+
+#, fuzzy
+#~ msgid "Password: "
+#~ msgstr "Passord"
+
+#, fuzzy
+#~ msgid "Lag nytt password"
+#~ msgstr "Nytt passord"
+
+#, fuzzy
+#~ msgid "Skriv nytt password"
+#~ msgstr "Nytt passord"
+
+#~ msgid ""
+#~ "Passord m&aring; best&aring; av minst syv tegn - b&aring;de tall og "
+#~ "bokstaver."
+#~ msgstr ""
+#~ "Passord m&aring; best&aring; av minst sju tegn - b&aring;de tal og "
+#~ "bokstavar."
+
+#, fuzzy
+#~ msgid "Gjenta nytt passord:"
+#~ msgstr "Stadfest nytt passord"
+
+#~ msgid "Avbryt, ikke lag nytt passord:"
+#~ msgstr "Avbryt, ikkje lag nytt passord:"
+
+#~ msgid "Har du glemt passordet?"
+#~ msgstr "Har du gl&oslash;ymt passordet?"
+
+#, fuzzy
+#~ msgid ""
+#~ "Hvis du har glemt passordet ditt, kan vi hjelpe deg med det. Legg inn e-"
+#~ "postadressen du har registrert tidligere og trykk p&aring; send-knappen, "
+#~ "s&aring; sender vi deg det!"
+#~ msgstr ""
+#~ "Viss du har gl&oslash;ymt passordet ditt, kan vi hjelpe deg med det. Legg "
+#~ "inn epost-adressa du har registrert tidlegare og trykk p&aring; send "
+#~ "knappen, s&aring; sender vi det til deg!"
+
+#, fuzzy
+#~ msgid "Har du glemt, eller mangler du passordet?"
+#~ msgstr "Har du gl&oslash;ymt passordet?"
+
+#, fuzzy
+#~ msgid "&#45; Har du ikke passord?"
+#~ msgstr "Har du gl&oslash;ymt passordet?"
+
+#~ msgid "Da m&aring; du f&oslash;rst opprette en aID som du logger inn med."
+#~ msgstr "Då m&aring; du først opprette ein aID som du logger inn med."
+
+#~ msgid "Det kan du gj&oslash;re her."
+#~ msgstr "Det kan du gjere her."
+
+#, fuzzy
+#~ msgid "&#45; Har du glemt passordet ditt?"
+#~ msgstr "Har du gl&oslash;ymt passordet?"
+
+#~ msgid ""
+#~ "Tast inn mobilnummeret ditt, s&aring; sener vi deg en engangskode du "
+#~ "fyller inn i neste steg. Deretter setter du et nytt passord."
+#~ msgstr ""
+#~ "Tast inn mobilnummeret ditt, s&aring; sender vi deg ein engongskode du "
+#~ "fyller inn i neste steg. Etter det set du eit nytt passord."
+
+#~ msgid "Brukerkontoen finnes ikke &dash; du m&aring; opprette aID"
+#~ msgstr "Brukarkontoen finst ikkje &dash; du m&aring; opprette aID"
+
+#, fuzzy
+#~ msgid "E-post/mobilnummer"
+#~ msgstr "Mobilnummer"
+
+#~ msgid "Oppgi ditt mobilnummer for &aring; f&aring; passord tilsendt"
+#~ msgstr "Oppgje mobilnummeret ditt for &aring; f&aring; passord tilsendt"
+
+#, fuzzy
+#~ msgid "Velg ditt nye passord"
+#~ msgstr "Ditt nye passord: "
+
+#~ msgid "Engangskode"
+#~ msgstr "Eingongskode"
+
+#, fuzzy
+#~ msgid "Bestill ny engangskode"
+#~ msgstr "Betalingsdato"
+
+#~ msgid "Type"
+#~ msgstr "Type"
+
+#~ msgid "Tidsperiode"
+#~ msgstr "Tidsperiode"
+
+#, fuzzy
+#~ msgid "Fra og med"
+#~ msgstr "Fr&aring; dato "
+
+#~ msgid "ventende"
+#~ msgstr "ventande"
+
+#, fuzzy
+#~ msgid "lagret"
+#~ msgstr "Lagre"
+
+#~ msgid "Sammendrag"
+#~ msgstr "Samandrag"
+
+#~ msgid "Tidsrom for endringen"
+#~ msgstr "Tidsrom for endringa"
+
+#, fuzzy
+#~ msgid "redigere"
+#~ msgstr "Redigere"
+
+#~ msgid "Hva gjelder klagen?"
+#~ msgstr "Kva gjeld klagen?"
+
+#~ msgid "Endringen skal gjelde FRA OG MED denne datoen:"
+#~ msgstr "Endringa skal gjelde FRÅ OG MED denne datoen:"
+
+#, fuzzy
+#~ msgid "Fra og med:"
+#~ msgstr "Fr&aring; dato "
+
+#~ msgid "Endringen skal gjelde TIL OG MED denne datoen:"
+#~ msgstr "Endringa skal gjelde TIL OG MED denne datoen:"
+
+#, fuzzy
+#~ msgid "Skriv ny leveringsadresse"
+#~ msgstr "Leveringsadressa i dag: "
+
+#~ msgid "Velg dato for endringen"
+#~ msgstr "Velg dato for endringa"
+
+#~ msgid "c/o"
+#~ msgstr "c/o"
+
+#~ msgid "Hva vil du gj&oslash;re med avisen?"
+#~ msgstr "Kva vil du gj&oslash;re med avisa?"
+
+#, fuzzy
+#~ msgid "Klage p&aring; levering er blitt lagret."
+#~ msgstr "Klage p&aring; levering blei lagra"
+
+#, fuzzy
+#~ msgid "Endringen er blitt slettet"
+#~ msgstr "Endringa er lagra"
+
+#~ msgid "Det skjedde en feil. Vennligst pr&oslash;v igjen."
+#~ msgstr "Det skjedde ein feil. Ver venleg å prøve igjen."
+
+#~ msgid "Use this widget to add a Infosoft serviceweb login."
+#~ msgstr "Bruk denne widgeten for å legge til serviceweb login."
+
+#, fuzzy
+#~ msgid "Min side"
+#~ msgstr "Til mi side"
+
+#~ msgid "Innlogget"
+#~ msgstr "Innlogga"
+
+#, fuzzy
+#~ msgid "Navn:"
+#~ msgstr "Namn"
+
+#, fuzzy
+#~ msgid "Mobilnummer:"
+#~ msgstr "Mobilnummer"
+
+#, fuzzy
+#~ msgid "E-post:"
+#~ msgstr "E-post"
+
+#~ msgid "Ikke innlogget"
+#~ msgstr "Ikkje innlogga"
+
+#~ msgid "Du er ikke innlogget."
+#~ msgstr "Du er ikkje innlogga."
+
+#~ msgid " for &aring; se og behandle dine ting."
+#~ msgstr " for &aring; sjå og behandle dine ting."
+
+#~ msgid "Dette er noe av det du kan gj&oslash;re:"
+#~ msgstr "Dette er noko av det du kan gjere:"
+
+#~ msgid "Se og behandle dine abonnement."
+#~ msgstr "Sjå og behandle abonnementa dine."
+
+#~ msgid "Melde ferieflytting og midlertidig adresseendring."
+#~ msgstr "Melde ferieflytting og mellombels adresseendring."
+
+#~ msgid "Endre leveringsadresse for avisen."
+#~ msgstr "Endre leveringsadresse for avisa."
+
+#~ msgid "Title:"
+#~ msgstr "Tittel:"
+
+#~ msgid "Innhold:"
+#~ msgstr "Innhald:"
+
+#~ msgid ""
+#~ "Innloggingen v&aring;r har skiftet navn til aID.<br/>Ved innlogging "
+#~ "f&oslash;rste gang m&aring; du opprette en aID, selv om du har benyttet "
+#~ "Min side tidligere."
+#~ msgstr ""
+#~ "Innlogginga vår har skifta namn til aID. </br> Ved innlogging første gong "
+#~ "må du opprette ein aID, sjølv om du har nytta Mi side tidligare."
+
+#~ msgid "Har du ikke passord? Opprett aID her"
+#~ msgstr "Har du gl&oslash;ymt passordet? Opprett aID her"
+
+#~ msgid "Tilbake"
+#~ msgstr "Tilbake"
+
+#~ msgid "Link-mobility"
+#~ msgstr "Link-mobility"
+
+#~ msgid ""
+#~ "Vi kan ta vare p&aring; avisa di medan du er bortreist, utan ekstra "
+#~ "kostnad. Etter ferieperioden din kan du hente avispakken i resepsjonen "
+#~ "hos oss, i @address@"
+#~ msgstr ""
+#~ "Vi kan ta vare p&aring; avisa di medan du er bortreist, utan ekstra "
+#~ "kostnad. Etter ferieperioden din kan du hente avispakken i resepsjonen "
+#~ "hos oss, i @address@"
+
+#~ msgid "Meny"
+#~ msgstr "Meny"
+
+#~ msgid "Abonnementinfo"
+#~ msgstr "Abonnementinfo"
+
+#~ msgid "Uteblitt avis"
+#~ msgstr "Uteblitt avis"
+
+#~ msgid "Logg ut"
+#~ msgstr "Logg ut"
+
+#~ msgid "Aboinfo"
+#~ msgstr "Aboinfo"
+
+#~ msgid "Leveringsinfo"
+#~ msgstr "Leveringsinfo"
+
+#~ msgid "&Oslash;konomisk status"
+#~ msgstr "&Oslash;konomisk status"
+
+#~ msgid "Omadressere"
+#~ msgstr "Omadressere"
+
+#~ msgid "Gi bort avis"
+#~ msgstr "Gje vekk avis"
+
+#~ msgid "fra"
+#~ msgstr "frå"
+
+#, fuzzy
+#~ msgid "Fornamn*"
+#~ msgstr "F&oslash;renamn"
+
+#~ msgid "Gate*"
+#~ msgstr "Gate*"
+
+#, fuzzy
+#~ msgid "Gatenr."
+#~ msgstr "Veg"
+
+#~ msgid "Sted (fylles ut automatisk)*"
+#~ msgstr "Stad (fylles ut automatisk)*"
+
+#~ msgid "* betyr at feltet m&aring; fylles ut"
+#~ msgstr "*betyr at feltet må fyllast ut"
+
+#~ msgid "Sjekk gjerne at alle opplysningene stemmer f&oslash;r du betaler"
+#~ msgstr "Sjekk gjerne at opplysningane stemmer før du betalar"
+
+#~ msgid "Valgt produkt og kontaktinformasjon"
+#~ msgstr "Valt produkt og kontaktinformasjon"
+
+#, fuzzy
+#~ msgid "Mobil/tlf:"
+#~ msgstr "Mobil"
+
+#~ msgid "Endre produkt/kontaktopplysninger (tilbake)"
+#~ msgstr "Endre produkt/kontaktopplysningar"
+
+#~ msgid "****"
+#~ msgstr "****"
+
+#~ msgid "Velg"
+#~ msgstr "Vel"
+
+#~ msgid "Papir"
+#~ msgstr "Papir"
+
+#~ msgid "Ditt nye passord: "
+#~ msgstr "Ditt nye passord: "
+
+#~ msgid "Gjelder: "
+#~ msgstr "Gjeld: "
+
+#, fuzzy
+#~ msgid "Avis: "
+#~ msgstr "eAvis"
+
+#~ msgid "Fra: "
+#~ msgstr "Fr&aring;: "
+
+#~ msgid "Infoweb service login"
+#~ msgstr "Infoweb service login"
+
+#~ msgid "Logg inn for tjenester knyttet til ditt abonnement, blant annet:"
+#~ msgstr "Logg inn for tenester knytta til abonnementet, mellom anna:"
+
+#~ msgid "Velge digital produkt p&aring; ferie"
+#~ msgstr "Velge digital produkt p&aring; ferie"
+
+#~ msgid "Ekstern kampanje?"
+#~ msgstr "Ekstern kampanje?"
+
+#~ msgid "Ekstern url"
+#~ msgstr "Ekstern url"
+
+#~ msgid "Funksjon"
+#~ msgstr "Funksjon"
+
+#~ msgid "These are widgets for the left sidebar."
+#~ msgstr "Dette er widgetane for venstre siderbar."
+
+#~ msgid "Logg in skjema"
+#~ msgstr "Logg-inn-skjema"
+
+#~ msgid "Gi bort"
+#~ msgstr "Gje vekk avis"
+
+#~ msgid "Brukarnamn/passord"
+#~ msgstr "Brukarnamn/passord"
+
+#~ msgid "Feil funkjsonsnavn: "
+#~ msgstr "Feil funksjonsnavn:"
+
+#~ msgid "Feil mobilnnummer"
+#~ msgstr "Feil mobilnummer"
+
+#~ msgid "Feil brukernavn: "
+#~ msgstr "Feil brukarnamn:"
+
+#~ msgid "SOAP-feil. SMS ble ikke sendt."
+#~ msgstr "SOAP-feil. SMS vart ikkje sendt."
+
+#~ msgid "Mislykket kundeforesp&oslash;rsel"
+#~ msgstr "Mislykka kundef&oslash:respurnad"
+
+#~ msgid "Feil passord"
+#~ msgstr "Feil passord"
+
+#~ msgid "Adressen blei lagret"
+#~ msgstr "Adressa blei lagra"
+
+#~ msgid "\"Ta vare p&aring; avisa\" blei lagret"
+#~ msgstr "\"Ta vare p&aring; avisa\" blei lagra"
+
+#~ msgid "Feil"
+#~ msgstr "Feil"
+
+#~ msgid "Endriga er lagret."
+#~ msgstr "Endringa er lagra."
+
+#~ msgid "Passord*"
+#~ msgstr "Passord*"
+
+#~ msgid "Pr&oslash;ver automatisk innlogging"
+#~ msgstr "Pr&oslash;ver automatisk innlogging"
+
+#~ msgid "Brukarnamn"
+#~ msgstr "Brukarnamn"
+
+#~ msgid "Leveringsadressa i dag: "
+#~ msgstr "Leveringsadressa i dag: "
+
+#~ msgid "Det er ikkje registrert nokon problem med dagens levering."
+#~ msgstr "Det er ikkje registrert noko problem med dagens levering."
+
+#~ msgid "Dagens ruteproblem:"
+#~ msgstr "Dagens ruteproblem:"
+
+#~ msgid "Melding om avvik i avisleveringa"
+#~ msgstr "Melding om avvik i avisleveringa"
+
+#~ msgid ""
+#~ "Dersom du ikkje har mottatt dagens avis, eller om du har andre grunnar "
+#~ "til &aring; klage p&aring; eller kommentere leveringa, er vi takknemlege "
+#~ "viss du sender oss ei melding om dette. D&aring; gir du oss ein sjanse "
+#~ "til &aring; l&oslash;yse problemet."
+#~ msgstr ""
+#~ "Dersom du ikkje har motteke dagens avis, eller om du har andre grunnar "
+#~ "til &aring; klage p&aring; eller kommentere leveringa, er vi takknemlege "
+#~ "viss du sender oss ei melding om dette. D&aring; gjev oss ein sjanse til "
+#~ "&aring; l&oslash;yse problemet."
+
+#~ msgid "Gjeld dato*"
+#~ msgstr "Gjeld dato*"
+
+#~ msgid ""
+#~ "Eventuelle tilleggsopplysningar (maks. 255 teikn), lengre meldingar "
+#~ "m&aring; sendast til f&oslash;lgjande e-post-adresse:"
+#~ msgstr ""
+#~ "Eventuelle tilleggsopplysningar (maks. 255 teikn), lengre meldingar "
+#~ "m&aring; sendast til f&oslash;lgjande e-post-adresse:"
+
+#~ msgid "Lagre og send"
+#~ msgstr "Lagre og send"
+
+#~ msgid ""
+#~ "Nedenfor kan du se alle dine bestillinger som er gjort i angitt periode. "
+#~ "Du kan selv velge perioden du &oslash;nsker opplysninger om."
+#~ msgstr ""
+#~ "Nedanfor kan du sj&aring; alle dine bestillingar som er gjort i angjeven "
+#~ "periode. Du kan sj&oslash;lv velje perioden du &oslash;nskjer "
+#~ "opplysningar om."
+
+#~ msgid "Gjeld i perioden fr&aring; og med*"
+#~ msgstr "Gjeld i perioden fr&aring; og med*"
+
+#~ msgid "Endring"
+#~ msgstr "Endring"
+
+#~ msgid "Vising og endring av ikkje utf&oslash;rte endringar."
+#~ msgstr "Vising og endring av ikkje utf&oslash;rte endringar."
+
+#~ msgid "Eller kryss her viss endringa skal vare inntil vidare:"
+#~ msgstr "Eller kryss her viss endringa skal vare inntil vidare:"
+
+#~ msgid "La andre f&aring; glede av &aring; lese avisa di!"
+#~ msgstr "Lat andre f&aring; glede av &aring; lese avisa di!"
+
+#~ msgid ""
+#~ "Skulle du av ein eller annan grunn ikkje ha bruk for avisa di i ein "
+#~ "periode, kan du gi den bort til ein institusjon? D&aring; f&aring;r sjuke "
+#~ "og gamle som ikkje har %s glede av &aring; lese avisa di. Legg inn "
+#~ "perioden du &oslash;nskjer &aring; gi bort avisa og klikk p&aring; "
+#~ "\"lagre og send\""
+#~ msgstr ""
+#~ "Skulle du av ein eller annan grunn ikkje ha bruk for avisa di i ein "
+#~ "periode, kan du gje den vekk til ein institusjon. D&aring; f&aring;r "
+#~ "sjuke og gamle som ikkje har %s glede av &aring; lese avisa di. Legg inn "
+#~ "perioden du &oslash;nskjer &aring; gi bort avisa og klikk p&aring; "
+#~ "\"lagre og send\""
+
+#~ msgid "Eg vil gjerne g&aring; over til nett abonnement for ein periode."
+#~ msgstr "Eg vil gjerne g&aring; over til nettabonnement for ein periode."
+
+#, fuzzy
+#~ msgid ""
+#~ "Eg &oslash;nsker &aring; lese avisa p&aring; Internett, og vil difor "
+#~ "ikkje ha avisen levert i postkassen."
+#~ msgstr ""
+#~ "Eg vil bestille midlertidig opphald i leveringa av papiravisa, og får i "
+#~ "samme periode tilgang til eAvisa, papiravisa i elektronisk format."
+
+#~ msgid "Registrer ny omadresseringsadresse"
+#~ msgstr "Registrer ny omadresseringsadresse"
+
+#~ msgid "Fornamn"
+#~ msgstr "F&oslash;renamn"
+
+#~ msgid "Stad*"
+#~ msgstr "Stad*"
+
+#~ msgid "Skal du flytte eller reise bort"
+#~ msgstr "Skal du flytte eller reise bort"
+
+#~ msgid ""
+#~ "&Oslash;nskjer du &aring; omadressere avisa vel du kva adresse du vil "
+#~ "bruke nedanfor, og oppgir periode. Vi kan ogs&aring; ta vare p&aring; "
+#~ "avisa for deg medan du er borte, eller vi kan gi den bort til ein "
+#~ "institusjon. Adresseendringar m&aring; v&aelig;re hos oss seinast kl. "
+#~ "11.00 dagen f&oslash;r. Endringar som gjeld m&aring;ndagsutg&aring;va, "
+#~ "seinast fredag kl. 11.00.</p><p>NB! Dersom avisa di ikkje vert levert til "
+#~ "avtalt tid og stad s&aring; m&aring; du varsle v&aring;rt kundesenter "
+#~ "snarast p&aring; epost: <a href=\"mailto:@email@\">@email@</a> eller ring "
+#~ "oss<br/> p&aring; @telephone@. Det vert ikkje godskrive for manglande "
+#~ "levering dersom ein ikkje har varsla v&aringt;rt kundesenter."
+#~ msgstr ""
+#~ "&Oslash;nskjer du &aring; omadressere avisa vel du kva adresse du vil "
+#~ "bruke nedanfor, og oppgjev periode. Vi kan ogs&aring; ta vare p&aring; "
+#~ "avisa for deg medan du er borte, eller vi kan gje den vekk til ein "
+#~ "institusjon. Adresseendringar m&aring; vere hos oss seinast kl. 11.00 "
+#~ "dagen f&oslash;r. Endringar som gjeld m&aring;ndagsutg&aring;va, seinast "
+#~ "fredag kl. 11.00.</p><p>NB! Dersom avisa di ikkje vert levert til avtalt "
+#~ "tid og stad s&aring; m&aring; du varsle v&aring;rt kundesenter snarast "
+#~ "p&aring; epost: <a href=\"mailto:@email@\">@email@</a> eller ring oss<br/"
+#~ "> p&aring; @telephone@. Det vert ikkje godskrive for manglande levering "
+#~ "dersom ein ikkje har varsla v&aringt;rt kundesenter."
+
+#~ msgid ""
+#~ "Denne sida gjev deg oversikt over innbetalingar og evnt. utest&aring;ande "
+#~ "nota m.m."
+#~ msgstr ""
+#~ "Denne sida gjev deg oversikt over innbetalingar og evnt. utest&aring;ande "
+#~ "nota m.m."
+
+#~ msgid "Digitalabonnement"
+#~ msgstr "Digitalabonnement"
+
+#, fuzzy
+#~ msgid "Abonnenmentsnota"
+#~ msgstr "Abonnementsnota: "
+
+#, fuzzy
+#~ msgid "Abon. nr"
+#~ msgstr "Abon. nr "
+
+#~ msgid "Periode"
+#~ msgstr "Periode"
+
+#~ msgid "Bet. frist"
+#~ msgstr "Bet. frist"
+
+#~ msgid " for perioden "
+#~ msgstr " for perioden "
+
+#~ msgid "Sum bel&oslash;p"
+#~ msgstr "Sum bel&oslash;p"
+
+#~ msgid "PS! Ved betaling via Nettbank oppgi abonnementsnr KID: "
+#~ msgstr "PS! Ved betaling via Nettbank oppgje abonnementsnr KID: "
+
+#~ msgid "Opprett ein ny brukar"
+#~ msgstr "Opprett ein ny brukar"
+
+#~ msgid "Digitalt abonnoment?*"
+#~ msgstr "Digitalt abonnement?*"
+
+#~ msgid "Abonnementsnummer"
+#~ msgstr "Abonnementsnummer"
+
+#~ msgid "Epost"
+#~ msgstr "Epost"
+
+#~ msgid "Mobil"
+#~ msgstr "Mobil"
+
+#~ msgid "Stadfest passord*"
+#~ msgstr "Stadfest passord*"
+
+#~ msgid "Sjekk din e-post og klikk p&aring; lenken du har mottatt fra oss."
+#~ msgstr "Sjekk gjerne at opplysningane stemmer før du betalar"
+
+#~ msgid ""
+#~ "Velkommen til Mi side. Her kan du administrere kundeinformasjonen din. "
+#~ "Bruk menyen til venstre side for &aring; navigere i tenestene."
+#~ msgstr ""
+#~ "Velkommen til Mi side. Her kan du administrere kundeinformasjonen din. "
+#~ "Bruk menyen til venstre side for &aring; navigere i tenestene."
+
+#~ msgid "E-postadressen"
+#~ msgstr "E-post"
+
+#~ msgid "Telefon hjem"
+#~ msgstr "Telefon heim"
+
+#~ msgid "Telefon jobb"
+#~ msgstr "Telefon jobb"
+
+#~ msgid "Brukarnamn*"
+#~ msgstr "Brukarnamn*"
+
+#~ msgid " "
+#~ msgstr " "
+
+#~ msgid "Br&oslash;tekst om midlertidig stopp"
+#~ msgstr "Br&oslash: om mellombels stopp"
+
+#~ msgid "Siste innbetalt: "
+#~ msgstr "Siste innbetalt: "
+
+#~ msgid "Passordet ditt kommer per epost"
+#~ msgstr "Passordet ditt vert sendt til deg p&aring; epost"
+
+#~ msgid "Ikkje mulig &aring; lagre et nytt passord"
+#~ msgstr "Ikkje mogleg &aring; lagre nytt passord"
+
+#~ msgid "Epost-adressen din finnes det ikkje"
+#~ msgstr "Epost-adressa di fins ikkje i v&aring;rt system"
+
+#~ msgid ""
+#~ "Her kan du endre brukarnamnet og passordet. Du har samme brukernamn og "
+#~ "passord til mi side og den digitale avisa."
+#~ msgstr ""
+#~ "Her kan du endre brukarnamnet og passordet. Du har samme brukernamn og "
+#~ "passord til mi side og den digitale avisa."
+
+#~ msgid "Nytt brukarnamn"
+#~ msgstr "Nytt brukarnamn"
+
+#~ msgid "Basisinstillinger"
+#~ msgstr "Basisinstillingar"
+
+#~ msgid "Konto er aktivert.<br/>Automatisk p&aring;logging er i gong"
+#~ msgstr "Konto er aktivert.<br/>Automatisk p&aring;logging er i gang"
+
+#~ msgid "P&aring;loggingsfeil"
+#~ msgstr "P&aring;loggingsfeil"
+
+#~ msgid "Uteblitt avis?"
+#~ msgstr "Uteblitt avis?"
+
+#~ msgid "Papierabonnoment"
+#~ msgstr "Papirabonnement"
+
+#~ msgid "Ny bruker?"
+#~ msgstr "Ny brukar?"
+
+#~ msgid "Gjelder abonnent:"
+#~ msgstr "Gjeld abonnent:"
+
+#~ msgid "Eg tillet &aring; bli kontakta via epost"
+#~ msgstr "Eg godtek &aring; bli kontakta via epost"
+
+#~ msgid "Eg tillet &aring; bli kontakta via mobiltelefon"
+#~ msgstr "Eg godtek &aring; bli kontakta via mobiltelefon"

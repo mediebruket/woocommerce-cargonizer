@@ -1,0 +1,35 @@
+.wcc-service-partners{
+  display: block;
+  padding:0px 0px;
+  max-height: 300px;
+  overflow-y: auto;
+  margin: 20px 0px 40px 0px;
+}
+
+#wcc-service-partners .service-partner-list{
+  list-style: none;
+  margin-left: 0px;
+  padding-left: 0px;
+}
+
+.service-partner-list li{
+  padding: 5px;
+  border-bottom: 1px solid #ccc;
+}
+
+.wcc-service-partner-label{
+  font-weight: bold;
+}
+
+.wcc-show-opening-hours{
+  display: block;
+  font-weight: bold;
+}
+
+.wcc-opening-day{
+  display: block;
+}
+
+.wcc-opening-hours{
+  display: none;
+}

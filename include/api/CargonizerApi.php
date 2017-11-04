@@ -50,6 +50,24 @@ class CargonizerApi{
   }
 
 
+  function getServicePartners( $postcode, $country, $carrier ){
+    //curl -g -XGET -H'X-Cargonizer-Key: 12345' 'http://cargonizer.no/service_partners.xml?country=NO&postcode=1337&carrier=postnord'
+    $args =
+        array(
+          'country' => $country,
+          'postcode' => $postcode,
+          'carrier' => $carrier
+        );
+
+    $resource = 'service_partners.xml?';
+    if ( $query_string = $this->buildQueryString($args) ){
+      $resource .= $query_string;
+    }
+
+    return $this->rest($resource, $headers=array(), $method='GET', $xml=null, $debug=false ); 
+  }
+
+
   function postLabel( $consignment_id, $printer_id ){
     _log('CargonizerApi::postLabel('.$consignment_id.' '.$printer_id.')');
     // curl -g -XPOST -H'X-Cargonizer-Key: 12345' -H'X-Cargonizer-Sender: 678' 'http://cargonizer.no/consignments/label_direct?printer_id=123&consignment_ids[]=1&consignment_ids[]=2&piece_ids[]=3&piece_ids[]=4'
@@ -68,7 +86,7 @@ class CargonizerApi{
       }
 
 
-      return $this->rest( $resource,  $headers=array(), $method='GET', $xml=null, $debug=true );
+      return $this->rest( $resource,  $headers=array(), $method='GET', $xml=null, $debug=false );
     }
     else{
       return null;
@@ -85,7 +103,7 @@ class CargonizerApi{
         'Content-Type' =>  'application/xml'
       );
 
-    return $this->rest('consignments.xml', $headers, 'POST', $xml, $debug=true, true );
+    return $this->rest('consignments.xml', $headers, 'POST', $xml, $debug=true, $debug=false );
   }
 
 
@@ -138,8 +156,6 @@ class CargonizerApi{
 
 
   function rest( $resource, $headers=array(), $method='GET', $xml=null, $debug=false, $force_response = false ){
-    // _log('Cargonizer::rest()');
-
     $default_headers =
       array(
         'X-Cargonizer-Key'    => $this->Key,
@@ -175,7 +191,9 @@ class CargonizerApi{
 
 
     if ( $debug ){
+      _log('Cargonizer::rest()');
       _log($url);
+      _log('arguments');
       _log($args);
       _log('response:');
       _log($response);

@@ -391,7 +391,6 @@ class Consignment{
       update_post_meta( $post_id, '_billing_address_1',   gi( $Order->Meta, '_billing_address_1' ) );
       update_post_meta( $post_id, '_billing_address_2',   gi( $Order->Meta, '_billing_address_2' ) );
 
-
       // firstname
       $sfn = gi( $Order->Meta, '_shipping_first_name' );
       if ( !$sfn ){
@@ -442,6 +441,19 @@ class Consignment{
       }
       update_post_meta( $post_id, '_shipping_address_2', $sa2 );
 
+      if ( $Order->ServicePartner && is_array($Order->ServicePartner) ){
+        _log('has service partner');
+        update_post_meta( $post_id, 'service-partner-id', $Order->ServicePartner['number'] );
+        update_post_meta( $post_id, 'service-partner-name', $Order->ServicePartner['name'] );
+        update_post_meta( $post_id, 'service-partner-address', $Order->ServicePartner['address'] );
+        update_post_meta( $post_id, 'service-partner-postcode', $Order->ServicePartner['postcode'] );
+        update_post_meta( $post_id, 'service-partner-city', $Order->ServicePartner['city'] );
+        update_post_meta( $post_id, 'service-partner-country', $Order->ServicePartner['country'] );
+      }
+      else{
+        _log('no service partner');
+      }
+      
 
       $address = $Order->WC_Order->get_address();
       update_post_meta( $post_id, 'email', gi( $address, 'email' ) );
@@ -516,10 +528,10 @@ class Consignment{
         _log('no subscription: '.$product_id);
         $is_active = false;
       }
-      else {
+      /*else {
         if ( $this->OrderId ){
         }
-      }
+      }*/
     }
 
 
@@ -567,7 +579,6 @@ class Consignment{
   function updateHistory( $consignment ){
     _log('Consignment::updateHistory()');
     // _log($consignment);
-
     $new_entry = array();
 
     if ( $created_at = $consignment['created-at']['$'] ){
@@ -578,11 +589,9 @@ class Consignment{
       $new_entry['consignment_tracking_code'] = $number;
     }
 
-
     if ( $tracking_url = $consignment['tracking-url'] ){
       $new_entry['consignment_tracking_url'] = $tracking_url;
     }
-
 
     if( $pdf = $consignment['consignment-pdf'] ){
       $new_entry['consignment_pdf'] = $pdf;
@@ -612,7 +621,6 @@ class Consignment{
 
   function prepareExport(){
     _log('Consignment::prepareExport()');
-
     //_log($this->Meta);
     // _log('prepareExport');
     // _log($this->Items);
@@ -638,7 +646,6 @@ class Consignment{
 
 
     $export['consignments']['consignment']['transfer'] = ( $this->AutoTransfer ) ? 'true' : 'false';
-
 
     // $export['consignments']['consignment']['booking_request'] = 'false';
     $export['consignments']['consignment']['product'] = $this->CarrierProduct;
@@ -686,7 +693,16 @@ class Consignment{
     $export['consignments']['consignment']['parts']['consignee']['email']     = gi( $this->Meta, 'email' );
     $export['consignments']['consignment']['parts']['consignee']['mobile']    = gi( $this->Meta, 'phone' );
 
-
+    // return address
+    if ( gi( $this->Meta, 'service-partner-id' ) ){
+      $export['consignments']['consignment']['parts']['service_partner']['number']     = gi( $this->Meta, 'service-partner-id' );
+      $export['consignments']['consignment']['parts']['service_partner']['name']       = gi( $this->Meta, 'service-partner-name' );
+      $export['consignments']['consignment']['parts']['service_partner']['address1']   = gi( $this->Meta, 'service-partner-address' );
+      $export['consignments']['consignment']['parts']['service_partner']['postcode']   = gi( $this->Meta, 'service-partner-postcode' );
+      $export['consignments']['consignment']['parts']['service_partner']['city']       = gi( $this->Meta, 'service-partner-city' );
+      $export['consignments']['consignment']['parts']['service_partner']['country']    = gi( $this->Meta, 'service-partner-country' );  
+    }
+    
     // return address
     $export['consignments']['consignment']['parts']['return_address']['name']     = get_option('cargonizer-return-address-name');
     $export['consignments']['consignment']['parts']['return_address']['country']  = get_option('cargonizer-return-address-country');
@@ -768,7 +784,7 @@ class Consignment{
 
 
   public static function getPlaceholders(){
-    return array( '@order_id@', '@shop_name@', '@parcel_tracking_url@', '@parcel_tracking_link@', '@parcel_tracking_code@', '@parcel_date@' );
+    return array( '@order_id@', '@shop_name@', '@parcel_tracking_url@', '@parcel_tracking_link@', '@parcel_tracking_code@', '@parcel_date@', '@service_partner@' );
   }
 
 
@@ -781,7 +797,7 @@ class Consignment{
 
       $tmp_placeholders = self::getPlaceholders();
       $placeholders = array();
-      _log('generate placeholders');
+      //_log('generate placeholders');
       foreach ($tmp_placeholders as $pi => $ph) {
 
         $placeholders[$ph] = null;
@@ -804,10 +820,19 @@ class Consignment{
         elseif ( $ph == '@parcel_date@'){
           $placeholders[$ph] = date( get_option( 'date_format' ), strtotime(gi($history_entry, 'created_at')) );
         }
+        elseif ( $ph == '@service_partner@'){
+
+          $service_partner  = gi( $this->Meta, 'service-partner-name' )."<br/>";
+          $service_partner .= gi( $this->Meta, 'service-partner-address' )."<br/>";
+          $service_partner .= gi( $this->Meta, 'service-partner-postcode' )."<br/>";
+          $service_partner .= gi( $this->Meta, 'service-partner-city' )."<br/>";
+          $service_partner .= gi( $this->Meta, 'service-partner-country' )."<br/>";
+ 
+          $placeholders[$ph] = $service_partner;
+        }
       }
 
       // _log($placeholders);
-
       $notification = array(
         'subject' => get_option('cargonizer-customer-notification-subject'),
         'message' => nl2br(htmlentities( get_option('cargonizer-customer-notification-message') , ENT_QUOTES, "UTF-8")),

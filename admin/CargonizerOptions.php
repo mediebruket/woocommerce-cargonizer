@@ -40,6 +40,7 @@ class CargonizerOptions{
 
     $this->DefaultPrinter             = $this->getDefaultPrinter();
     $this->PrintOnExport              = $this->getPrintOnExport();
+    $this->UseServicePartners         = $this->getUseServicePartners();
 
     $this->TransportAgreementServices = $this->getSelectedTransportAgreementServices();
 
@@ -204,6 +205,11 @@ class CargonizerOptions{
   }
 
 
+  function getUseServicePartners(){
+    return get_option('cargonizer-use-service-partners');
+  }
+
+
   function getTransportProduct(){
     return get_option('cargonizer-default-carrier-product');
   }
@@ -228,6 +234,16 @@ class CargonizerOptions{
     }
 
     return $selected_transport_agreement;
+  }
+
+
+  function getCarrierIdentifier(){
+    if (is_array($this->SelectedTransportAgreement) && isset($this->SelectedTransportAgreement['identifier']) ){
+      return $this->SelectedTransportAgreement['identifier'];
+    }
+    else{
+      return null;
+    }
   }
 
 
@@ -290,6 +306,9 @@ class CargonizerOptions{
 
     return $transport_agreements;
   }
+
+
+
 
 
   function sanitizeTransportAgreements($array){
@@ -497,6 +516,14 @@ class CargonizerOptions{
         'type' => 'text',
         'value' => get_option('cargonizer-sandbox-api-sender'),
       ),
+      array(
+        'name' => 'cargonizer-enable-logging',
+        'label' => __('Enable logging', 'wc-cargonizer' ),
+        'desc' => 'Log plugin events inside debug.log',
+        'type' => 'checkbox',
+        'value' => get_option('cargonizer-enable-logging'),
+        'option' => 'on',
+      ),
     );
   }
 
@@ -519,6 +546,14 @@ class CargonizerOptions{
           'type'    => 'checkbox',
           'value'   => $this->PrintOnExport,
           'option'   => 'on',
+        ),
+        array(
+          'name'    => 'cargonizer-use-service-partners',
+          'label'   => __('Use service partners<br/>(pick-up points)', 'wc-cargonizer' ),
+          'desc'    => __('Required for PostNord'),
+          'type'    => 'checkbox',
+          'value'   => $this->UseServicePartners,
+          'option'  => 'on',
         ),
         array(
           'name'    => 'cargonizer-carrier-id',
@@ -652,7 +687,7 @@ class CargonizerOptions{
       array(
         'name'    => 'cargonizer-recurring-consignments-count-skip-intervals',
         'label'   => __('Count intervals (months) to skip', 'wc-cargonizer' ),
-        'desc'    => __(''),
+        'desc'    => null,
         'type'    => 'number',
         'value'   => $this->RecurringConsignmentCountSkipIntervals,
         'max'     => 5,
