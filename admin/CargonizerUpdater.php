@@ -19,7 +19,7 @@ class CargonizerUpdater{
     add_filter( "plugins_api", array( $this, "setPluginInfo" ), 10, 3 );
     add_filter( "pre_set_site_transient_update_plugins", array( $this, "setTransitent" ), 1 );
     add_action( 'admin_notices', array($this, 'getLicenceKeyInfo') );
-    // add_action( 'activated_plugin', array($this, 'registerPlugin') , 10, 2 );
+    add_action( 'activated_plugin', array($this, 'registerPlugin') , 10, 2 );
     add_filter( "upgrader_post_install", array( $this, "afterUpdate" ), 10, 3 );
   }
 
@@ -237,7 +237,6 @@ class CargonizerUpdater{
       );
 
     $url = self::buildUrl('activation', $query_vars);
-    // _log($url);
     wp_remote_get( $url );
   }
 
