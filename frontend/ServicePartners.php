@@ -8,6 +8,7 @@ add_action('woocommerce_checkout_billing', array('ServicePartners', 'addVueApp' 
 class ServicePartners{
 
   public static function getServicePartners(){
+    _log('ServicePartners::getServicePartners()');
     $Api = new CargonizerApi();
     $service_partners = array();
     $carrier = null;
@@ -18,50 +19,53 @@ class ServicePartners{
 
     $response = $Api->getServicePartners( gi($_POST,'postcode'), gi($_POST,'country'), $carrier );
 
-    if ( isset($response['results']['service-partners']['service-partner']) 
-      && is_array($response['results']['service-partners']['service-partner']) 
-        && count($response['results']['service-partners']['service-partner']) 
-      ){
-     
-      foreach ($response['results']['service-partners']['service-partner'] as $key => $sp) {
-        $checked = ($key==0) ? true: false;
-        $address = sprintf('%s, %s %s', $sp['address1'], $sp['postcode'], $sp['city'] );
-        $opening_hours = array();
+    if ( is_object($response) ){
+      $pickup_points = mbx($response, 'service-partners/service-partner', 'array');
+      if ( is_array($pickup_points) ){
+        foreach ( $pickup_points as $key => $Point) {
+          $address = sprintf('%s, %s %s', mbx($Point, 'address1'), mbx($Point, 'postcode'), mbx($Point, 'city') );
+          $opening_hours = array();
+          $opening_days = mbx($Point, 'opening-hours/day', 'array' );
 
-        if ( isset($sp['opening-hours']['day']) && is_array($sp['opening-hours']['day']) ){
-          foreach ($sp['opening-hours']['day'] as $dk => $day) {
-            //_log($day);
-            if ( isset($day['hours']) ){
-              $hours = sprintf('%s-%s', $day['hours']['@from'], $day['hours']['@to'] );
-            }
-            else{
-              $hours = __('stengt', 'wc-cargonizer' );
-            }
+          if ( is_array($opening_days) ){
+            foreach ($opening_days as $dk => $Day) {
+              $from = mbx($Day, 'hours/@from');
+              $to   = mbx($Day, 'hours/@to');
+              $hours = ( $from && $to ) ? sprintf('%s-%s', $from, $to ) : __('closed', 'wc-cargonizer' );
 
-            $opening_hours[] = 
-              array(
-                'name' => self::translateDay($day['@name']),
-                'hours' => $hours
-              );
+              $opening_hours[] =
+                array(
+                  'name' => self::translateDay( mbx($Day, '@name') ),
+                  'hours' => $hours
+                );
+            }
+            // _log('$opening_hours');
+            // _log($opening_hours);
           }
+          // else{
+          //   _log('missing opening hours');
+          // }
+
+          $partner =
+            array(
+              'number'        => mbx($Point, 'number'),
+              'name'          => mbx($Point, 'name'),
+              'opening_hours' => $opening_hours,
+              'address1'      => mbx($Point, 'address1'),
+              'postcode'      => mbx($Point, 'postcode'),
+              'city'          => mbx($Point, 'city'),
+              'country'       => mbx($Point, 'country'),
+              'address_as_text' => $address,
+              'checked'       => ($key==0) ? true: false
+            );
+
+          $service_partners[] = $partner;
         }
-
-        $partner = 
-          array(
-            'number'        => $sp['number'],
-            'name'          => $sp['name'],
-            'opening_hours' => $opening_hours,
-            'address1'      => $sp['address1'],
-            'postcode'      => $sp['postcode'],
-            'city'          => $sp['city'],
-            'country'       => $sp['country'],
-            'address_as_text' => $address,
-            'checked'       => $checked
-          );
-
-        $service_partners[] = $partner;
       }
     }
+
+
+    // _log($service_partners);
 
     echo json_encode($service_partners);
     die();
@@ -78,7 +82,7 @@ class ServicePartners{
       printf('<input type="hidden" name="wcc-service-partner-postcode" id="wcc-service-partner-postcode" />' );
       printf('<input type="hidden" name="wcc-service-partner-city" id="wcc-service-partner-city" />' );
       printf('<input type="hidden" name="wcc-service-partner-country" id="wcc-service-partner-country" />' );
-      
+
       printf('<div class="wcc-service-partners" id="wcc-service-partners">');
       printf('  <h3 class="wcc-service-partners-title">%s</h3>', __('Choose pick-up point', 'wc-cargonizer') );
       printf('    <ul class="service-partner-list">' );
@@ -124,5 +128,5 @@ class ServicePartners{
     }
   }
 
-  
+
 } // end of class

@@ -453,7 +453,7 @@ class Consignment{
       else{
         _log('no service partner');
       }
-      
+
 
       $address = $Order->WC_Order->get_address();
       update_post_meta( $post_id, 'email', gi( $address, 'email' ) );
@@ -581,30 +581,16 @@ class Consignment{
     // _log($consignment);
     $new_entry = array();
 
-    if ( $created_at = $consignment['created-at']['$'] ){
-      $new_entry['created_at'] = $created_at;
-    }
+    if ( is_array($consignment) && isset($consignment[0]) && is_object($consignment[0]) ){
+      $new_entry['created_at'] = mbx($consignment[0], 'created-at');
+      $new_entry['consignment_tracking_code'] = mbx($consignment[0], 'number');
+      $new_entry['consignment_tracking_url'] = mbx($consignment[0], 'tracking-url');
+      $new_entry['consignment_pdf'] = mbx($consignment[0], 'consignment-pdf');
 
-    if ( $number = $consignment['number'] ){
-      $new_entry['consignment_tracking_code'] = $number;
-    }
-
-    if ( $tracking_url = $consignment['tracking-url'] ){
-      $new_entry['consignment_tracking_url'] = $tracking_url;
-    }
-
-    if( $pdf = $consignment['consignment-pdf'] ){
-      $new_entry['consignment_pdf'] = $pdf;
-    }
-
-    if ( $consignment['bundles']['bundle'] ){
-      $bundle = $consignment['bundles']['bundle'];
       $new_entry['consignment_id'] = null;
-      if ( isset($bundle[0]) ){
-        $new_entry['consignment_id'] = $bundle[0]['consignment-id']['$'];
-      }
-      else {
-       $new_entry['consignment_id'] = $bundle['consignment-id']['$'];
+      $bundles = mbx( $consignment[0], 'bundles/bundle', 'array' );
+      if ( is_array($bundles) && isset($bundles[0]) ){
+        $new_entry['consignment_id'] = mbx($bundles[0], 'consignment-id');
       }
     }
 
@@ -700,9 +686,9 @@ class Consignment{
       $export['consignments']['consignment']['parts']['service_partner']['address1']   = gi( $this->Meta, 'service-partner-address' );
       $export['consignments']['consignment']['parts']['service_partner']['postcode']   = gi( $this->Meta, 'service-partner-postcode' );
       $export['consignments']['consignment']['parts']['service_partner']['city']       = gi( $this->Meta, 'service-partner-city' );
-      $export['consignments']['consignment']['parts']['service_partner']['country']    = gi( $this->Meta, 'service-partner-country' );  
+      $export['consignments']['consignment']['parts']['service_partner']['country']    = gi( $this->Meta, 'service-partner-country' );
     }
-    
+
     // return address
     $export['consignments']['consignment']['parts']['return_address']['name']     = get_option('cargonizer-return-address-name');
     $export['consignments']['consignment']['parts']['return_address']['country']  = get_option('cargonizer-return-address-country');
@@ -821,13 +807,11 @@ class Consignment{
           $placeholders[$ph] = date( get_option( 'date_format' ), strtotime(gi($history_entry, 'created_at')) );
         }
         elseif ( $ph == '@service_partner@'){
-
           $service_partner  = gi( $this->Meta, 'service-partner-name' )."<br/>";
           $service_partner .= gi( $this->Meta, 'service-partner-address' )."<br/>";
           $service_partner .= gi( $this->Meta, 'service-partner-postcode' )."<br/>";
           $service_partner .= gi( $this->Meta, 'service-partner-city' )."<br/>";
           $service_partner .= gi( $this->Meta, 'service-partner-country' )."<br/>";
- 
           $placeholders[$ph] = $service_partner;
         }
       }
@@ -848,8 +832,8 @@ class Consignment{
 
       wp_mail( $email, $notification['subject'], $notification['message'] );
       _log('notification sent to: '.$email);
-      _log('$notification');
-      _log($notification);
+      // _log('$notification');
+      // _log($notification);
 
     }
     else{
@@ -1061,7 +1045,6 @@ class Consignment{
     //_log('Consignment::setShippingCosts()');
     // _log($rates);
     // _log($package);
-
     $esc = get_option('cargonizer-estimate-shipping-costs');
 
     if ( $esc && isset($package['contents']) && !empty($package['contents']) ){
@@ -1085,12 +1068,9 @@ class Consignment{
         $length = $WC_P->get_length();
         $weight = $WC_P->get_weight();
 
-
         $volume = 0;
-
         if ( $width && $height && $length ){
           $volume = $width * $height * $length / 1000;
-          // _log('volume: '.$volume);
         }
 
         $parcel['volume'] += $volume * $qty;
@@ -1110,6 +1090,9 @@ class Consignment{
         $Consignment->setMeta( '_shipping_address_1', $package['destination']['address'] );
         $Consignment->setMeta( '_shipping_address_2', $package['destination']['address_2'] );
 
+        $Consignment->CarrierProduct = get_option( 'cargonizer-default-carrier-product' );
+        $Consignment->CarrierProductType = get_option( 'cargonizer-default-product-type' );
+
         $Consignment->Items[] =
             array(
               'parcel_package_type' => $Consignment->CarrierProductType,
@@ -1126,17 +1109,17 @@ class Consignment{
         $CargonizerApi = new CargonizerApi();
         $result = $CargonizerApi->estimateCosts( $CargonizeXml->Xml );
 
-        // _log($result['consignment-cost']);
-        if ( isset($result['consignment-cost']['estimated-cost']) && is_array($result['consignment-cost']['estimated-cost']) ){
-          foreach ($rates as $key => $value) {
-            if ( is_numeric( strpos($key, 'flat_rate') ) ) {
-              // _log($rates);
-              // _log($key);
-              $rates[$key]->cost = $result['consignment-cost']['estimated-cost']['$'];
-              $rates[$key]->taxes = array( 1 => $result['consignment-cost']['estimated-cost']['$'] *0.25 );
-            } // if
-          } // foreach
-        }// if
+        if ( is_object($result) ){
+          $estimated_cost = mbx($result, 'estimated-cost' );
+          foreach ($rates as $key => $Rate) {
+            if ( $Rate->method_id == 'flat_rate' ){
+              $rates[$key]->cost = $estimated_cost;
+              $rates[$key]->taxes = array( 1 => $estimated_cost *0.25 );
+            }
+          }
+
+          // _log($rates);
+        }
       }
       else{
         _log('no destination ');

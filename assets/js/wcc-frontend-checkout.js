@@ -3,7 +3,7 @@ $(document).ready(function(){
   wcc_init_post_codes();
   wcc_init_different_addresses();
 });
- 
+
 
 function wcc_start_app(){
   result = null;
@@ -25,7 +25,7 @@ function wcc_start_app(){
           this.set_postcode_and_country();
           if ( this.postcode && wcc_last_postcode != this.postcode ){
             wcc_last_postcode = this.postcode;
-          
+
             var data = {
               'action': 'get_service_partners',
               'country': this.country,
@@ -36,13 +36,13 @@ function wcc_start_app(){
               if ( typeof response !== 'undefined' && response.length ){
                 var sp = JSON.parse(response);
                 wcc_app.service_partners = sp;
-                
+
                 $('.service-partner-list li:first-child input').attr('checked', true);
                 $('.wcc-opening-hours').hide();
                 setTimeout( trigger_update_service_partner,  1000);
               }
-            });  
-          }          
+            });
+          }
         },
         set_postcode_and_country : function(){
           if ( $('#ship-to-different-address-checkbox:checked').length ){
@@ -51,15 +51,17 @@ function wcc_start_app(){
           }
           else{
             this.postcode = $('#billing_postcode').val();
-            this.country = $('#billing_country').val(); 
+            this.country = $('#billing_country').val();
           }
         },
         toggle_opening_hours : function(data_id, e){
           e.preventDefault();
+
+          console.log('#opening-hours-'+data_id);
           $('#opening-hours-'+data_id).toggle();
         },
-        checked_service_partner: function(){ 
-          number = $('.wcc-service-partner:checked').val();        
+        checked_service_partner: function(){
+          number = $('.wcc-service-partner:checked').val();
           service_partner = get_service_partner(number);
           if (typeof service_partner === 'object' ){
             /*console.log('update hidden fields');
@@ -74,7 +76,7 @@ function wcc_start_app(){
         }
       }
     });
-}     
+}
 
 
 function wcc_init_post_codes(){
@@ -103,7 +105,7 @@ function get_service_partner(number){
 
   return service_partner;
 }
- 
+
 
 function trigger_update_service_partner(){
   wcc_app.checked_service_partner();

@@ -51,7 +51,7 @@ class ConsignmentController extends CargonizerCommonController{
 
 
 
-  public static function createConsignment( $post_id  ){
+  public static function createConsignment( $post_id ){
     _log('ConsignmentController::createConsignment('.$post_id.')');
 
     $response = false;
@@ -64,34 +64,39 @@ class ConsignmentController extends CargonizerCommonController{
       _log('post consignment');
       $result = $CargonizerApi->postConsignment($CargonizeXml->Xml);
       if ( $result ){
-        // _log($result);
-        if ( is_array($result) && isset($result['consignments']['consignment']['errors']) ){
-          _log('consignment: error');
-          $response = $result['consignments']['consignment']['errors']['error'];
-        }
-        elseif ( is_array($result) && isset($result['consignments']['consignment']) ){
-          _log('consignment: success');
-          $response = $result;
-
-          $Consignment->setNextShippingDate( $auto_inc=true );
-          if ( $new_entry = $Consignment->updateHistory( $result['consignments']['consignment'] ) ){
-            $Consignment->notifyCustomer( $new_entry );
+        // check if response is object
+        if ( is_object($result) ){
+          // something was wrong with the request
+          if ( $error_message = mbx($result, 'consignment/errors/error') ){
+            _log('consignment: error');
+            $response = $error_message;
           }
-
-          // update order
-          if ( $Consignment->OrderId ){
-            _log('has order id');
-            $Order = new ShopOrder( $Consignment->OrderId );
-            $Order->setCargonized();
-            $Order->saveConsignmentDetails( $consignment = $result['consignments']['consignment'] );
-            $Order->addNote();
-          }
+          // consignment was successfully created
           else{
-            _log('no order id');
+            _log('consignment: success');
+            $Consignment->setNextShippingDate( $auto_inc=true );
+
+            // update consignment history
+            if ( $new_entry = $Consignment->updateHistory( mbx($result, 'consignment', 'array') ) ){
+              $response = $new_entry;
+              $Consignment->notifyCustomer( $new_entry );
+            }
+
+            // update order
+            if ( $Consignment->OrderId ){
+              $Order = new ShopOrder( $Consignment->OrderId );
+              $Order->setCargonized();
+              $Order->saveConsignmentDetails( $consignment = mbx($result, 'consignment', 'array') );
+              $Order->addNote();
+            }
+            else{
+              _log('no order id');
+            }
           }
         }
         else{
-          _log('consignment: else error');
+          _log('unknown error');
+          _log('$result');
           _log($result);
           $response = htmlspecialchars_decode(strip_tags($result));
         }

@@ -113,15 +113,15 @@ class ShopOrder{
     $postcode   = gi($this->Meta, 'wcc-service-partner-postcode');
     $city       = gi($this->Meta, 'wcc-service-partner-city');
     $country    = gi($this->Meta, 'wcc-service-partner-country');
-    
+
     //_log($name);
     $partner = null;
     if ( $name && $address && $postcode && $city ){
-      $partner = compact('number', 'name', 'address', 'postcode', 'city', 'country');  
+      $partner = compact('number', 'name', 'address', 'postcode', 'city', 'country');
     }
-    
+
     //_log($partner);
-    return $partner;    
+    return $partner;
   }
 
 
@@ -338,7 +338,6 @@ class ShopOrder{
       $default = str_replace('@products@', $this->getProductsList($recurring=false), $default);
       return $default;
     }
-
     //_log($this->Printer);
   }
 
@@ -531,33 +530,23 @@ class ShopOrder{
   }
 
 
-  public static function _getTransportAgreements(){
-    return get_transient('transport_agreements');
-  }
-
-
   function saveConsignmentDetails( $consignment ){
-    _log('Parcel::saveConsignmentDetails');
-    _log($consignment);
+    _log('ShopOrder::saveConsignmentDetails');
+    // _log($consignment);
+    if ( is_array($consignment) && isset($consignment[0]) && is_object($consignment[0]) ){
+      update_post_meta( $this->ID, 'consignment_created_at', mbx($consignment[0], 'created-at')  );
+      update_post_meta( $this->ID, 'consignment_tracking_code', mbx($consignment[0], 'number') );
+      update_post_meta( $this->ID, 'consignment_tracking_url', mbx($consignment[0], 'tracking-url') );
+      update_post_meta( $this->ID, 'consignment_pdf', mbx($consignment[0], 'consignment-pdf') );
 
-    update_post_meta( $this->ID, 'consignment_created_at', $consignment['created-at']['$'] );
-    update_post_meta( $this->ID, 'consignment_tracking_code', $consignment['number'] );
-    update_post_meta( $this->ID, 'consignment_tracking_url', $consignment['tracking-url'] );
-    update_post_meta( $this->ID, 'consignment_pdf', $consignment['consignment-pdf'] );
-
-
-    if ( $consignment['bundles']['bundle'] ){
-      $bundle = $consignment['bundles']['bundle'];
-      if ( isset($bundle[0]) ){
-        $consignment_id = $bundle[0]['consignment-id']['$'];
+      $bundles = mbx( $consignment[0], 'bundles/bundle', 'array' );
+      if ( is_array($bundles) && isset($bundles[0]) ){
+        $consignment_id = mbx($bundles[0], 'consignment-id');
+        update_post_meta( $this->ID, 'consignment_id', $consignment_id );
       }
-      else {
-       $consignment_id = $bundle['consignment-id']['$'];
-      }
-      update_post_meta( $this->ID, 'consignment_id', $consignment_id );
+
+      $this->getPostMeta();
     }
-
-    $this->getPostMeta();
   }
 
 

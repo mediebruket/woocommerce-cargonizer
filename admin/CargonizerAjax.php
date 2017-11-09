@@ -7,7 +7,7 @@ class CargonizerAjax{
     add_action( 'wp_ajax_edit', array( $this, '_addPackageRow' ) );
     add_action( 'wp_ajax_nopriv_ajaxedit', array( $this, '_addPackageRow' ) );
     add_action( 'wp_ajax_delete', array( $this, '_deletePackageRow' ) );
-    add_action( 'wp_ajax_wcc_create_consignment', array( $this, '_createConsignment' ) );
+    add_action( 'wp_ajax_wcc_create_consignment', array( $this, '_createAjaxConsignment' ) );
     add_action( 'wp_ajax_wcc_print_latest_consignment', array( $this, '_printLatestConsignment' ) );
   }
 
@@ -88,11 +88,11 @@ class CargonizerAjax{
       _log('Printer: '. $Order->Printer);
 
       if ( !$Order->ConsignmentId ){
-        $response = 'Missing consignment id';
+        $response = __('Missing consignment id', 'wc-cargonizer');
       }
 
       if ( !$Order->Printer ){
-        $response = 'Missing printer_abort(printer_handle)';
+        $response = __('Missing printer_abort(printer_handle)', 'wc-cargonizer');
       }
 
       if ( $Order->ConsignmentId && $Order->Printer ){
@@ -104,10 +104,10 @@ class CargonizerAjax{
               $printer = $ta[$Order->Printer]. " (".$Order->Printer.")";
             }
           }
-          $response = 'Label was printed on printer '.$printer;
+          $response =  sprintf( __('Label was printed on printer', 'wc-cargonizer'), $printer ) ;
         }
         else{
-          $response = 'Could not connect to Cargonizer';
+          $response = __('Could not connect to Cargonizer', 'wc-cargonizer');
         }
       }
     }
@@ -117,21 +117,20 @@ class CargonizerAjax{
   }
 
 
-  function _createConsignment(){
-    _log('CargonizerAjax::_createConsignment()');
+  function _createAjaxConsignment(){
+    _log('CargonizerAjax::_createAjaxConsignment()');
 
     $response = array('status' => null, 'message' => null);
     if ( isset($_POST['order_id']) && is_numeric($_POST['order_id']) ){
       $result = ConsignmentController::createConsignment( $_POST['order_id'] );
-
       // _log('result');
       // _log($result);
-      if ( is_array($result) && isset($result['consignments']['consignment']['id']['$']) ){
-        $response['status'] = 'ok';
-        $response['message'] = sprintf( __('New consignment created: %s', 'wc-cargonizer'),  $result['consignments']['consignment']['id']['$'] );
+      if ( is_array($result) && isset($result['consignment_id']) ){
+        $response['status'] = __('ok', 'wc-cargonizer');
+        $response['message'] = sprintf( __('New consignment created: %s', 'wc-cargonizer'), $result['consignment_id'] );
       }
       else{
-        $response['status'] = 'error';
+        $response['status'] = __('error', 'wc-cargonizer');
 
         if ( is_string($result) ){
           $response['message'] = $result;
@@ -166,12 +165,12 @@ class CargonizerAjax{
 
       if ( !$consignment_id ){
         $response['status'] = 'error';
-        $response['message'] = 'Missing consignment id';
+        $response['message'] = __('Missing consignment id', 'wc-cargonizer');
       }
 
       if ( !$Consignment->Printer ){
         $response['status'] = 'error';
-        $response['message'] = 'Missing printer_abort(printer_handle)';
+        $response['message'] = __('Missing printer_abort (printer_handle)', 'wc-cargonizer');
       }
 
       if ( $consignment_id && $Consignment->Printer ){
@@ -179,16 +178,16 @@ class CargonizerAjax{
         if ( $Api->postLabel( $consignment_id, $Consignment->Printer ) == 'Printing' ){
           $printer = $Consignment->Printer;
           if ( $ta = get_transient( 'wcc_printer_list' ) ){
-            if ( isset( $ta[$Consignment->Printer] ) ){
+            if ( isset($ta[$Consignment->Printer]) ){
               $printer = $ta[$Consignment->Printer]. " (".$Consignment->Printer.")";
             }
           }
           $response['status'] = 'ok';
-          $response['message'] = 'Label was printed on printer '.$printer;
+          $response['message'] = sprintf( __('Label was printed on printer %s', 'wc-cargonizer'), $printer );
         }
         else{
          $response['status']   = 'error';
-         $response['message']  = 'Could not connect to Cargonizer';
+         $response['message']  = __('Could not connect to Cargonizer', 'wc-cargonizer');
         }
       }
     }

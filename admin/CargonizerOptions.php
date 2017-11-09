@@ -82,13 +82,16 @@ class CargonizerOptions{
 
   function getProductsByCarrierId( $carrier_id ){
     $products = null;
-    foreach ( $this->TransportAgreements as $ta ){
-      if ( $ta['id'] == $carrier_id ){
-        if ( isset($ta['products']) && is_array($ta['products']) ){
-          $products = $ta['products'];
+    if ( is_array($this->TransportAgreements) ){
+      foreach ( $this->TransportAgreements as $ta ){
+        if ( $ta['id'] == $carrier_id ){
+          if ( isset($ta['products']) && is_array($ta['products']) ){
+            $products = $ta['products'];
+          }
         }
       }
     }
+
 
     return $products;
   }
@@ -293,126 +296,103 @@ class CargonizerOptions{
 
 
   function getTransportAgreements($force_update=false){
-    //_log('CargonizerOptions::getTransportAgreements()');
+    // _log('CargonizerOptions::getTransportAgreements()');
     $transport_agreements = get_transient('transport_agreements');
 
     if ( !$transport_agreements or $force_update ){
+      _log('update transport agreements');
       $Api = new CargonizerApi(true);
-      if ( $ta = $this->sanitizeTransportAgreements( $Api->TransportAgreements['transport-agreements']['transport-agreement'] ) ){
-         $this->saveTransportAgreements( $ta );
-         $transport_agreements = $ta;
+      $agreements = $Api->TransportAgreements->xpath('/transport-agreements/transport-agreement');
+
+      if ( $ta = $this->extractTransportAgreements($agreements) ){
+        $this->saveTransportAgreements( $ta );
+
+        $transport_agreements = $ta;
       }
     }
 
+    // _log($transport_agreements);
     return $transport_agreements;
   }
 
 
+  function extractTransportAgreements( $transport_agreements ) {
+    $ta = null;
 
+    if ( is_array($transport_agreements) ){
+      foreach ($transport_agreements as $key => $Agreement) {
 
-
-  function sanitizeTransportAgreements($array){
-    $transport_agreements = null;
-    // _log('CargonizerSettings::sanitizeTransportAgreements()');
-
-    if ( is_array($array) ){
-      foreach ($array as $key => $value) {
-        // _log($value);
-        if ( isset($value['carrier']['identifier']) && isset($value['id']['$']) ){
-          // _log($value['carrier']['identifier']);
-
-          // set carrier
+        if ( $identifier = mbx( $Agreement, 'carrier/identifier') ){
+          // set carrier details
           $carrier = array(
-            'id'          => $value['id']['$'],
-            'identifier'  => $value['carrier']['identifier'],
-            'name'        => $value['carrier']['name'],
-            'desc'        => $value['description'],
-            'title'       => $value['carrier']['identifier'].' ('.$value['description'] .')'
+            'id'          => mbx( $Agreement, 'id' ),
+            'identifier'  => $identifier,
+            'name'        => mbx( $Agreement, 'carrier/name'),
+            'desc'        => mbx( $Agreement, 'description'),
+            'title'       => $identifier.' ('. mbx( $Agreement, 'description') .')'
           );
 
+          $carrier_products = array();
 
-          // set products
-          $products = array();
-
-          if ( is_array($value['products']['product']) ){
-            foreach ( $value['products']['product']  as $key => $product) {
-
+          // collect carrier products in $carrier_products
+          if ( $products = mbx($Agreement, 'products/product', 'array' ) ){
+            foreach ($products as $key => $Product) {
+              // set product item types
               $types = array();
-              if ( isset($product['item_types']['item_type']) && is_array($product['item_types']['item_type']) ){
-                // default
-                foreach ($product['item_types']['item_type'] as $index => $type){
-                  if ( $abbreviation = gi($type, '@abbreviation' )  ){
-                    $types[ $type['@abbreviation'] ] = $type['@name_no'];
-                  }
-                  break;
-                }
-
-                // exception
-                if ( empty($types) ){
-                  if ( isset($product['item_types']['item_type']['@abbreviation']) && isset($product['item_types']['item_type']['@name_no']) ){
-                    $types[$product['item_types']['item_type']['@abbreviation']] = $product['item_types']['item_type']['@name_no'];
-                  }
+              if ( $item_types = mbx( $Product, 'item_types/item_type', 'array' ) ){
+                foreach ($item_types as $key => $ItemType) {
+                  if ( $abbreviation = mbx($ItemType, '@abbreviation' ) )
+                  $name =  ( get_locale() == 'nb_NO' ) ? mbx($ItemType, '@name_no' ) : mbx($ItemType, '@name_en' );
+                  $types[$abbreviation] = $name;
                 }
               }
 
-
+              // set product services
               $services = array();
-              if ( isset($product['services']) && is_array($product['services']['service']) ){
-
-                foreach ( $product['services']['service'] as $key => $service ) {
-
-                  if ( isset($service['name']) && isset($service['identifier']) ){
-                    // _log( $service['name']. " ". $service['identifier']);
-                    $services[] =
-                      array(
-                        'name' => $service['name'],
-                        'identifier' => $service['identifier']
-                      );
-                  }
-                  // else{
-                  //   _log('empty service');
-                  //   _log($service);
-                  // }
-
+              if ( $product_services = mbx( $Product, 'services/service', 'array' ) ){
+                foreach ($product_services as $key => $Service){
+                  $services[] =
+                    array(
+                      'name' => mbx( $Service, 'name'),
+                      'identifier' => mbx( $Service, 'identifier')
+                    );
                 }
               }
-              // else{
-              //   _log('no services: '.$product['name']);
-              // }
-              //
 
-
-
+              // add to carriers products if product has types
               if ( !empty($types) ){
-                $products[] = array(
-                  'name'        => $product['name'],
-                  'identifier'  => $product['identifier'],
-                  'types'       => $types,
-                  'services'       => $services,
+                $carrier_products[] =
+                  array(
+                    'name'        => mbx($Product,'name'),
+                    'identifier'  => mbx($Product,'identifier'),
+                    'types'       => $types,
+                    'services'    => $services,
                   );
               }
-            }
-          }
+
+            } // foreach products
+          } // if products
 
           // add carrier if has products
-          if ( $products ){
-            $carrier['products'] = $products;
-            $transport_agreements[] = $carrier;
+          if ( !empty($carrier_products) ){
+            $carrier['products'] = $carrier_products;
+            $ta[] = $carrier;
           }
 
-        }
+        } // if carrier has identifier
+
       }
     }
 
-    return $transport_agreements;
-    // _log($this->TransportAgreements);
+
+    return $ta;
   }
 
 
   function saveTransportAgreements(  $transport_agreements ){
     // _log('CargonizerSettings::saveTransportAgreements');
-    // _log($this->TransportAgreements);
     set_transient( 'transport_agreements', $transport_agreements, 1*60*60 );
+    _log('transport agreements saved');
   }
 
 
@@ -426,33 +406,31 @@ class CargonizerOptions{
       }
     }
 
-
     return $companies;
   }
 
 
   public static function getPrinterList(){
-    //_log('CargonizerOptions::getPrinterList()');
     $array = array();
     $transient = 'wcc_printer_list';
 
     if ( $ta = get_transient( $transient ) ){
-      // _log('has printer transient');
       foreach ($ta as $printer_id => $printer_name) {
         $array[ $printer_id ] = $printer_name;
       }
     }
     else{
-      // _log('get printers from cargonizer');
       $Api = new CargonizerApi();
-      $printers = $Api->getPrinters();
+      $Printers = $Api->getPrinters();
 
+      if ( is_object($Printers) ){
+        $has_printers = mbx( $Printers,'printer', 'array' );
 
-      $array = array();
-      if ( isset($printers['printers']) && is_array($printers['printers']) && !empty($printers['printers']) ){
-        foreach ($printers['printers'] as $key => $p) {
-          if (  isset($p['id']) ){
-            $array[ $p['id']['$'] ] = $p['name'] ;
+        if ( is_array($has_printers) ){
+          foreach ( $has_printers as $key => $Printer) {
+            if ( $printer_id = mbx($Printer, 'id') ){
+              $array[$printer_id] = mbx($Printer,'name');
+            }
           }
         }
       }
@@ -461,7 +439,7 @@ class CargonizerOptions{
         set_transient( $transient, $array, 1*60*60 );
       }
       else{
-        $array[0] = 'no printer available';
+        $array[0] = __('no printer available', 'wc-cargonizer');
       }
     }
 

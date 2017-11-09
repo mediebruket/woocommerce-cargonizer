@@ -64,7 +64,7 @@ class CargonizerApi{
       $resource .= $query_string;
     }
 
-    return $this->rest($resource, $headers=array(), $method='GET', $xml=null, $debug=false ); 
+    return $this->rest($resource, $headers=array(), $method='GET', $xml=null, $debug=false );
   }
 
 
@@ -85,7 +85,6 @@ class CargonizerApi{
         $resource .= $query_string;
       }
 
-
       return $this->rest( $resource,  $headers=array(), $method='GET', $xml=null, $debug=false );
     }
     else{
@@ -103,23 +102,23 @@ class CargonizerApi{
         'Content-Type' =>  'application/xml'
       );
 
-    return $this->rest('consignments.xml', $headers, 'POST', $xml, $debug=true, $debug=false );
+    return $this->rest('consignments.xml', $headers, 'POST', $xml, $debug=false, $force_response=true );
   }
 
 
-  function getAgreementByName($name){
-    // _log('getAgreement');
-    $agreement = null;
+  // function getAgreementByName($name){
+  //   // _log('getAgreement');
+  //   $agreement = null;
 
-    foreach ($this->TransportAgreements['transport-agreements']['transport-agreement'] as $key => $value) {
-      if ( isset($value['carrier']['identifier']) && $value['carrier']['identifier'] == $name ){
-        $agreement = $value;
-        break;
-      }
-    }
+  //   foreach ($this->TransportAgreements['transport-agreements']['transport-agreement'] as $key => $value) {
+  //     if ( isset($value['carrier']['identifier']) && $value['carrier']['identifier'] == $name ){
+  //       $agreement = $value;
+  //       break;
+  //     }
+  //   }
 
-    return $agreement;
-  }
+  //   return $agreement;
+  // }
 
 
   function estimateCosts( $xml ){
@@ -134,19 +133,19 @@ class CargonizerApi{
   }
 
 
-  function getAgreementById($id){
-    // _log('getAgreement');
-    $agreement = null;
+  // function getAgreementById($id){
+  //   // _log('getAgreement');
+  //   $agreement = null;
 
-    foreach ($this->TransportAgreements['transport-agreements']['transport-agreement'] as $key => $value) {
-      if ( isset($value['carrier']['identifier']) && $value['carrier']['identifier'] == 'bring' ){
-        $agreement = $value;
-        break;
-      }
-    }
+  //   foreach ($this->TransportAgreements['transport-agreements']['transport-agreement'] as $key => $value) {
+  //     if ( isset($value['carrier']['identifier']) && $value['carrier']['identifier'] == 'bring' ){
+  //       $agreement = $value;
+  //       break;
+  //     }
+  //   }
 
-    return $agreement;
-  }
+  //   return $agreement;
+  // }
 
 
   function buildQueryString( $query_args ){
@@ -170,17 +169,9 @@ class CargonizerApi{
 
     $args = array(
       'timeout'     => 30,
-      // 'redirection' => 5,
-      //'httpversion' => '1.0',
       'user-agent'  => 'WordPress/Woocommerce: ' . get_bloginfo( 'url' ),
-      // 'blocking'    => true,
       'headers'     => $headers,
       'body'        => $xml,
-      // 'compress'    => false,
-      // 'decompress'  => true,
-      // 'sslverify'   => true,
-      // 'stream'      => false,
-      // 'filename'    => null
       'method'      => $method
     );
 
@@ -201,7 +192,7 @@ class CargonizerApi{
 
     if ( $status==200 or $status==201 or $status == 202 or $force_response ){
       if ( $status == 200 or $status == 201 or $status == 400 ){
-        return xmlToArray( simplexml_load_string(wp_remote_retrieve_body($response)) );
+        return simplexml_load_string(wp_remote_retrieve_body($response));
       }
       else{
         return wp_remote_retrieve_body($response);

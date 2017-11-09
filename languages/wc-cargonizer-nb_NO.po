@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Infosoft plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-04 10:48+0100\n"
-"PO-Revision-Date: 2017-11-04 10:49+0100\n"
+"POT-Creation-Date: 2017-11-09 12:24+0100\n"
+"PO-Revision-Date: 2017-11-09 12:25+0100\n"
 "Last-Translator: \n"
 "Language-Team: Mediebruket <post@mediebruket.no>\n"
 "Language: nn_NO\n"
@@ -13,7 +13,7 @@ msgstr ""
 "X-Poedit-KeywordsList: __;_e\n"
 "X-Poedit-Basepath: ..\n"
 "Plural-Forms: nplurals=2; plural=n!=1;\n"
-"X-Generator: Poedit 2.0.4\n"
+"X-Generator: Poedit 1.5.4\n"
 "X-Poedit-SearchPath-0: .\n"
 
 #: admin/AdminConsignmentOptions.php:58 admin/AdminShopOrderOptions.php:58
@@ -53,25 +53,25 @@ msgstr ""
 msgid "Shipping address 2"
 msgstr ""
 
-#: admin/AdminConsignmentOptions.php:128 admin/CargonizerOptions.php:733
+#: admin/AdminConsignmentOptions.php:128 admin/CargonizerOptions.php:719
 msgid "Postcode"
-msgstr ""
+msgstr "Postnummer"
 
-#: admin/AdminConsignmentOptions.php:134 admin/CargonizerOptions.php:740
+#: admin/AdminConsignmentOptions.php:134 admin/CargonizerOptions.php:726
 msgid "City"
-msgstr ""
+msgstr "Sted"
 
-#: admin/AdminConsignmentOptions.php:140 admin/CargonizerOptions.php:726
+#: admin/AdminConsignmentOptions.php:140 admin/CargonizerOptions.php:712
 msgid "Country"
-msgstr ""
+msgstr "Land"
 
 #: admin/AdminConsignmentOptions.php:146
 msgid "E-mail"
-msgstr ""
+msgstr "E-post"
 
 #: admin/AdminConsignmentOptions.php:152
 msgid "Phone"
-msgstr ""
+msgstr "Telefon"
 
 #: admin/AdminConsignmentOptions.php:165
 msgid "Is recurring"
@@ -87,7 +87,7 @@ msgid "Interval"
 msgstr ""
 
 #: admin/AdminConsignmentOptions.php:183 admin/AdminShopOrderOptions.php:236
-#: admin/CargonizerOptions.php:653
+#: admin/CargonizerOptions.php:639
 msgid "every"
 msgstr ""
 
@@ -119,7 +119,7 @@ msgid "Saves the consignment as \"sent\""
 msgstr ""
 
 #: admin/AdminConsignmentOptions.php:211 admin/AdminShopOrderOptions.php:92
-#: admin/CargonizerOptions.php:536
+#: admin/CargonizerOptions.php:522
 msgid "Print on export"
 msgstr ""
 
@@ -168,7 +168,7 @@ msgstr ""
 msgid "Receiver"
 msgstr ""
 
-#: admin/AdminShopOrderOptions.php:146 admin/CargonizerOptions.php:705
+#: admin/AdminShopOrderOptions.php:146 admin/CargonizerOptions.php:691
 msgid "Message"
 msgstr ""
 
@@ -183,8 +183,8 @@ msgstr ""
 #: admin/AdminShopOrderOptions.php:168
 msgid ""
 "To create a consignment on cargonizer.no:<br/>- Will only work if shipping "
-"date is empty<br/>- Enable this checkox if carrier is selected and the "
-"parcel(s) added."
+"date is empty<br/>- Enable this checkox if carrier is selected and the parcel"
+"(s) added."
 msgstr ""
 
 #: admin/AdminShopOrderOptions.php:183
@@ -232,7 +232,7 @@ msgstr ""
 msgid "Notification"
 msgstr ""
 
-#: admin/CargonizerAdmin.php:53 admin/CargonizerOptions.php:747
+#: admin/CargonizerAdmin.php:53 admin/CargonizerOptions.php:733
 msgid "Address"
 msgstr ""
 
@@ -336,12 +336,45 @@ msgstr ""
 msgid "Check consignments"
 msgstr ""
 
-#: admin/CargonizerAjax.php:131
+#: admin/CargonizerAjax.php:91 admin/CargonizerAjax.php:168
+msgid "Missing consignment id"
+msgstr ""
+
+#: admin/CargonizerAjax.php:95
+msgid "Missing printer_abort(printer_handle)"
+msgstr ""
+
+#: admin/CargonizerAjax.php:107
+msgid "Label was printed on printer"
+msgstr ""
+
+#: admin/CargonizerAjax.php:110 admin/CargonizerAjax.php:190
+msgid "Could not connect to Cargonizer"
+msgstr ""
+
+#: admin/CargonizerAjax.php:129
+msgid "ok"
+msgstr ""
+
+#: admin/CargonizerAjax.php:130
 #, php-format
 msgid "New consignment created: %s"
 msgstr ""
 
-#: admin/CargonizerAjax.php:197
+#: admin/CargonizerAjax.php:133
+msgid "error"
+msgstr ""
+
+#: admin/CargonizerAjax.php:173
+msgid "Missing printer_abort (printer_handle)"
+msgstr ""
+
+#: admin/CargonizerAjax.php:186
+#, php-format
+msgid "Label was printed on printer %s"
+msgstr ""
+
+#: admin/CargonizerAjax.php:196
 msgid "Missing post id"
 msgstr ""
 
@@ -353,152 +386,160 @@ msgstr "Leveringssted:"
 msgid "Add row"
 msgstr ""
 
-#: admin/CargonizerOptions.php:476
+#: admin/CargonizerOptions.php:442
+msgid "no printer available"
+msgstr ""
+
+#: admin/CargonizerOptions.php:454
 msgid "Licence key"
 msgstr ""
 
-#: admin/CargonizerOptions.php:490
+#: admin/CargonizerOptions.php:468
 msgid "Api key"
 msgstr ""
 
-#: admin/CargonizerOptions.php:496
+#: admin/CargonizerOptions.php:474
 msgid "Api sender"
 msgstr ""
 
-#: admin/CargonizerOptions.php:502
+#: admin/CargonizerOptions.php:480
 msgid "Sandbox"
 msgstr ""
 
-#: admin/CargonizerOptions.php:509
+#: admin/CargonizerOptions.php:487
 msgid "Sandbox api key"
 msgstr ""
 
-#: admin/CargonizerOptions.php:515
+#: admin/CargonizerOptions.php:493
 msgid "Sandbox api sender"
 msgstr ""
 
-#: admin/CargonizerOptions.php:528
+#: admin/CargonizerOptions.php:499
+msgid "Enable logging"
+msgstr ""
+
+#: admin/CargonizerOptions.php:514
 msgid "Default printer"
 msgstr ""
 
-#: admin/CargonizerOptions.php:544
+#: admin/CargonizerOptions.php:530
 msgid "Use service partners<br/>(pick-up points)"
 msgstr ""
 
-#: admin/CargonizerOptions.php:545
+#: admin/CargonizerOptions.php:531
 msgid "Required for PostNord"
 msgstr ""
 
-#: admin/CargonizerOptions.php:552
+#: admin/CargonizerOptions.php:538
 msgid "Default delivery company"
 msgstr ""
 
-#: admin/CargonizerOptions.php:553
+#: admin/CargonizerOptions.php:539
 msgid "Api settings required to load delivery companies"
 msgstr ""
 
-#: admin/CargonizerOptions.php:560
+#: admin/CargonizerOptions.php:546
 msgid "Default product"
 msgstr ""
 
-#: admin/CargonizerOptions.php:561
+#: admin/CargonizerOptions.php:547
 msgid "If empty, select delivery company and update"
 msgstr ""
 
-#: admin/CargonizerOptions.php:568
+#: admin/CargonizerOptions.php:554
 msgid "Default product type"
 msgstr ""
 
-#: admin/CargonizerOptions.php:569
+#: admin/CargonizerOptions.php:555
 msgid "If empty, select product and update"
 msgstr ""
 
-#: admin/CargonizerOptions.php:577
+#: admin/CargonizerOptions.php:563
 msgid "Default product services"
 msgstr ""
 
-#: admin/CargonizerOptions.php:595
+#: admin/CargonizerOptions.php:581
 msgid "Height&nbsp;(cm)"
 msgstr ""
 
-#: admin/CargonizerOptions.php:601
+#: admin/CargonizerOptions.php:587
 msgid "Length&nbsp;(cm)"
 msgstr ""
 
-#: admin/CargonizerOptions.php:607
+#: admin/CargonizerOptions.php:593
 msgid "Width&nbsp;(cm)"
 msgstr ""
 
-#: admin/CargonizerOptions.php:613
+#: admin/CargonizerOptions.php:599
 msgid "Message to consignee"
 msgstr ""
 
-#: admin/CargonizerOptions.php:620
+#: admin/CargonizerOptions.php:606
 msgid "Reference prefix"
 msgstr ""
 
-#: admin/CargonizerOptions.php:623
+#: admin/CargonizerOptions.php:609
 msgid "Order"
 msgstr ""
 
-#: admin/CargonizerOptions.php:627
+#: admin/CargonizerOptions.php:613
 msgid "Estimate shipping costs?"
 msgstr ""
 
-#: admin/CargonizerOptions.php:634
+#: admin/CargonizerOptions.php:620
 msgid "Transfer automatically to carrier?"
 msgstr ""
 
-#: admin/CargonizerOptions.php:649 admin/CargonizerOptions.php:650
+#: admin/CargonizerOptions.php:635 admin/CargonizerOptions.php:636
 msgid "Default interval"
 msgstr ""
 
-#: admin/CargonizerOptions.php:657
+#: admin/CargonizerOptions.php:643
 msgid "Warning time"
 msgstr ""
 
-#: admin/CargonizerOptions.php:658
+#: admin/CargonizerOptions.php:644
 msgid "Default 1 day"
 msgstr ""
 
-#: admin/CargonizerOptions.php:665
+#: admin/CargonizerOptions.php:651
 msgid "Skip first shipping if order is placed after default interval"
 msgstr ""
 
-#: admin/CargonizerOptions.php:666
+#: admin/CargonizerOptions.php:652
 msgid "i.e. default interval is every 15th and order is placed on 20th"
 msgstr ""
 
-#: admin/CargonizerOptions.php:673
+#: admin/CargonizerOptions.php:659
 msgid "Skip interval after ..."
 msgstr ""
 
-#: admin/CargonizerOptions.php:674
+#: admin/CargonizerOptions.php:660
 msgid "must be higher than default interval"
 msgstr ""
 
-#: admin/CargonizerOptions.php:677
+#: admin/CargonizerOptions.php:663
 msgid "after"
 msgstr ""
 
-#: admin/CargonizerOptions.php:681
+#: admin/CargonizerOptions.php:667
 msgid "Count intervals (months) to skip"
 msgstr ""
 
-#: admin/CargonizerOptions.php:698
+#: admin/CargonizerOptions.php:684
 msgid "Subject"
 msgstr ""
 
-#: admin/CargonizerOptions.php:699
+#: admin/CargonizerOptions.php:685
 msgid "i.e. \"Order @order_id@ at @shop_name@ is sent"
 msgstr ""
 
-#: admin/CargonizerOptions.php:706
+#: admin/CargonizerOptions.php:692
 msgid "E-Mail notification to customer after export to Cargonizer"
 msgstr ""
 
-#: admin/CargonizerOptions.php:719
-#: include/controllers/ConsignmentController.php:163
+#: admin/CargonizerOptions.php:705
+#: include/controllers/ConsignmentController.php:168
 msgid "Name"
 msgstr ""
 
@@ -514,7 +555,7 @@ msgstr ""
 msgid "Actions"
 msgstr ""
 
-#: conf/conf.php:31 include/controllers/ConsignmentController.php:166
+#: conf/conf.php:31 include/controllers/ConsignmentController.php:171
 msgid "Status"
 msgstr ""
 
@@ -522,41 +563,41 @@ msgstr ""
 msgid "Last shipping date"
 msgstr ""
 
-#: frontend/ServicePartners.php:39
-msgid "stengt"
-msgstr ""
+#: frontend/ServicePartners.php:34
+msgid "closed"
+msgstr "stengt"
 
-#: frontend/ServicePartners.php:89
+#: frontend/ServicePartners.php:87
 msgid "Choose pick-up point"
 msgstr "Velg leveringssted"
 
-#: frontend/ServicePartners.php:94
+#: frontend/ServicePartners.php:92
 msgid "Show opening hours"
 msgstr "Vis åpningstider"
 
-#: include/Consignment.php:860
+#: include/Consignment.php:853
 #, php-format
 msgid "Consignment created: <a href=\"%s\">edit</a>"
 msgstr ""
 
-#: include/Consignment.php:1144
+#: include/Consignment.php:1136
 msgid "consignment"
 msgstr ""
 
-#: include/Consignment.php:1145
+#: include/Consignment.php:1137
 msgid "consignments"
 msgstr ""
 
-#: include/Consignment.php:1150
+#: include/Consignment.php:1142
 msgid "Add "
 msgstr ""
 
-#: include/ShopOrder.php:440
+#: include/ShopOrder.php:439
 #, php-format
 msgid "Cargonizer: Parcel %s"
 msgstr ""
 
-#: include/ShopOrder.php:451
+#: include/ShopOrder.php:450
 #, php-format
 msgid "Consignment id: %s"
 msgstr ""
@@ -566,19 +607,18 @@ msgstr ""
 msgid "%s %sth"
 msgstr ""
 
-#: include/controllers/ConsignmentController.php:162
+#: include/controllers/ConsignmentController.php:167
 msgid "Id"
 msgstr ""
 
-#: include/controllers/ConsignmentController.php:164
+#: include/controllers/ConsignmentController.php:169
 msgid "Count"
 msgstr ""
 
-#: include/controllers/ConsignmentController.php:165
+#: include/controllers/ConsignmentController.php:170
 msgid "Subscription"
 msgstr ""
 
-#, fuzzy
 #~| msgid "Midlertidig leveringsadresse"
 #~ msgid "Velg leveringssted"
 #~ msgstr "Mellombels leveringsadresse"

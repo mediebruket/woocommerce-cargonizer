@@ -46,3 +46,21 @@ if ( !function_exists('cleanDate') ){
     return str_replace('-', null, $date );
   }
 }
+
+
+function mbx($SimpleXMLElement, $path, $type='string' ){
+  $value = null;
+
+  if ( is_object( $SimpleXMLElement) ){
+    if ( $v = $SimpleXMLElement->xpath($path) ){
+      if ( $type == 'string' ){
+        $value = (string)$v[0];
+      }
+      else if ( $type == 'array' && is_array($v) ){
+        $value = $v;
+      }
+    }
+  }
+
+  return $value;
+}
