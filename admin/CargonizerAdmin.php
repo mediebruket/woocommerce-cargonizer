@@ -199,7 +199,7 @@ class CargonizerAdmin{
     if ( is_checkout() && get_option('cargonizer-use-service-partners') ){
       $plugin_path =  str_replace('admin/', null, plugin_dir_url(__FILE__) );
       $path = $plugin_path.'assets/';
-        
+
       //wp_deregister_script('jquery');
       wp_register_script( 'wcc-jquery', 'https://code.jquery.com/jquery-2.2.4.min.js', false, '2.2.5' );
       wp_enqueue_script('wcc-jquery');
@@ -214,9 +214,9 @@ class CargonizerAdmin{
 
       foreach ($styles as $s) {
         echo '<link rel="stylesheet" href="'.$path .'css/'.$s.'" type="text/css" />' . "\n";
-      }  
+      }
     }
-    
+
   }
 
 
@@ -274,7 +274,7 @@ class CargonizerAdmin{
       wp_enqueue_script( 'tableedit-js' );
 
     }
-    
+
   }
 
 
@@ -491,7 +491,7 @@ class CargonizerAdmin{
 
 
   public static function addCargonizerActions( $post ){
-    if ( is_object($post) && $post->post_type == 'consignment' ){
+    if ( is_object($post) &&  $post->post_type == 'consignment' ){
       $Consignment = new Consignment($post->ID);
       echo '<div class="wcc-meta-box-consignment">';
 

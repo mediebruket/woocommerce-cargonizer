@@ -159,7 +159,7 @@ class ShopOrder{
         'id' => 1,
         'parcel_amount'       => 1,
         'parcel_description'  => '',
-        'parcel_weight'       =>  $this->getTotalWeight(),
+        'parcel_weight'       => $this->getTotalWeight(),
         'parcel_height'       => get_option('cargonizer-parcel-height'),
         'parcel_length'       => get_option('cargonizer-parcel-length'),
         'parcel_width'        => get_option('cargonizer-parcel-width')
@@ -182,7 +182,12 @@ class ShopOrder{
       }
     }
 
-    if (  $weight ){
+
+    if ( $weight && get_option( 'woocommerce_weight_unit', 'kg' ) == 'g' ){
+      $weight /= 1000;
+    }
+
+    if ( $weight ){
       $weight = number_format($weight, 2, '.', ' ');
     }
 
@@ -206,12 +211,23 @@ class ShopOrder{
 
 
   function getCarrierId(){
-    return gi($this->Meta, 'parcel_carrier_id');
+    $carrier_id = gi($this->Meta, 'parcel_carrier_id');
+    if( !$carrier_id ){
+      $carrier_id = get_option( 'cargonizer-carrier-id' );
+    }
+
+    return $carrier_id;
   }
 
 
   function getCarrierProduct(){
-    return gi($this->Meta, 'parcel_carrier_product');
+    $carrier_product = gi($this->Meta, 'parcel_carrier_product');
+
+    if ( !$carrier_product ){
+      $carrier_product = get_option( 'cargonizer-default-carrier-product' );
+    }
+
+    return $carrier_product;
   }
 
 
@@ -373,7 +389,14 @@ class ShopOrder{
 
 
   function getParcelType(){
-    return gi($this->Meta, 'parcel_carrier_product_type');
+    $product_type = gi($this->Meta, 'parcel_carrier_product_type');
+
+    if (!$product_type){
+      $product_type = get_option( 'cargonizer-default-product-type' );
+    }
+
+
+    return $product_type;
     //_log($this->Printer);
   }
 
@@ -488,7 +511,7 @@ class ShopOrder{
 
 
   function isReady( $force = false ){
-    _log('ShopOrder::isReady()');
+    _log('ShopOrder::isReady('.$force.')');
     $is_ready = false;
     // if parcel is not exported / cargonized
     if ( !gi($this->Meta, 'is_cargonized') or $force ){
@@ -508,7 +531,7 @@ class ShopOrder{
 
       if ( $this->CarrierId && $this->CarrierProduct && $this->ParcelPackages ){
         // checkbox create_consignment is on
-        if ( gi($_POST, 'parcel_create_consignment_now') ){
+        if ( gi($_POST, 'parcel_create_consignment_now') or $force ){
           $is_ready = true;
         }
         else{

@@ -13,6 +13,27 @@ class ShopOrderController extends CargonizerCommonController{
     add_action( 'save_post', array($this, 'saveConsignmentSettgings'), 10, 1 );
     add_action( 'save_post', array($this, 'saveConsignment'), 20, 1 );
     add_action( 'init',  array($this, 'resetConsignment') , 10, 2 );
+    add_filter( 'bulk_actions-edit-shop_order',  array($this, 'filterBulkActions' ) );
+    add_action( 'init', array($this, 'bulkCreateConsigments' ) );
+  }
+
+
+  function bulkCreateConsigments(){
+    if ( _is($_REQUEST, 'action') == 'create_consignment' ){
+      if ( isset($_REQUEST['post']) && is_array($_REQUEST['post']) && !empty($_REQUEST['post']) ) {
+        foreach ($_REQUEST['post'] as $key => $order_id) {
+          $_REQUEST['post_ID'] = $order_id;
+          $this->saveConsignment($order_id, $force=true, $create=false);
+        }
+      }
+    }
+  }
+
+
+  function filterBulkActions($actions){
+    $actions['create_consignment'] = __('Create consignment', 'wc-cargonizer');
+
+    return $actions;
   }
 
 
@@ -25,7 +46,7 @@ class ShopOrderController extends CargonizerCommonController{
           update_post_meta( $post_id, $index, gi($_REQUEST, $index ) );
           _log('copied: '.$index);
         }
-      }   
+      }
     }
   }
 
@@ -66,13 +87,13 @@ class ShopOrderController extends CargonizerCommonController{
   }
 
 
-  function saveConsignment( $post_id ){
+  function saveConsignment( $post_id, $force=false, $create=true ){
     if ( !isset($_REQUEST['post_ID']) or $_REQUEST['post_ID'] != $post_id ){
       return false;
     }
 
-    if ( $Order = $this->isOrder( $return_object=true ) ){
-      _log('ShopOrderController::saveConsignment()');
+    if ( $Order = $this->isOrder( $post_id, $return_object=true ) ){
+      // _log('ShopOrderController::saveConsignment()');
       $consignment_post_id = null;
       $is_future = ($Order->hasFutureShippingDate()) ? true : false;
 
@@ -80,12 +101,14 @@ class ShopOrderController extends CargonizerCommonController{
         $consignment_post_id = Consignment::createOrUpdate( $Order, $recurring=false );
       }
 
-      if ( $Order->isReady($force=false) && !$is_future ){
+      if ( $Order->isReady($force) && !$is_future ){
         _log('... is ready');
         if ( $cid = Consignment::createOrUpdate( $Order, $recurring=false ) ){
           _log('consignment created/updated: '.$cid);
-          _log('create consignment now');
-          $result = ConsignmentController::createConsignment($cid);
+          if ( $create ){
+            _log('create consignment now');
+            $result = ConsignmentController::createConsignment($cid);
+          }
         }
       }
       else{

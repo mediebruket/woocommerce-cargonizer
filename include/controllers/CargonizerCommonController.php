@@ -47,8 +47,12 @@ class CargonizerCommonController{
   }
 
 
-  function isOrder( $object=true ){
-    global $post;
+  function isOrder( $post_id, $object=true ){
+    // global $post;
+    $post = new StdClass();
+    if ( is_numeric($post_id) ){
+      $post = get_post($post_id);
+    }
 
     if ( isset($post->post_type) && $post->post_type == 'shop_order' ){
       if ( $object ){

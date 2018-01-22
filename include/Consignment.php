@@ -1069,11 +1069,17 @@ class Consignment{
         $weight = $WC_P->get_weight();
 
         $volume = 0;
+
         if ( $width && $height && $length ){
           $volume = $width * $height * $length / 1000;
         }
 
         $parcel['volume'] += $volume * $qty;
+
+        if ( get_option('woocommerce_weight_unit') == 'g' ){
+          $weight_unit /= 1000;
+        }
+
         $parcel['weight'] += ($weight * $qty);
       }
 
