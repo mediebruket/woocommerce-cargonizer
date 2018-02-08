@@ -314,12 +314,12 @@ class CargonizerAdmin{
 
   public static function newCustomOrderColumn($columns){
     $new_columns = (is_array($columns)) ? $columns : array();
-    unset( $new_columns['order_actions'] );
+    unset( $new_columns['wc_actions'] );
 
     $new_columns['wcc_consignment_id'] = __('Consignment id');
     $new_columns['wcc_tracking_url'] = __('Tracking url');
 
-    $new_columns['order_actions'] = $columns['order_actions'];
+    $new_columns['wc_actions'] = $columns['wc_actions'];
     return $new_columns;
   }
 
