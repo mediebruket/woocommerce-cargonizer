@@ -302,12 +302,13 @@ class CargonizerOptions{
     if ( !$transport_agreements or $force_update ){
       _log('update transport agreements');
       $Api = new CargonizerApi(true);
-      $agreements = $Api->TransportAgreements->xpath('/transport-agreements/transport-agreement');
+      if ( is_object($Api) && isset($Api->TransportAgreements) ){
+        $agreements = $Api->TransportAgreements->xpath('/transport-agreements/transport-agreement');
 
-      if ( $ta = $this->extractTransportAgreements($agreements) ){
-        $this->saveTransportAgreements( $ta );
-
-        $transport_agreements = $ta;
+        if ( $ta = $this->extractTransportAgreements($agreements) ){
+          $this->saveTransportAgreements( $ta );
+          $transport_agreements = $ta;
+        }
       }
     }
 

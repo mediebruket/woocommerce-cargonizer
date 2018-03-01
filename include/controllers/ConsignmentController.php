@@ -61,7 +61,7 @@ class ConsignmentController extends CargonizerCommonController{
       $CargonizeXml = new CargonizeXml( $Consignment->prepareExport() );
       $CargonizerApi = new CargonizerApi();
       $result = null;
-      _log('post consignment');
+
       $result = $CargonizerApi->postConsignment($CargonizeXml->Xml);
       if ( $result ){
         // check if response is object

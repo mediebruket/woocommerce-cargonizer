@@ -102,7 +102,8 @@ class CargonizerApi{
         'Content-Type' =>  'application/xml'
       );
 
-    return $this->rest('consignments.xml', $headers, 'POST', $xml, $debug=false, $force_response=true );
+    _log($xml);
+    return $this->rest('consignments.xml', $headers, 'POST', $xml, $debug=true, $force_response=true );
   }
 
 
