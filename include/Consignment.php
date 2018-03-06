@@ -4,6 +4,7 @@ add_action( 'admin_init', array('Consignment', '_updateNextShippingDates'), 20 )
 add_action( 'pre_get_posts', array('Consignment', '_orderConsignmentsByShippingDate'), 20 );
 add_filter( 'woocommerce_package_rates' , array('Consignment', '_setShippingCosts'), 10, 2 );
 
+
 class Consignment{
   public $AutoTransfer;
   public $ID;
@@ -607,7 +608,7 @@ class Consignment{
 
   function prepareExport(){
     _log('Consignment::prepareExport()');
-    //_log($this->Meta);
+    _log($this->Meta);
     // _log('prepareExport');
     // _log($this->Items);
     // http://www.logistra.no/api-documentation/12-utviklerinformasjon/16-api-consignments.html
@@ -658,6 +659,30 @@ class Consignment{
     if ( !$export['consignments']['consignment']['parts']['consignee']['country'] ) {
       $export['consignments']['consignment']['parts']['consignee']['country'] = ( gi( $this->Meta, '_billing_country' ) ) ? gi( $this->Meta, '_billing_country' ) : 'NO';
     }
+
+    
+    if ( is_string($export['consignments']['consignment']['parts']['consignee']['country']) && strlen($export['consignments']['consignment']['parts']['consignee']['country']) > 2 ){
+      _log('fix country: '.$export['consignments']['consignment']['parts']['consignee']['country']);
+      if ( function_exists('WC') ){
+        $country = trim($export['consignments']['consignment']['parts']['consignee']['country']); 
+        $countries = apply_filters( 'woocommerce_countries', include WC()->plugin_path() . '/i18n/countries.php' );
+
+        foreach ($countries as $country_code => $country_name) {
+          if ( $country_name == $country ){
+            _log('country found: '.$country_name. "(".$country_code.")" );
+            $export['consignments']['consignment']['parts']['consignee']['country'] = $country_code;
+            break;
+          }
+        }
+      }  
+    }
+    else{
+      _log('country code is valid: ');
+      _log($export['consignments']['consignment']['parts']['consignee']['country']);
+    }
+
+    
+    
 
     if ( !$export['consignments']['consignment']['parts']['consignee']['postcode'] ){
       $export['consignments']['consignment']['parts']['consignee']['postcode'] = gi( $this->Meta, '_billing_postcode' );
