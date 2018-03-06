@@ -704,20 +704,15 @@ class CargonizerOptions{
       array(
         'name' => 'cargonizer-return-address-name',
         'label' => __('Name', 'wc-cargonizer' ),
+        'desc'    => __('Name of the consignor', 'wc-cargonizer'),
         'type' => 'text',
         'value' => get_option('cargonizer-return-address-name'),
       ),
 
       array(
-        'name' => 'cargonizer-return-address-country',
-        'label' => __('Country', 'wc-cargonizer' ),
-        'type' => 'text',
-        'value' => get_option('cargonizer-return-address-country'),
-      ),
-
-      array(
         'name' => 'cargonizer-return-address-postcode',
         'label' => __('Postcode', 'wc-cargonizer' ),
+        'desc'    => __('Postal code of the consignor', 'wc-cargonizer'),
         'type' => 'text',
         'value' => get_option('cargonizer-return-address-postcode'),
       ),
@@ -725,6 +720,7 @@ class CargonizerOptions{
       array(
         'name' => 'cargonizer-return-address-city',
         'label' => __('City', 'wc-cargonizer' ),
+        'desc'    => __('City/location of the consignor', 'wc-cargonizer'),
         'type' => 'text',
         'value' => get_option('cargonizer-return-address-city'),
       ),
@@ -732,8 +728,17 @@ class CargonizerOptions{
       array(
         'name' => 'cargonizer-return-address-address1',
         'label' => __('Address', 'wc-cargonizer' ),
+        'desc'    => __('Address/street of the consignor', 'wc-cargonizer'),
         'type' => 'text',
         'value' => get_option('cargonizer-return-address-address1'),
+      ),
+
+      array(
+        'name' => 'cargonizer-return-address-country',
+        'label' => __('Country', 'wc-cargonizer' ),
+        'desc'    => __('Must be a ISO 3166 Country Code, i.e. NO for Norway', 'wc-cargonizer'),
+        'type' => 'text',
+        'value' => get_option('cargonizer-return-address-country'),
       ),
 
     );
