@@ -2,7 +2,7 @@
 /*woo
 Plugin Name: Woocommerce Cargonizer
 Description:
-Version: 0.4.9
+Version: 0.5.0
 Author: Mediebruket AS
 Author URI: http://mediebruket.no
 */
