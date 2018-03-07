@@ -28,10 +28,9 @@ class ShopOrderController extends CargonizerCommonController{
 
 
   function bulkCreateConsigments( $redirect_to, $doaction, $post_ids ){
-    _log('ShopOrderController::bulkCreateConsigments()');
-    _log($doaction);
-    _log($post_ids);
-
+    // _log('ShopOrderController::bulkCreateConsigments()');
+    // _log($doaction);
+    // _log($post_ids);
     if ( $doaction !== 'create_consignment' ) {
       return $redirect_to;
     }
@@ -42,12 +41,10 @@ class ShopOrderController extends CargonizerCommonController{
         $this->saveConsignment($order_id, $force=true, $create=false);
       }
     }
-    else{
-      _log('no post ids checked');
-    }
-
+    // else{
+    //   _log('no post ids checked');
+    // }
     $redirect_to = add_query_arg( 'bulk_created_consignments', count( $post_ids ), $redirect_to );
-
 
     return $redirect_to;
   }
