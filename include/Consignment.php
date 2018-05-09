@@ -384,6 +384,7 @@ class Consignment{
       }
 
       // copy meta values
+      update_post_meta( $post_id, '_billing_company',     gi( $Order->Meta, '_billing_company' ) );
       update_post_meta( $post_id, '_billing_first_name',  gi( $Order->Meta, '_billing_first_name' ) );
       update_post_meta( $post_id, '_billing_last_name',   gi( $Order->Meta, '_billing_last_name' ) );
       update_post_meta( $post_id, '_billing_country',     gi( $Order->Meta, '_billing_country' ) );
@@ -391,6 +392,13 @@ class Consignment{
       update_post_meta( $post_id, '_billing_city',        gi( $Order->Meta, '_billing_city' ) );
       update_post_meta( $post_id, '_billing_address_1',   gi( $Order->Meta, '_billing_address_1' ) );
       update_post_meta( $post_id, '_billing_address_2',   gi( $Order->Meta, '_billing_address_2' ) );
+
+       // company name
+      $co_name = gi( $Order->Meta, '_shipping_company' );
+      if ( !trim($co_name) ){
+        $co_name = trim( gi($Order->Meta, '_billing_company') );
+      }
+      update_post_meta( $post_id, '_shipping_company', $co_name );
 
       // firstname
       $sfn = gi( $Order->Meta, '_shipping_first_name' );
@@ -643,8 +651,15 @@ class Consignment{
 
      // _log($address);
     // customer address
-    $export['consignments']['consignment']['parts']['consignee']['name']      = gi( $this->Meta, '_shipping_first_name' )." ".gi( $this->Meta,'_shipping_last_name' );
-    $export['consignments']['consignment']['parts']['consignee']['country']   = ( gi( $this->Meta, '_shipping_country' ) ) ? gi( $this->Meta, '_shipping_country' ) : 'NO';
+    // 
+    
+    $consignee_name =  gi( $this->Meta, '_shipping_first_name' )." ".gi( $this->Meta,'_shipping_last_name' );
+    if ( $company_name = trim( gi($this->Meta, '_shipping_company') ) ){
+      $consignee_name = $company_name; 
+    }
+
+    $export['consignments']['consignment']['parts']['consignee']['name']      = $consignee_name;
+    $export['consignments']['consignment']['parts']['consignee']['country']   = ( $country = gi( $this->Meta, '_shipping_country' ) ) ? $country : 'NO';
     $export['consignments']['consignment']['parts']['consignee']['postcode']  = gi( $this->Meta, '_shipping_postcode' );
     $export['consignments']['consignment']['parts']['consignee']['city']      = gi( $this->Meta, '_shipping_city' );
     $export['consignments']['consignment']['parts']['consignee']['address1']  = gi( $this->Meta, '_shipping_address_1' );
@@ -653,7 +668,12 @@ class Consignment{
 
     if ( ! trim($export['consignments']['consignment']['parts']['consignee']['name']) ){
       // customer address
-      $export['consignments']['consignment']['parts']['consignee']['name'] = gi( $this->Meta, '_billing_first_name' )." ".gi( $this->Meta,'_billing_last_name' );
+      $consignee_name = gi( $this->Meta, '_billing_first_name' )." ".gi( $this->Meta,'_billing_last_name' );
+      if ( $company_name = trim( gi($this->Meta, '_billing_company') ) ){
+        $consignee_name = $company_name; 
+      }
+
+      $export['consignments']['consignment']['parts']['consignee']['name'] = $consignee_name;
     }
 
     if ( !$export['consignments']['consignment']['parts']['consignee']['country'] ) {
@@ -757,7 +777,7 @@ class Consignment{
         $item_attributes['volume'] = $volume;
       }
       else{
-        $item_attributes['volume'] = $item_attributes['length']*$item_attributes['width']*$item_attributes['height']/1000;
+        $item_attributes['volume'] = floatval($item_attributes['length'])*floatval($item_attributes['width'])*floatval($item_attributes['height'])/1000;
       }
 
 
