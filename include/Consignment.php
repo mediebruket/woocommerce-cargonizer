@@ -810,6 +810,7 @@ class Consignment{
     $export['consignments']['consignment']['references']['consignor'] = get_option( 'cargonizer-parcel-ref-consignor' )." ".$this->OrderId;
     $export['consignments']['consignment']['references']['consignee'] = $this->CustomerId;
 
+    // _log($export);
     return $export;
   }
 
@@ -1087,12 +1088,13 @@ class Consignment{
 
 
   public static function _setShippingCosts($rates, $package){
-    //_log('Consignment::setShippingCosts()');
     // _log($rates);
     // _log($package);
+    // _log($_REQUEST['post_data']);
     $esc = get_option('cargonizer-estimate-shipping-costs');
-
     if ( $esc && isset($package['contents']) && !empty($package['contents']) ){
+      _log('Consignment::setShippingCosts()');
+
       $products = $package['contents'];
       // _log( 'has: ' .count($products). ' items' );
       $parcel = array(
@@ -1121,7 +1123,7 @@ class Consignment{
 
         $parcel['volume'] += $volume * $qty;
 
-        if ( get_option('woocommerce_weight_unit') == 'g' ){
+        if ( get_option('woocommerce_weight_unit', 'kg') == 'g' ){
           $weight_unit /= 1000;
         }
 
@@ -1132,7 +1134,7 @@ class Consignment{
       $Consignment = new Consignment( null );
 
       if ( isset($package['destination']) && !empty($package['destination']) ){
-        // _log('set destination');
+        // _log('set destination ....');
         $Consignment->setMeta( '_shipping_first_name', 'Ola' );
         $Consignment->setMeta( '_shipping_last_name', 'Nordmann' );
         $Consignment->setMeta( '_shipping_postcode', $package['destination']['postcode'] );
@@ -1140,6 +1142,18 @@ class Consignment{
         $Consignment->setMeta( '_shipping_city', $package['destination']['country'] );
         $Consignment->setMeta( '_shipping_address_1', $package['destination']['address'] );
         $Consignment->setMeta( '_shipping_address_2', $package['destination']['address_2'] );
+
+
+        if ( isset($_REQUEST['post_data']) && is_string($_REQUEST['post_data']) &&  strlen($_REQUEST['post_data']) ){
+          parse_str($_REQUEST['post_data'], $query_args);
+          // _log($query_args);
+          $Consignment->setMeta( 'service-partner-id', _is($query_args, 'wcc-service-partner-id') );
+          $Consignment->setMeta( 'service-partner-name', _is($query_args, 'wcc-service-partner-name') );
+          $Consignment->setMeta( 'service-partner-address', _is($query_args, 'wcc-service-partner-address') );
+          $Consignment->setMeta( 'service-partner-postcode', _is($query_args, 'wcc-service-partner-postcode') );
+          $Consignment->setMeta( 'service-partner-city', _is($query_args, 'wcc-service-partner-city') );
+          $Consignment->setMeta( 'service-partner-country', _is($query_args, 'wcc-service-partner-country') );
+        }
 
         $Consignment->CarrierProduct = get_option( 'cargonizer-default-carrier-product' );
         $Consignment->CarrierProductType = get_option( 'cargonizer-default-product-type' );
@@ -1169,7 +1183,8 @@ class Consignment{
             }
           }
 
-          // _log($rates);
+        // _log('$rates');
+        // _log($rates);
         }
       }
       else{
