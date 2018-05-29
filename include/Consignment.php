@@ -616,7 +616,7 @@ class Consignment{
 
   function prepareExport(){
     _log('Consignment::prepareExport()');
-    _log($this->Meta);
+    // _log($this->Meta);
     // _log('prepareExport');
     // _log($this->Items);
     // http://www.logistra.no/api-documentation/12-utviklerinformasjon/16-api-consignments.html
@@ -697,11 +697,9 @@ class Consignment{
       }  
     }
     else{
-      _log('country code is valid: ');
+      // _log('country code is valid: ');
       _log($export['consignments']['consignment']['parts']['consignee']['country']);
     }
-
-    
     
 
     if ( !$export['consignments']['consignment']['parts']['consignee']['postcode'] ){
@@ -1088,6 +1086,7 @@ class Consignment{
 
 
   public static function _setShippingCosts($rates, $package){
+    _log('Consignment::_setShippingCosts()');
     // _log($rates);
     // _log($package);
     // _log($_REQUEST['post_data']);
@@ -1143,16 +1142,33 @@ class Consignment{
         $Consignment->setMeta( '_shipping_address_1', $package['destination']['address'] );
         $Consignment->setMeta( '_shipping_address_2', $package['destination']['address_2'] );
 
-
         if ( isset($_REQUEST['post_data']) && is_string($_REQUEST['post_data']) &&  strlen($_REQUEST['post_data']) ){
           parse_str($_REQUEST['post_data'], $query_args);
-          // _log($query_args);
-          $Consignment->setMeta( 'service-partner-id', _is($query_args, 'wcc-service-partner-id') );
-          $Consignment->setMeta( 'service-partner-name', _is($query_args, 'wcc-service-partner-name') );
-          $Consignment->setMeta( 'service-partner-address', _is($query_args, 'wcc-service-partner-address') );
-          $Consignment->setMeta( 'service-partner-postcode', _is($query_args, 'wcc-service-partner-postcode') );
-          $Consignment->setMeta( 'service-partner-city', _is($query_args, 'wcc-service-partner-city') );
-          $Consignment->setMeta( 'service-partner-country', _is($query_args, 'wcc-service-partner-country') );
+          
+          if( isset($query_args['wcc-service-partner-id']) ){
+            _log('has service partner id');
+            $Consignment->setMeta( 'service-partner-id', $query_args['wcc-service-partner-id'] );  
+          }
+          
+          if( isset($query_args['wcc-service-partner-name'])  ){
+            $Consignment->setMeta( 'service-partner-name', $query_args['wcc-service-partner-name'] );
+          }
+
+          if( isset($query_args['wcc-service-partner-address']) ){
+            $Consignment->setMeta( 'service-partner-address', isset($query_args['wcc-service-partner-address']) );
+          }            
+          
+          if( isset($query_args['wcc-service-partner-postcode']) ){
+            $Consignment->setMeta( 'service-partner-postcode', $query_args['wcc-service-partner-postcode'] );
+          }
+
+          if( isset($query_args['wcc-service-partner-city']) ){
+            $Consignment->setMeta( 'service-partner-city', $query_args['wcc-service-partner-city'] );
+          }
+
+          if( isset($query_args['wcc-service-partner-country']) ){
+            $Consignment->setMeta( 'service-partner-country', $query_args['wcc-service-partner-country'] );
+          }
         }
 
         $Consignment->CarrierProduct = get_option( 'cargonizer-default-carrier-product' );
