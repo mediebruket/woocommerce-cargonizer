@@ -18,14 +18,14 @@ class CargonizerApi{
       // _log('sandbox');
       $this->Key    = get_option('cargonizer-sandbox-api-key' );
       $this->Sender = get_option('cargonizer-sandbox-api-sender' );
-      $this->Domain = 'http://sandbox.cargonizer.no/';
+      $this->Domain = 'https://sandbox.cargonizer.no/';
       //_log($this);
     }
     else{
       // _log('prod');
       $this->Key    = get_option('cargonizer-api-key' );
       $this->Sender = get_option('cargonizer-api-sender' );
-      $this->Domain = 'http://cargonizer.no/';
+      $this->Domain = 'https://cargonizer.no/';
       //_log($this);
     }
 
