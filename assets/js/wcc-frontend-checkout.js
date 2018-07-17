@@ -1,9 +1,28 @@
+/*
+  * only in use if the shop uses postnord and service partners/ delivery locations
+ */
+
 $(document).ready(function(){
   wcc_start_app();
   wcc_init_post_codes();
   wcc_init_different_addresses();
 });
 
+
+/*
+  * This vue application is active on the checkout page.
+  * It shows a list of available service partners on the checkout page,
+  * if the cusomer enters the delivery postcode and country.
+
+  * The application differs between delivery and shipping address,
+  * if the checkout page follows woocommerce conventions ( #ship-to-different-address-checkbox ).
+  *
+  * The php class ServicePartners adds hidden fields
+  * to save the details of the selected service partner ( ServicePartners::addVueApp() ).
+  *
+  * The details of the service partner will be saved after the order is submitted
+  * ShopOrderController::saveServicePartner()
+ */
 
 function wcc_start_app(){
   result = null;

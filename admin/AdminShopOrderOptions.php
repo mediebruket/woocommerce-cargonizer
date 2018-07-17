@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * class AdminShopOptions
+ * contains all meta fields for class AdminShopOrder
+ *
+ **/
+
 class AdminShopOptions{
   public $CargonizerOptions;
   public $Id;

@@ -10,10 +10,22 @@ add_action( 'manage_posts_extra_tablenav', array('CargonizerAdmin', '_addBatchBu
 add_action( 'post_submitbox_misc_actions', array('CargonizerAdmin', 'addCargonizerActions') );
 add_action( 'admin_notices', array('CargonizerAdmin', 'showAdminNotice' ) );
 
+/**
+ * class CargonizerAdmin
+ * - handles the following default settings to connect woocommerce with logistra cargonizer
+ *   - api
+ *   - carrier
+ *   - parcel
+ *   - notification
+ *   - recurring
+ *   - address
+ *   - licence
+ *
+ * - registeres assets (javascript & stylesheets)
+ **/
 
 class CargonizerAdmin{
   public $Options;
-
 
   function __construct(){
     add_action( 'admin_menu', array($this, 'createSubmenu' ) );
@@ -56,6 +68,10 @@ class CargonizerAdmin{
   }
 
 
+  /**
+   * shows the admin page under admin => woocommerce => cargonizer
+   * calls subpages by the following convention: [setting]Page, i.e. apiPage, parcelPage
+   **/
   function adminPage() {
     global $woocommerce;
     $this->Options = new CargonizerOptions();
@@ -64,18 +80,18 @@ class CargonizerAdmin{
     ?>
     <div class="wrap woocommerce">
       <div class="icon32" id="icon-woocommerce-importer"><br></div>
-      <h2 class="nav-tab-wrapper woo-nav-tab-wrapper">
-      <?php foreach ($this->getTabs() as $key => $text) {
+      <h2 class="nav-tab-wrapper woo-nav-tab-wrapper"><?php foreach ($this->getTabs() as $key => $text) {
         printf('<a href="%s" class="nav-tab %s">%s</a>', admin_url('admin.php?page='.WCC_Admin.'&tab='.$key) , (($tab == $key) ? 'nav-tab-active' : null), $text );
-      }
-      ?>
-      </h2>
+      } ?></h2>
       <?php self::$tab(); ?>
     </div>
     <?php
   }
 
-
+  /**
+   * subpage of CargonizerAdmin::adminPage()
+   *
+   **/
   function apiPage(){
     if ( isset($_POST['update']) ){
       $this->Options->updateOptions('Api');
@@ -86,6 +102,10 @@ class CargonizerAdmin{
   }
 
 
+  /**
+   * subpage of CargonizerAdmin::adminPage()
+   *
+   **/
   function generalPage(){
     if ( isset($_POST['update']) ){
       $this->Options->updateOptions('General');
@@ -104,6 +124,10 @@ class CargonizerAdmin{
   }
 
 
+  /**
+   * subpage of CargonizerAdmin::adminPage()
+   *
+   **/
   function parcelPage(){
     if ( isset($_POST['update']) ){
       $this->Options->updateOptions('Parcel');
@@ -114,6 +138,10 @@ class CargonizerAdmin{
   }
 
 
+  /**
+   * subpage of CargonizerAdmin::adminPage()
+   *
+   **/
   function recurringPage(){
     if ( isset($_POST['update']) ){
       $this->Options->updateOptions('Recurring');
@@ -124,6 +152,10 @@ class CargonizerAdmin{
   }
 
 
+  /**
+   * subpage of CargonizerAdmin::adminPage()
+   *
+   **/
   function addressPage(){
     if ( isset($_POST['update']) ){
       $this->Options->updateOptions( 'Address' );
@@ -134,6 +166,10 @@ class CargonizerAdmin{
   }
 
 
+  /**
+   * subpage of CargonizerAdmin::adminPage()
+   *
+   **/
   function notificationPage(){
     if ( isset($_POST['update']) ){
       $this->Options->updateOptions( 'Notification' );
@@ -150,7 +186,10 @@ class CargonizerAdmin{
     <?php
   }
 
-
+  /**
+   * subpage of CargonizerAdmin::adminPage()
+   *
+   **/
   function licencePage(){
     if ( isset($_POST['update']) ){
       $this->Options->updateOptions( 'Licence' );
@@ -195,6 +234,10 @@ class CargonizerAdmin{
     <?php
   }
 
+  /**
+   * only in use if the shop uses postnord as carrier
+   *
+   **/
   function registerFrontendScripts(){
     if ( is_checkout() && get_option('cargonizer-use-service-partners') ){
       $plugin_path =  str_replace('admin/', null, plugin_dir_url(__FILE__) );
@@ -278,6 +321,10 @@ class CargonizerAdmin{
   }
 
 
+  /**
+   * adds the transport agreements as javascript variables to the source code
+   *
+   **/
   function addTransportAgreements(){
     // _log('addTransportAgreements');
     $this->Options = new CargonizerOptions();
@@ -312,6 +359,11 @@ class CargonizerAdmin{
   }
 
 
+  /**
+   * adds new columns to the order overview in the wp admin area
+   *
+   * @columns array
+   **/
   public static function newCustomOrderColumn($columns){
     $new_columns = (is_array($columns)) ? $columns : array();
     unset( $new_columns['wc_actions'] );
@@ -324,6 +376,11 @@ class CargonizerAdmin{
   }
 
 
+  /**
+   * fills the custom order columns ( CargonizerAdmin::newCustomerOrderColumn ) with values
+   *
+   * @column array
+   **/
   public static function setCustomOrderColumnValue($column){
     global $post;
     $data = get_post_meta( $post->ID );
@@ -343,6 +400,11 @@ class CargonizerAdmin{
   }
 
 
+  /**
+   * shows a reset link to clear all consignment details
+   *
+   * @Order object
+   **/
   public static function showResetLink( $Order ){
     if( method_exists($Order, 'get_id') ){ // woocommerce 3.x
       if ( is_object($Order) && get_post_meta( $Order->get_id(), 'is_cargonized', true ) ){
@@ -363,12 +425,22 @@ class CargonizerAdmin{
   }
 
 
+  /**
+   * makes column consignment-next-shipping-date sortable
+   *
+   * @columns array
+   **/
   public static function _registerSortableColumns( $columns ) {
     $columns['consignment-next-shipping-date'] = 'consignment-next-shipping-date';
     return $columns;
   }
 
 
+  /**
+   * wordpress filter to add custom columns
+   *
+   * @columns array
+   **/
   public static function _registerEditColumns($columns) {
     unset($columns['tags']);
     unset($columns['date']);
@@ -376,6 +448,12 @@ class CargonizerAdmin{
   }
 
 
+  /**
+   * wordpress action to  fill custom columns with values
+   *
+   * @column string
+   * @post_id int
+   **/
   public static function _fillCustomColumns( $column, $post_id ) {
     if ( self::isCustomConsignmentColumn($column) ){
       $Consignment = new Consignment ( $post_id );
@@ -490,6 +568,13 @@ class CargonizerAdmin{
   }
 
 
+  /**
+   * adds cargonizer quick links
+   *  - create consignment
+   *  - print consignment
+   *
+   * @post object
+   **/
   public static function addCargonizerActions( $post ){
     if ( is_object($post) &&  $post->post_type == 'consignment' ){
       $Consignment = new Consignment($post->ID);
@@ -509,6 +594,13 @@ class CargonizerAdmin{
   }
 
 
+  /**
+   * checks if a consigment has to be send
+   *  - only for recurring consignments
+   *
+   * @next_shipping_date  string
+   * @checkdate           string
+   **/
   public static function isInTime( $next_shipping_date, $check_date ){
     $warning_time = get_option( 'cargonizer-recurring-consignments-warning-time', '1' );
     $wtd = 0;
@@ -540,6 +632,11 @@ class CargonizerAdmin{
   }
 
 
+  /**
+   * checks if a column is bulk or custom
+   *
+   * @column string
+   **/
   public static function isCustomConsignmentColumn($column){
     $custom_columns = CargonizerConfig::getConfig('consignment');
 
@@ -552,6 +649,10 @@ class CargonizerAdmin{
   }
 
 
+  /**
+   * adds a batch button to the consignment overview
+   * to create multiple new consignments with one click
+   **/
   public static function _addBatchButton( $x=null ){
     if ( gi($_GET, 'post_type') == 'consignment' ){
       echo '<div class="alignleft actions"><a href="#" id="ajax-create-consignments" class="button">'.CargonizerIcons::consignment().' '. __('Create new consignment', 'wc-cargonizer'). '</a></div>';

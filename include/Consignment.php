@@ -1,4 +1,9 @@
 <?php
+/**
+ * the consignment class
+ *
+ **/
+
 add_action( 'init', array('Consignment', '_registerPostType'), 10 );
 add_action( 'admin_init', array('Consignment', '_updateNextShippingDates'), 20 ); // OBS check next shipping date first
 add_action( 'pre_get_posts', array('Consignment', '_orderConsignmentsByShippingDate'), 20 );
@@ -318,7 +323,15 @@ class Consignment{
     return get_post_meta( $this->Id, 'consignment_product_type', true );
   }
 
-
+  /**
+   * creates or updates a consignment
+   * - returns the post id of the consignment
+   *
+   * usage: Consignment::createOrUpdate( $Order, $recurring=false )
+   *
+   * @Order object ( class ShopOrder )
+   * @recurring bool
+   **/
   public static function createOrUpdate( $Order, $recurring=false ){
     _log('Consignment::createOrUpdate('.$Order->ID.')');
     _log('recurring: '.$recurring);
@@ -477,6 +490,11 @@ class Consignment{
   }
 
 
+  /**
+   * returns all parcles related to a consignment
+   * - only for recurring consignments
+   *
+  **/
   function getHistory(){
     // _log('Consignment::getHistory()');
     $history = array();
@@ -494,6 +512,14 @@ class Consignment{
   }
 
 
+  /**
+   * checks is there is any warning which is related to a recurring consignment.
+   * conditions:
+   *   - is recurring
+   *   - has subcriptions products
+   *   - if subscription product is active
+   *
+  **/
   function hasSubscriptionWarning(){
     // _log('Consignment::hasSubscriptionWarning()');
     $warning = false;
@@ -529,6 +555,11 @@ class Consignment{
   }
 
 
+  /**
+   * checks if the subscription product is active
+   *
+   * @product_id int
+   **/
   function isSubscriptionProductActive( $product_id ){
     _log('Consignment::isSubscriptionProductActive('.$product_id.')');
     $is_active = true;
@@ -548,6 +579,11 @@ class Consignment{
   }
 
 
+  /**
+   * get all subscriptions by order id
+   *
+   * @order_id int
+   **/
   function getSubscriptionsByOrderId( $order_id =null ){
     if ( !$order_id ){
       $order_id = $this->OrderId;
@@ -560,6 +596,11 @@ class Consignment{
   }
 
 
+  /**
+   * checks if product is a subscription product
+   *
+   * @product_id int
+   **/
   function isSubscriptionProduct( $product_id ){
     if ( is_numeric(array_search($product_id, $this->SubscriptionProducts)) ){
       return true;
@@ -570,6 +611,10 @@ class Consignment{
   }
 
 
+  /**
+   * gets the product ids of all subscription products
+   *
+   **/
   function getSubscriptionProducts(){
     $product_ids = array();
 
@@ -585,6 +630,12 @@ class Consignment{
   }
 
 
+  /**
+   * updates the history of a consignment
+   *  - only for recurring consignments
+   *
+   * @consignment array
+   **/
   function updateHistory( $consignment ){
     _log('Consignment::updateHistory()');
     // _log($consignment);
@@ -614,6 +665,11 @@ class Consignment{
   }
 
 
+  /**
+   * prepares the values of a consignment for the export
+   * return value $export is needed for class CargonizeXml
+   *
+  **/
   function prepareExport(){
     _log('Consignment::prepareExport()');
     // _log($this->Meta);
@@ -651,11 +707,11 @@ class Consignment{
 
      // _log($address);
     // customer address
-    // 
-    
+    //
+
     $consignee_name =  gi( $this->Meta, '_shipping_first_name' )." ".gi( $this->Meta,'_shipping_last_name' );
     if ( $company_name = trim( gi($this->Meta, '_shipping_company') ) ){
-      $consignee_name = $company_name; 
+      $consignee_name = $company_name;
     }
 
     $export['consignments']['consignment']['parts']['consignee']['name']      = $consignee_name;
@@ -670,7 +726,7 @@ class Consignment{
       // customer address
       $consignee_name = gi( $this->Meta, '_billing_first_name' )." ".gi( $this->Meta,'_billing_last_name' );
       if ( $company_name = trim( gi($this->Meta, '_billing_company') ) ){
-        $consignee_name = $company_name; 
+        $consignee_name = $company_name;
       }
 
       $export['consignments']['consignment']['parts']['consignee']['name'] = $consignee_name;
@@ -680,11 +736,11 @@ class Consignment{
       $export['consignments']['consignment']['parts']['consignee']['country'] = ( gi( $this->Meta, '_billing_country' ) ) ? gi( $this->Meta, '_billing_country' ) : 'NO';
     }
 
-    
+
     if ( is_string($export['consignments']['consignment']['parts']['consignee']['country']) && strlen($export['consignments']['consignment']['parts']['consignee']['country']) > 2 ){
       _log('fix country: '.$export['consignments']['consignment']['parts']['consignee']['country']);
       if ( function_exists('WC') ){
-        $country = trim($export['consignments']['consignment']['parts']['consignee']['country']); 
+        $country = trim($export['consignments']['consignment']['parts']['consignee']['country']);
         $countries = apply_filters( 'woocommerce_countries', include WC()->plugin_path() . '/i18n/countries.php' );
 
         foreach ($countries as $country_code => $country_name) {
@@ -694,13 +750,13 @@ class Consignment{
             break;
           }
         }
-      }  
+      }
     }
     else{
       // _log('country code is valid: ');
       _log($export['consignments']['consignment']['parts']['consignee']['country']);
     }
-    
+
 
     if ( !$export['consignments']['consignment']['parts']['consignee']['postcode'] ){
       $export['consignments']['consignment']['parts']['consignee']['postcode'] = gi( $this->Meta, '_billing_postcode' );
@@ -813,11 +869,20 @@ class Consignment{
   }
 
 
+  /**
+   * placeholder which can be used i confirmation mails
+   *
+  **/
   public static function getPlaceholders(){
     return array( '@order_id@', '@shop_name@', '@parcel_tracking_url@', '@parcel_tracking_link@', '@parcel_tracking_code@', '@parcel_date@', '@service_partner@' );
   }
 
 
+  /**
+   * sends a notification to the customer
+   *
+   * @var string
+   **/
   function notifyCustomer( $history_entry ){
     _log('Consignment::notifyCustomer()');
     // update meta fields
@@ -886,6 +951,12 @@ class Consignment{
   }
 
 
+  /**
+   * adds a note to the woocommerce order
+   *
+   * @order_id        int
+   * @consignment_id  int
+   **/
   public static function addNote( $order_id, $consignment_id ){
     _log('Consignment::addNote('.$order_id.')');
     _log( $consignment_id );
@@ -915,6 +986,12 @@ class Consignment{
   }
 
 
+  /**
+   * gets the consignment id by the order id
+   *
+   * @order_id    int
+   * @recurring   bool
+   **/
   public static function getConsignmentIdByOrderId( $order_id, $recurring=false ){
     _log('Consignment::getConsignmentIdByOrderId('.$order_id.')');
     global $wpdb;
@@ -928,6 +1005,10 @@ class Consignment{
   }
 
 
+  /**
+   * gets all recurring consignments from wp_posts
+   *
+   **/
   public static function getAllRecurringConsignments(){
     global $wpdb;
     $sql =  "SELECT p.ID FROM  %s p, %s pm WHERE p.ID = pm.post_id AND p.post_type = 'consignment' AND pm.meta_key = 'consignment_is_recurring' and pm.meta_value = '1'";
@@ -937,6 +1018,11 @@ class Consignment{
   }
 
 
+  /**
+   * updates the next shipping date
+   *  - only for recurring consignments
+   *
+  **/
   public static function _updateNextShippingDates(){
 
     if ( !is_admin() or !isset($_GET['post_type']) or $_GET['post_type'] && $_GET['post_type']!='consignment' ){
@@ -988,6 +1074,11 @@ class Consignment{
   }
 
 
+  /**
+   * sets the next shipping date
+   *  - only for recurring consignments
+   *
+  **/
   function setNextShippingDate( $auto_inc=false ){
     _log('Consignment::setNextShippingDate()');
     _log($auto_inc);
@@ -1025,6 +1116,11 @@ class Consignment{
   }
 
 
+  /**
+   * calculates the next shipping date
+   *  - only for recurring consignments
+   *
+  **/
   public static function calcNextShippingDate( $interval, $auto_inc=false ){
     if ( is_numeric($interval) && $interval > 0 ){
       $month = date('m');
@@ -1049,11 +1145,21 @@ class Consignment{
   }
 
 
+  /**
+   * updates the next shipping date if first next shipping date must be skipped
+   * - special function for valthene.no.
+   *
+  **/
   public static function calcSkippedShipppingDate( $date, $interval ){
     return date("Y-m-d", strtotime("+".$interval." month", strtotime($date) ) );
   }
 
 
+  /**
+   * orders the consignments by shipping date
+   *
+   * @query   object
+  **/
   public static function _orderConsignmentsByShippingDate( $query ){
     if ( gi($_GET, 'post_type') == 'consignment' && gi($_GET, 'orderby') == 'consignment-next-shipping-date'){
       $order = 'desc';
@@ -1070,6 +1176,12 @@ class Consignment{
   }
 
 
+  /**
+   * returns a json object of a consignment
+   *
+   * @post_id   int
+   * @echo      bool
+   **/
   public static function getJsonObject( $post_id, $echo = true ){
 
     $Consignment = new Consignment($post_id);
@@ -1085,6 +1197,12 @@ class Consignment{
   }
 
 
+  /**
+   * woocommerce filter to set/manipulate the sipping costs
+   *
+   * @rates     array
+   * @package   array
+   **/
   public static function _setShippingCosts($rates, $package){
     _log('Consignment::_setShippingCosts()');
     // _log($rates);
@@ -1104,6 +1222,7 @@ class Consignment{
           'volume' => 0
         );
 
+      // calculates the package dimensions
       foreach ($products as $key => $p) {
         $qty = $p['quantity'];
         // _log('$qty: '.$qty);
@@ -1133,7 +1252,7 @@ class Consignment{
       $Consignment = new Consignment( null );
 
       if ( isset($package['destination']) && !empty($package['destination']) ){
-        // _log('set destination ....');
+        // dummy customer because the cargonizer api requires first and last name
         $Consignment->setMeta( '_shipping_first_name', 'Ola' );
         $Consignment->setMeta( '_shipping_last_name', 'Nordmann' );
         $Consignment->setMeta( '_shipping_postcode', $package['destination']['postcode'] );
@@ -1144,20 +1263,20 @@ class Consignment{
 
         if ( isset($_REQUEST['post_data']) && is_string($_REQUEST['post_data']) &&  strlen($_REQUEST['post_data']) ){
           parse_str($_REQUEST['post_data'], $query_args);
-          
+
           if( isset($query_args['wcc-service-partner-id']) ){
             _log('has service partner id');
-            $Consignment->setMeta( 'service-partner-id', $query_args['wcc-service-partner-id'] );  
+            $Consignment->setMeta( 'service-partner-id', $query_args['wcc-service-partner-id'] );
           }
-          
+
           if( isset($query_args['wcc-service-partner-name'])  ){
             $Consignment->setMeta( 'service-partner-name', $query_args['wcc-service-partner-name'] );
           }
 
           if( isset($query_args['wcc-service-partner-address']) ){
             $Consignment->setMeta( 'service-partner-address', isset($query_args['wcc-service-partner-address']) );
-          }            
-          
+          }
+
           if( isset($query_args['wcc-service-partner-postcode']) ){
             $Consignment->setMeta( 'service-partner-postcode', $query_args['wcc-service-partner-postcode'] );
           }

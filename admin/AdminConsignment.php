@@ -1,5 +1,11 @@
 <?php
 
+/**
+ class AdminConsignment
+ - extends class AdminConsignmentOptions
+ - adds metaboxes to custom post type consignment
+**/
+
 class AdminConsignment extends AdminConsignmentOptions{
 
   function __construct(){
@@ -18,7 +24,6 @@ class AdminConsignment extends AdminConsignmentOptions{
       'high'
     );
   }
-
 
 
   function makeOrderMetaBox( $meta_id ) {

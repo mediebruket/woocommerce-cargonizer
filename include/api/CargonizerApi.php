@@ -12,7 +12,14 @@ class CargonizerApi{
 
   public $TransportAgreements;
 
-  function __construct($set_transport_agreements=false){
+  /**
+   * initializes the cargonizer client
+   * depending on the wc cargonizer settings,
+   * the class uses the live or the sandbox modus
+   *
+   * @consignment_id bool
+   **/
+  function __construct($consignment_id int=false){
 
     if ( get_option( 'cargonizer-sandbox-modus' ) ){
       // _log('sandbox');
@@ -35,6 +42,9 @@ class CargonizerApi{
   }
 
 
+  /**
+    * gets all transport agreements by sender id
+  **/
   function getTransportAgreements(){
     // curl -g -XGET -H'X-Cargonizer-Key: b38515a578db604ba77f063801155add075a56e4' -H'X-Cargonizer-Sender: 1142' 'http://sandbox.cargonizer.no/transport_agreements.xml'
     //_log('CargonizerApi::getTransportAgreements');
@@ -43,6 +53,9 @@ class CargonizerApi{
   }
 
 
+  /**
+    * gets all printers by sender id
+  **/
   function getPrinters(){
     // curl -g -XGET -H'X-Cargonizer-Key: b38515a578db604ba77f063801155add075a56e4' -H'X-Cargonizer-Sender: 1142' 'http://sandbox.cargonizer.no/transport_agreements.xml'
     //_log('CargonizerApi::getPrinters()');
@@ -50,6 +63,14 @@ class CargonizerApi{
   }
 
 
+  /**
+    * gets all service partners by country, postcode and carrier
+    * service partner = delivery location (leveringssted. i.e. Coop Mega, Joker Naustdal )
+    *
+    * @postcode int
+    * @country string
+    * @carrier string
+  **/
   function getServicePartners( $postcode, $country, $carrier ){
     //curl -g -XGET -H'X-Cargonizer-Key: 12345' 'http://cargonizer.no/service_partners.xml?country=NO&postcode=1337&carrier=postnord'
     $args =
@@ -68,6 +89,12 @@ class CargonizerApi{
   }
 
 
+  /**
+   * prints the post label for a specific for a specific consignment
+   *
+   * @consignment_id int
+   * @printer_id int
+   **/
   function postLabel( $consignment_id, $printer_id ){
     _log('CargonizerApi::postLabel('.$consignment_id.' '.$printer_id.')');
     // curl -g -XPOST -H'X-Cargonizer-Key: 12345' -H'X-Cargonizer-Sender: 678' 'http://cargonizer.no/consignments/label_direct?printer_id=123&consignment_ids[]=1&consignment_ids[]=2&piece_ids[]=3&piece_ids[]=4'
@@ -92,7 +119,11 @@ class CargonizerApi{
     }
   }
 
-
+  /**
+   * posts request a consignment to the cargonizer api
+   *
+   * @xml string
+   **/
   function postConsignment($xml){
     // curl -g -XGET -H'X-Cargonizer-Key: b38515a578db604ba77f063801155add075a56e4' -H'X-Cargonizer-Sender: 1142' 'http://sandbox.cargonizer.no/transport_agreements.xml'
     _log('CargonizerApi::postConsignment()');
@@ -122,6 +153,11 @@ class CargonizerApi{
   // }
 
 
+  /**
+   * estimates the costs of a parcel
+   *
+   * @xml string
+   **/
   function estimateCosts( $xml ){
     // curl -g -XPOST -d@consignment.xml -H'X-Cargonizer-Key: 12345' -H'X-Cargonizer-Sender: 678' 'http://cargonizer.no/consignment_costs.xml'
     _log('CargonizerApi::estimateCosts()');
@@ -155,6 +191,16 @@ class CargonizerApi{
   }
 
 
+  /**
+   * starts the rest request
+   *
+   * @resource        string
+   * @headers         array
+   * @method          GET/POST
+   * @xml             string
+   * @debug           bool
+   * @force_response  bool
+   **/
   function rest( $resource, $headers=array(), $method='GET', $xml=null, $debug=false, $force_response = false ){
     $default_headers =
       array(

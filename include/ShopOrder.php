@@ -1,4 +1,8 @@
 <?php
+/**
+ * class ShopOrder to handle the custom post type "shop_order" (registered by woocommerce)
+ *
+ **/
 
 class ShopOrder{
   public $AutoTransfer;
@@ -25,6 +29,11 @@ class ShopOrder{
   public $WC_Order;
 
 
+  /**
+   * constructor
+   *
+   * @post_id int(order id)
+   **/
   function __construct($post_id){
     // _log("ShopOrder::__construct");
 
@@ -82,6 +91,10 @@ class ShopOrder{
   } // construct
 
 
+  /**
+   * get all products which are related to the order
+   *
+   **/
   function getProducts(){
     $products = array();
 
@@ -167,6 +180,10 @@ class ShopOrder{
   }
 
 
+  /**
+   * calculate the total weight of the order
+   *
+  **/
   function getTotalWeight(){
     $weight = null;
     $order_items = $this->WC_Order->get_items();
@@ -452,6 +469,11 @@ class ShopOrder{
   }
 
 
+  /**
+   * adds a note to the order
+   *
+   * @type string
+   **/
   function addNote( $type = 'exported' ){
     _log('Cargonizer::addNote('.$this->ID.')');
 
@@ -483,6 +505,10 @@ class ShopOrder{
   }
 
 
+  /**
+   * resets all cargonizer settings and consignment details
+   *
+  **/
   function reset(){
     _log('ShopOrder::reset('.$this->ID.')');
     $rf =
@@ -510,6 +536,17 @@ class ShopOrder{
   }
 
 
+  /**
+   * checks if a order is ready to cargonize
+   * conditions:
+   *  - is already carognized?
+   *  - has carrier id?
+   *  - has carrier product?
+   *  - has items/collis ?
+   *  - is checkbox "send consignment now" set?
+   *
+   * @force bool
+   **/
   function isReady( $force = false ){
     _log('ShopOrder::isReady('.$force.')');
     $is_ready = false;
@@ -553,6 +590,11 @@ class ShopOrder{
   }
 
 
+  /**
+   * saves the details of a consignments
+   *
+   * @consignment array
+   **/
   function saveConsignmentDetails( $consignment ){
     _log('ShopOrder::saveConsignmentDetails');
     // _log($consignment);

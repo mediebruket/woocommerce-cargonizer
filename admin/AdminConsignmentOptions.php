@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * class AdminConsignmentOptions
+ * contains all meta fields for class AdminConsignment
+ *
+ **/
 class AdminConsignmentOptions{
   public $CargonizerOptions;
   public $Id;

@@ -9,6 +9,9 @@ jQuery(document).ready(
 );
 
 
+/*
+  * checks all consignments which have to be send with one click
+*/
 function initCheckDueConsignments(){
   jQuery('#js-check-consignments').click(function(){
     var elements = jQuery(".consignment-status div.alert-warning").parents('.type-consignment').find('.check-column input');
@@ -17,7 +20,10 @@ function initCheckDueConsignments(){
 }
 
 
-// creates multiple consignments
+/*
+  * listener for #ajax-create-consignments
+  * to create mulitiple new consignments with one click
+*/
 function initAjaxCreateConsignments(){
   jQuery("#ajax-create-consignments").click(function(e){
     e.preventDefault();
@@ -34,7 +40,10 @@ function initAjaxCreateConsignments(){
 }
 
 
-// creates a consignment on click
+/*
+  * listener for .ajax-create-consignment and ajax-main-create-consignment
+  * to create a new consignment
+*/
 function initAjaxCreateConsignment(){
   jQuery('.ajax-create-consignment').click(
     function(e){
@@ -90,7 +99,9 @@ function initAjaxCreateConsignment(){
 
 
 
-// creates the consignment
+/*
+  * starts ajax request to create a new consignment
+*/
 function createConsignments( posts, index ){
   _log('createConsignments');
 
@@ -139,6 +150,10 @@ function createConsignments( posts, index ){
 }
 
 
+/*
+  * listener to print the last consignment one more time 
+  * without creating a new consignment
+ */
 function initAjaxPrintLatestConsignment(){
   jQuery('.ajax-print-consignment').click(function(e){
     e.preventDefault();
@@ -223,7 +238,9 @@ function initAjaxPrintLatestConsignment(){
 
 
 
-
+/*
+  * starts process to print the label of a consignment
+*/
 function initPrintBtn(){
   if ( jQuery('#acf-field_56cee621c7cd1').length ){
     var consignment_id = jQuery('#acf-field_56cee621c7cd1').val();
@@ -241,6 +258,9 @@ function initPrintBtn(){
 }
 
 
+/*
+  * starts ajax request to print the label of a consignment
+*/
 function printOrder(){
   var post_id = jQuery('#post_ID').val();
   if ( post_id.length ){

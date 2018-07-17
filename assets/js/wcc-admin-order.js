@@ -9,6 +9,9 @@ jQuery(document).ready(function(){
   initShopOrderIsRecurring();
 });
 
+/*
+  * listener if order has recurring consignment
+*/
 function initShopOrderIsRecurring(){
   toggleRecurringFields();
   jQuery("#is_recurring").change( function(){
@@ -17,6 +20,9 @@ function initShopOrderIsRecurring(){
 }
 
 
+/*
+  * toggles fields for recurring consignments
+*/
 function toggleRecurringFields(){
   if ( jQuery("#is_recurring:checked").length ){
     jQuery(".is-recurring").show();
@@ -33,6 +39,10 @@ function initIsCargonized(){
   }
 }
 
+/*
+ * initializes jquery add on table edit 
+ * to add/remove/edit the parcel items
+*/
 function initTableEdit(){
   jQuery('.parcel-items').Tabledit(
   {
@@ -63,6 +73,9 @@ function initTableEdit(){
 }
 
 
+/*
+  * listener for the table buttons
+*/
 function initTableButtons(){
   jQuery('.tabledit-edit-button, .tabledit-delete-button').click(function(){
     jQuery('.tabledit-save-button, .tabledit-confirm-button').click(function(){
@@ -73,6 +86,9 @@ function initTableButtons(){
 }
 
 
+/*
+  * listener for the table to add a new item to a parcel
+*/
 function initTableRepeater(){
   jQuery('.js-add-package-row').click(function(e){
     e.preventDefault();
@@ -111,6 +127,11 @@ function initTableRepeater(){
 }
 
 
+/*
+  * vue application to change 
+  * the default package settings on shop level
+  * in case that an other carrier eller an other product is necessary
+ */
 function shop_updateCarrierProduct(){
   agreement = data;
    new Vue({
@@ -200,6 +221,9 @@ function shop_updateCarrierProduct(){
 }
 
 
+/*
+ * find product by product identifier
+ */
 function getProductByIdentifier( identifier ){
   product = null;
   jQuery.each(data.products , function(index, p){
@@ -212,6 +236,9 @@ function getProductByIdentifier( identifier ){
 }
 
 
+/*
+ * find recurring product by product identifier
+ */
 function getRecurringProductByIdentifier( identifier ){
   product = null;
   jQuery.each(data.recurring_consignment_products , function(index, p){
@@ -224,6 +251,9 @@ function getRecurringProductByIdentifier( identifier ){
 }
 
 
+/*
+ * find carrier by carier id
+ */
 function getCarrierById ( carrier_id ){
   if ( typeof transport_agreements !== 'undefined' && transport_agreements[carrier_id] !== 'undefined' ){
     return transport_agreements[carrier_id];

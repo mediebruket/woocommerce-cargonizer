@@ -1,4 +1,9 @@
 <?php
+/**
+ class AdminConsignment
+ - extends class AdminShopOptions
+ - adds metaboxes to post type shop_order (registered by woocommerce)
+**/
 
 class AdminShopOrder extends AdminShopOptions{
 

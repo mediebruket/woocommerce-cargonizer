@@ -1,4 +1,13 @@
 <?php
+/**
+ * converts an array to valid xml
+ *
+ * example usage:
+ * $CargonizeXml = new CargonizeXml( $Consignment->prepareExport() );
+ * $CargonizerApi = new CargonizerApi();
+ * $CargonizerApi->postConsignment( $CargonizeXml->Xml );
+ *
+ **/
 
   class CargonizeXml{
     public $Xml;

@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * class CargonizerOptions
+ * - contains general settings for woocommerce cargonizer
+ *   which can be changed under admin => woocommerce => cargonizer
+ *
+ * @var string
+ **/
+
+
 class CargonizerOptions{
   protected $CarrierId;
   protected $DefaultPrinter;
