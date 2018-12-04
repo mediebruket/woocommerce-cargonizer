@@ -19,7 +19,7 @@ class CargonizerApi{
    *
    * @consignment_id bool
    **/
-  function __construct($consignment_id int=false){
+  function __construct($consignment_id){
 
     if ( get_option( 'cargonizer-sandbox-modus' ) ){
       // _log('sandbox');
@@ -36,15 +36,15 @@ class CargonizerApi{
       //_log($this);
     }
 
-    if ( $set_transport_agreements ){
-      $this->TransportAgreements = $this->getTransportAgreements();
-    }
+//    if ( $set_transport_agreements ){
+//      $this->TransportAgreements = $this->getTransportAgreements();
+//    }
   }
 
 
   /**
-    * gets all transport agreements by sender id
-  **/
+   * gets all transport agreements by sender id
+   **/
   function getTransportAgreements(){
     // curl -g -XGET -H'X-Cargonizer-Key: b38515a578db604ba77f063801155add075a56e4' -H'X-Cargonizer-Sender: 1142' 'http://sandbox.cargonizer.no/transport_agreements.xml'
     //_log('CargonizerApi::getTransportAgreements');
@@ -54,8 +54,8 @@ class CargonizerApi{
 
 
   /**
-    * gets all printers by sender id
-  **/
+   * gets all printers by sender id
+   **/
   function getPrinters(){
     // curl -g -XGET -H'X-Cargonizer-Key: b38515a578db604ba77f063801155add075a56e4' -H'X-Cargonizer-Sender: 1142' 'http://sandbox.cargonizer.no/transport_agreements.xml'
     //_log('CargonizerApi::getPrinters()');
@@ -64,21 +64,21 @@ class CargonizerApi{
 
 
   /**
-    * gets all service partners by country, postcode and carrier
-    * service partner = delivery location (leveringssted. i.e. Coop Mega, Joker Naustdal )
-    *
-    * @postcode int
-    * @country string
-    * @carrier string
-  **/
+   * gets all service partners by country, postcode and carrier
+   * service partner = delivery location (leveringssted. i.e. Coop Mega, Joker Naustdal )
+   *
+   * @postcode int
+   * @country string
+   * @carrier string
+   **/
   function getServicePartners( $postcode, $country, $carrier ){
     //curl -g -XGET -H'X-Cargonizer-Key: 12345' 'http://cargonizer.no/service_partners.xml?country=NO&postcode=1337&carrier=postnord'
     $args =
-        array(
-          'country' => $country,
-          'postcode' => $postcode,
-          'carrier' => $carrier
-        );
+      array(
+        'country' => $country,
+        'postcode' => $postcode,
+        'carrier' => $carrier
+      );
 
     $resource = 'service_partners.xml?';
     if ( $query_string = $this->buildQueryString($args) ){
